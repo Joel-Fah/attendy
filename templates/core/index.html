@@ -1,0 +1,71 @@
+{% extends 'core/base.html' %}
+{% load static %}
+{% load tailwind_tags %}
+
+{# Title of the page #}
+{% block title %}Home{% endblock %}
+
+{# Body styles #}
+{% block body_styles %}
+{% endblock body_styles %}
+
+{# Header of the page #}
+{% block header %}
+    {% include "components/header.html" %}
+{% endblock header %}
+
+{# Body of the page #}
+{% block body %}
+<main>
+    <div class="relative h-[50vh] lg:h-[65vh] overflow-hidden bg-primaryColor bg-cover bg-no-repeat bg-[url('https://raw.githubusercontent.com/Joel-Fah/images/bdc0aba9f73a548b15c1d581b605c83664b3979b/stars_bg.svg')] flex items-center justify-center text-whiteColor">
+        <div class="flex flex-col items-center justify-center gap-2">
+            <span class="outline outline-1 outline-whiteColor px-4 py-1 rounded-full text-sm opacity-80">no more</span>
+            <h2 class="text-4xl text-center font-medium mb-20">
+                Délégué pleazzzzeeee,<br>
+                <span id="typewriter" class=""></span>
+            </h2>
+        </div>
+        <img src="{% static 'core/images/logo-shapes.svg' %}" alt="" class="absolute -bottom-20 lg:-bottom-1/4 w-1/2">
+    </div>
+    <div class="h-screen">
+        my current location
+    </div>
+</main>
+{% endblock body %}
+
+{# Additional javascript #}
+{% block javascript %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const texts = ["I want to write my name", "Where is the list?", "I need the class list for X course", "No it's ok ... jk!"];
+        let index = 0;
+        let charIndex = 0;
+        const typewriterElement = document.getElementById('typewriter');
+        const typingSpeed = 100; // Adjust typing speed here
+        const delayBetweenTexts = 2500; // Delay between texts
+    
+        function type() {
+            if (charIndex < texts[index].length) {
+                typewriterElement.textContent += texts[index].charAt(charIndex);
+                charIndex++;
+                setTimeout(type, typingSpeed);
+            } else {
+                setTimeout(erase, delayBetweenTexts);
+            }
+        }
+    
+        function erase() {
+            if (charIndex > 0) {
+                typewriterElement.textContent = texts[index].substring(0, charIndex - 1);
+                charIndex--;
+                setTimeout(erase, typingSpeed);
+            } else {
+                index = (index + 1) % texts.length;
+                setTimeout(type, typingSpeed);
+            }
+        }
+    
+        type();
+    });
+</script>
+{% endblock javascript %}

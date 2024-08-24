@@ -1,0 +1,131 @@
+{% extends 'core/base.html' %}
+{% load static %}
+{% load tailwind_tags %}
+
+{# Title of the page #}
+{% block title %}Home{% endblock %}
+
+{# Body styles #}
+{% block body_styles %}
+{% endblock body_styles %}
+
+{# Body of the page #}
+{% block body %}
+<main>
+    <div
+        class="absolute inset-0 h-dvh w-full bg-whiteColor bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px]">
+        <div class="flex flex-col items-center justify-center gap-4 h-screen text-center px-4 lg:p-0">
+            <div class="flex gap-2 outline outline-1 outline-darkColor/70 text-darkColor/70 px-4 py-0.5 rounded-full backdrop-blur-md">
+                <img src="{% static 'core/images/peace.png' %}" alt="peace" class="w-6 h-6 object-contain">
+                <small class="">
+                    Welcome to Attendy
+                </small>
+            </div>
+            <h1 class="text-3xl lg:text-7xl font-bold font-sans">
+                You better be there early,<br>
+                délégué's no joke
+            </h1>
+            <p class="mt-4">
+                Let's make course attendance and taking course summaries a ... better thing<br>
+                well... kind of.
+            </p>
+
+            <form method="post" action="{% url 'account_login' %}"
+                class="flex flex-col justify-center gap-2 w-1/2 lg:w-full px-4 lg:p-0 lg:w-1/3 rounded-3xl text-left">
+                {% csrf_token %}
+                <!-- Display non fields errors -->
+                {% if form.non_field_errors %}
+                <small class="text-sm text-danger bg-danger/10 rounded-xl px-2 py-1">
+                    {% for error in form.non_field_errors %}
+                    {{ error }}
+                    {% endfor %}
+                </small>
+                {% endif %}
+                
+                <div class="flex flex-col gap-2">
+                    {# Email field #}
+                    <div class="">
+                        <div class="relative">
+                            <div class="absolute inset-y-0 start-0 flex items-center ps-2.5 pointer-events-none">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none">
+                                    <path d="M6.5 9H8.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                                    <path d="M17.5 8V4C17.5 2.89543 18.3954 2 19.5 2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                                    <path d="M12.5 18L12.5 22" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+                                    <path d="M17.5 5.15889C16.5351 5 15.2591 5 13.375 5H10.625C7.70671 5 6.24757 5 5.14302 5.59039C4.27088 6.05656 3.55656 6.77088 3.09039 7.64302C2.5 8.74757 2.5 10.2067 2.5 13.125C2.5 14.876 2.5 15.7515 2.85424 16.4142C3.13394 16.9375 3.56253 17.3661 4.08581 17.6458C4.74854 18 5.62403 18 7.375 18H16.625C18.376 18 19.2515 18 19.9142 17.6458C20.4375 17.3661 20.8661 16.9375 21.1458 16.4142C21.5 15.7515 21.5 14.876 21.5 13.125C21.5 10.2067 21.5 8.74757 20.9096 7.64302C20.7356 7.31755 20.5271 7.01406 20.2887 6.73725" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+                                    <path d="M12.5006 18V11C12.5006 10.071 12.5006 9.60649 12.439 9.21782C12.1002 7.07836 10.4222 5.40041 8.28276 5.06155C8.2009 5.04859 8.11566 5.03835 8.02344 5.03027" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+                                </svg>
+                            </div>
+                            {{ form.login }}
+                        </div>
+                        {% if form.login.errors %}
+                        <small class="text-sm text-danger">
+                            {% for error in form.login.errors %}
+                            {{ error }}
+                            {% endfor %}
+                        </small>
+                        {% endif %}
+                    </div>
+                    {# Password field #}
+                    <div class="">
+                        <div class="relative">
+                            <div class="absolute inset-y-0 start-0 flex items-center ps-2.5 pointer-events-none">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none">
+                                    <path d="M18 10.9971C17.6078 10.1968 16.5481 9.02153 14.3703 9.07154C14.3703 9.07154 12.6431 8.99652 10.6906 8.99652C8.73815 8.99652 7.82408 9.04224 6.25999 9.07154C5.25872 9.04653 3.35629 9.2716 2.48018 11.3472C1.90445 13.0976 1.87941 16.7736 2.22986 18.6241C2.30496 19.5744 2.80559 20.8998 4.35757 21.6C5.30878 22.1001 6.83573 21.9 7.9872 22.0001M5.98465 8.1963C5.93458 5.82065 5.83445 3.94514 8.58796 2.39472C9.51414 2.01962 10.8909 1.69453 12.5931 2.49475C14.3703 3.57004 14.5917 4.70802 14.7458 4.99543C15.1713 6.12074 14.9461 7.72117 14.9961 8.37135" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+                                    <path d="M15.5 19.7351C15.5 20.9792 14.4911 21.9656 13.2552 21.9656C12.0194 21.9656 11 20.9792 11 19.7351C11 18.4911 12.0194 17.4915 13.2552 17.4915C14.4911 17.4915 15.5 18.4911 15.5 19.7351Z" stroke="currentColor" stroke-width="1.5" />
+                                    <path d="M15.2251 17.7909L17.2156 15.8482M22.0001 15.8482L20.3731 14.3089C19.6001 13.5692 18.9501 14.2149 18.6264 14.4906L17.2156 15.8482M17.2156 15.8482L18.8251 17.3936" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+                                </svg>
+                            </div>
+                            {{ form.password }}
+                            <div class="absolute inset-y-0 end-0 flex items-center pe-2.5 cursor-pointer"
+                                id="toggle-password-visibility">
+                                <svg id="eye-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24"
+                                    height="24" fill="none" class="text-black">
+                                    <path
+                                        d="M21.544 11.045C21.848 11.4713 22 11.6845 22 12C22 12.3155 21.848 12.5287 21.544 12.955C20.1779 14.8706 16.6892 19 12 19C7.31078 19 3.8221 14.8706 2.45604 12.955C2.15201 12.5287 2 12.3155 2 12C2 11.6845 2.15201 11.4713 2.45604 11.045C3.8221 9.12944 7.31078 5 12 5C16.6892 5 20.1779 9.12944 21.544 11.045Z"
+                                        stroke="currentColor" stroke-width="1.5" />
+                                    <path
+                                        d="M15 12C15 10.3431 13.6569 9 12 9C10.3431 9 9 10.3431 9 12C9 13.6569 10.3431 15 12 15C13.6569 15 15 13.6569 15 12Z"
+                                        stroke="currentColor" stroke-width="1.5" />
+                                </svg>
+                            </div>
+                        </div>
+                        {% if form.password.errors %}
+                        <small class="text-sm text-danger">
+                            {% for error in form.password.errors %}
+                            {{ error }}
+                            {% endfor %}
+                        </small>
+                        {% endif %}
+                    </div>
+                    {# Submit button #}
+                    <div class="text-whiteColor">
+                        <button type="submit"
+                            class="block mb-2 focus:outline-none rounded-2xl w-full px-5 py-2 text-center bg-primaryColor hover:bg-blue-950 focus:ring-2 focus:ring-secondaryColor focus:ring-offset-1 transition-all duration-300 ease-in-out">
+                            Let's go on another journey
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</main>
+{% endblock %}
+
+
+{% block javascript %}
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const passwordInput = document.querySelector('#password');
+        const togglePasswordVisibility = document.querySelector('#toggle-password-visibility');
+        const eyeIcon = document.querySelector('#eye-icon');
+
+        togglePasswordVisibility.addEventListener('click', function () {
+            const isPassword = passwordInput.getAttribute('type') === 'password';
+            passwordInput.setAttribute('type', isPassword ? 'text' : 'password');
+            eyeIcon.innerHTML = isPassword
+                ? '<path d="M21.544 11.045C21.848 11.4713 22 11.6845 22 12C22 12.3155 21.848 12.5287 21.544 12.955C20.1779 14.8706 16.6892 19 12 19C7.31078 19 3.8221 14.8706 2.45604 12.955C2.15201 12.5287 2 12.3155 2 12C2 11.6845 2.15201 11.4713 2.45604 11.045C3.8221 9.12944 7.31078 5 12 5C16.6892 5 20.1779 9.12944 21.544 11.045Z" stroke="currentColor" stroke-width="1.5" /> <path d="M15 12C15 10.3431 13.6569 9 12 9C10.3431 9 9 10.3431 9 12C9 13.6569 10.3431 15 12 15C13.6569 15 15 13.6569 15 12Z" stroke="currentColor" stroke-width="1.5" />'
+                : '<path d="M19.439 15.439C20.3636 14.5212 21.0775 13.6091 21.544 12.955C21.848 12.5287 22 12.3155 22 12C22 11.6845 21.848 11.4713 21.544 11.045C20.1779 9.12944 16.6892 5 12 5C11.0922 5 10.2294 5.15476 9.41827 5.41827M6.74742 6.74742C4.73118 8.1072 3.24215 9.94266 2.45604 11.045C2.15201 11.4713 2 11.6845 2 12C2 12.3155 2.15201 12.5287 2.45604 12.955C3.8221 14.8706 7.31078 19 12 19C13.9908 19 15.7651 18.2557 17.2526 17.2526" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" /><path d="M9.85786 10C9.32783 10.53 9 11.2623 9 12.0711C9 13.6887 10.3113 15 11.9289 15C12.7377 15 13.47 14.6722 14 14.1421" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" /><path d="M3 3L21 21" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />';
+        });
+    });
+</script>
+{% endblock javascript %}

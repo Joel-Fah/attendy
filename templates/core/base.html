@@ -1,0 +1,56 @@
+{% load static tailwind_tags %}
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth bg-whiteColor">
+
+<head>
+    <!-- og meta tags -->
+    {% block meta_tags %}
+
+    {% endblock meta_tags %}
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>
+        Attendy - {% block title %}{% endblock title %}
+    </title>
+
+    {# Favicon #}
+    <link rel="shortcut icon" href="{% static 'core/images/attendy.svg' %}" type="image/x-icon">
+
+    {# Font ~ Patrick Hand & Urbanist @Google Fonts#}
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Patrick+Hand&family=Urbanist:ital,wght@0,100..900;1,100..900&display=swap"
+        rel="stylesheet">
+
+    {# Icons ~ HugeIcons, Free Stroke rounded icons. #}
+    <!-- SVG codes of icons are directly obtained (copied) from https://hugeicons.com/icons -->
+
+    {# CSS: Tailwind, Custom #}
+    {% tailwind_css %}
+    <link rel="stylesheet" href="{% static 'core/css/styles.css' %}">
+
+</head>
+
+<body class="font-sans text-lg text-darkColor bg-whiteColor {% block body_styles %}{% endblock body_styles %}">
+    
+    {% block header %}
+      
+    {% endblock header %}
+
+    {% block body %}
+
+    {% endblock %}
+
+    {# JS and Additional javascript #}
+    {% block javascript %}
+
+    {% endblock javascript %}
+
+</body>
+
+</html>
