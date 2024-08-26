@@ -3,6 +3,7 @@ from django_summernote.admin import SummernoteModelAdmin
 from django import forms
 from .models import Student, StudentDelegate, Lecturer, TeachingRecord, Course, Enrollment
 
+
 # Register your models here.
 
 
@@ -15,17 +16,19 @@ class StudentAdmin(admin.ModelAdmin):
 
     readonly_fields = ['updated_at', 'created_at']
 
+
 class StudentDelegateForm(forms.ModelForm):
     student = forms.ModelChoiceField(
         queryset=Student.objects.filter(is_delegate=True),
-        required=False,
+        required=True,
         label="Student Delegate"
     )
 
     class Meta:
         model = Course
         fields = '__all__'
-        
+
+
 class StudentDelegateAdmin(admin.ModelAdmin):
     model = StudentDelegate
     form = StudentDelegateForm
@@ -36,7 +39,7 @@ class StudentDelegateAdmin(admin.ModelAdmin):
 
     def student_name(self, obj):
         return obj.student.name
-    
+
     def course_title(self, obj):
         return obj.course.title
 
@@ -51,7 +54,7 @@ class LecturerAdmin(admin.ModelAdmin):
     list_filter = ['is_present']
     search_fields = ['name', 'arrival', 'departure']
     list_per_page = 25
-    
+
     readonly_fields = ['updated_at', 'created_at']
 
 
@@ -62,7 +65,7 @@ class TeachingRecordAdmin(SummernoteModelAdmin):
     search_fields = ['course__title', 'lecturer__name']
 
     summernote_fields = ['description']
-    
+
     readonly_fields = ['updated_at', 'created_at']
 
     # get course title
@@ -80,8 +83,8 @@ class CourseAdmin(admin.ModelAdmin):
     list_filter = ['semester']
     search_fields = ['title', 'code']
     list_per_page = 25
-    
-    readonly_fields = ['duration', 'updated_at', 'created_at']
+
+    readonly_fields = ['slug', 'duration', 'updated_at', 'created_at']
 
     def semester_year(self, obj):
         return f'{obj.semester} {obj.year}'
@@ -96,9 +99,10 @@ class EnrollmentAdmin(admin.ModelAdmin):
 
     def student_name(self, obj):
         return obj.student.name
-    
+
     def course_title(self, obj):
         return obj.course.title
+
 
 # Register on dashboard admin
 admin.site.register(Student, StudentAdmin)

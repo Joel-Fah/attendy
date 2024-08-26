@@ -174,7 +174,7 @@ SUMMERNOTE_CONFIG = {
 
 # Authentication
 LOGIN_URL = 'account_login'
-LOGIN_REDIRECT_URL = 'core:home'
+LOGIN_REDIRECT_URL = 'core:dashboard'
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',

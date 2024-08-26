@@ -1,0 +1,26 @@
+{% extends 'core/base_app.html' %}
+{% load static %}
+{% load tailwind_tags %}
+
+{# Title of the page #}
+{% block title %}Home{% endblock %}
+
+{# Body styles #}
+{% block body_styles %}
+{% endblock body_styles %}
+
+{# Header of the page #}
+{% block header %}
+    {% include "components/header_app.html" %}
+{% endblock header %}
+
+{# Body of the page #}
+{% block body %}
+<main>
+  <div class="p-4 sm:ml-64">
+    <div class="rounded-lg mt-14">
+       <h2 class="text-xl">This is not the dahsboard you think...</h2>
+    </div>
+ </div>
+</main>
+{% endblock body %}

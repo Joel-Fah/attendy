@@ -1,0 +1,163 @@
+{% extends 'core/base_app.html' %}
+{% load static %}
+{% load tailwind_tags %}
+{% load custom_date_formatter %}
+
+{# Title of the page #}
+{% block title %} {{ record.course.title }} {% endblock %}
+
+{% block extra_styles %}
+<style>
+    .record-content ul {
+        list-style-type: disc;
+        padding-left: 1.5rem;
+    }
+
+    .record-content ol {
+        list-style-type: decimal;
+        padding-left: 1.5rem;
+    }
+
+    .record-content h1,
+    .record-content h2,
+    .record-content h3,
+    .record-content h4,
+    .record-content h5,
+    .record-content h6 {
+        font-size: 1.5rem;
+        font-weight: bold;
+        margin-top: 1.5rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .record-content a {
+        text-decoration: underline;
+        color: #4285F4;
+    }
+</style>
+{% endblock extra_styles %}
+
+{# Body styles #}
+{% block body_styles %}
+{% endblock body_styles %}
+
+{# Header of the page #}
+{% block header %}
+{% include "components/header_app.html" %}
+{% endblock header %}
+
+{# Body of the page #}
+{% block body %}
+<div class="relative p-4 md:ml-64">
+    <div class="flex flex-col gap-4 items-start justify-center w-full mt-14">
+        <div class="flex flex-col gap-1">
+            <small>
+                <a href="{% url 'core:records' %}" class="text-secondaryColor">Teaching records</a> /
+            </small>
+            <h2 class="text-3xl">
+                {{ record.course.code }} {{ record.course.title }}
+            </h2>
+            <small class="flex items-center gap-4">
+                <span class="text-darkColor flex gap-1 px-2.5 rounded-xl bg-darkColor/5">
+                    <span class="text-darkColor/50">Quality assurance: </span>
+                    {% if record.quality_assurance == 'Approved' %}
+                    <span class="text-success">{{ record.quality_assurance }}</span>
+                    {% else %}
+                    <span class="text-danger">{{ record.quality_assurance }}</span>
+                    {% endif %}
+                </span>
+
+                <span class="text-darkColor flex gap-1 px-2.5 rounded-xl bg-darkColor/5">
+                    <span class="text-darkColor/50">Last update: </span>
+                    {{ record.updated_at|format_date }}
+                </span>
+            </small>
+        </div>
+
+        <div class="grid grid-cols-12 gap-2">
+            <div class="col-span-full lg:col-span-8">
+                <h3 class="block text-xl text-secondaryColor font-medium">Lessons and Brief Content/Assignments</h3>
+                <div class="record-content">
+                    {{ record.description|safe }}
+                </div>
+            </div>
+
+            <div class="col-span-full lg:col-span-3 lg:col-start-10">
+                <div class="flex flex-col gap-2 w-full">
+
+                    <div class="flex flex-col items-start py-2 px-4 rounded-2xl bg-secondaryColor/10">
+                        <small class="text-darkColor/50 text-sm">Lecturer:</small>
+                        <span class="text-darkColor"> {{ record.lecturer.name }} </span>
+                    </div>
+
+                    <div class="flex flex-col items-start py-2 px-4 rounded-2xl bg-secondaryColor/10">
+                        <small class="text-darkColor/50 text-sm">Course delegate:</small>
+                        <span class="text-darkColor"> {{ course_delegate.student.name }} </span>
+                    </div>
+
+                    <div class="flex flex-col items-start gap-0.5 py-2 px-4 rounded-2xl bg-secondaryColor/10">
+                        <small class="text-darkColor/50 text-sm">Start - Finish time:</small>
+                        <span class="text-darkColor"> {{ record.course.start_time }} ~ {{ record.course.end_time }}
+                        </span>
+                    </div>
+
+                    <div class="flex flex-col items-start gap-0.5 py-2 px-4 rounded-2xl bg-secondaryColor/10">
+                        <small class="text-darkColor/50 text-sm">Duration:</small>
+                        <span class="text-darkColor"> {{ record.course.duration }} </span>
+                    </div>
+
+                    <div class="flex flex-col items-start gap-0.5 py-2 px-4 rounded-2xl bg-secondaryColor/10">
+                        <small class="text-darkColor/50 text-sm">Semester:</small>
+                        <span class="text-darkColor"> {{ record.course.semester }} {{ record.course.year }} </span>
+                    </div>
+
+                    <div class="flex flex-col items-start gap-0.5 py-2 px-4 rounded-2xl bg-secondaryColor/10">
+                        <small class="text-darkColor/50 text-sm">Number of students:</small>
+                        <span class="text-darkColor">
+                            {% if enrollments > 0 %}
+                            {{ enrollments }}
+                            {% else %}
+                            No students enrolled.
+                            {% endif %}
+                        </span>
+                    </div>
+
+                    <div class="flex flex-col items-start gap-0.5 py-2 px-4 rounded-2xl bg-secondaryColor/10">
+                        <small class="text-darkColor/50 text-sm">Date:</small>
+                        <span class="text-darkColor"> {{ record.created_at|format_date }} </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="flex gap-2">
+            <a href="" class="flex items-center gap-2 py-2 px-4 rounded-xl text-whiteColor bg-primaryColor hover:bg-blue-950 transition-all duration-300 ease-linear">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none">
+                    <path d="M20 13V10.6569C20 9.83935 20 9.4306 19.8478 9.06306C19.6955 8.69552 19.4065 8.40649 18.8284 7.82843L14.0919 3.09188C13.593 2.593 13.3436 2.34355 13.0345 2.19575C12.9702 2.165 12.9044 2.13772 12.8372 2.11401C12.5141 2 12.1614 2 11.4558 2C8.21082 2 6.58831 2 5.48933 2.88607C5.26731 3.06508 5.06508 3.26731 4.88607 3.48933C4 4.58831 4 6.21082 4 9.45584V13M13 2.5V3C13 5.82843 13 7.24264 13.8787 8.12132C14.7574 9 16.1716 9 19 9H19.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                    <path d="M19.75 16H17.25C16.6977 16 16.25 16.4477 16.25 17V19M16.25 19V22M16.25 19H19.25M4.25 22V19.5M4.25 19.5V16H6C6.9665 16 7.75 16.7835 7.75 17.75C7.75 18.7165 6.9665 19.5 6 19.5H4.25ZM10.25 16H11.75C12.8546 16 13.75 16.8954 13.75 18V20C13.75 21.1046 12.8546 22 11.75 22H10.25V16Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
+                Print record
+            </a>
+
+            <a href="" class="flex items-center gap-2 py-2 px-4 rounded-xl text-whiteColor bg-primaryColor hover:bg-blue-950 transition-all duration-300 ease-linear">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none">
+                    <path d="M10.2892 21.9614H9.39111C6.14261 21.9614 4.51836 21.9614 3.50918 20.9363C2.5 19.9111 2.5 18.2612 2.5 14.9614V9.96139C2.5 6.66156 2.5 5.01165 3.50918 3.98653C4.51836 2.9614 6.14261 2.9614 9.39111 2.9614H12.3444C15.5929 2.9614 17.4907 3.01658 18.5 4.04171C19.5092 5.06683 19.5 6.66156 19.5 9.96139V11.1478" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                    <path d="M15.9453 2V4M10.9453 2V4M5.94531 2V4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                    <path d="M7 15H11M7 10H15" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+                    <path opacity="0.93" d="M20.7598 14.8785C19.8544 13.8641 19.3112 13.9245 18.7076 14.1056C18.2851 14.166 16.8365 15.8568 16.2329 16.3952C15.2419 17.3743 14.2464 18.3823 14.1807 18.5138C13.9931 18.8188 13.8186 19.3592 13.7341 19.963C13.5771 20.8688 13.3507 21.8885 13.6375 21.9759C13.9242 22.0632 14.7239 21.8954 15.6293 21.7625C16.2329 21.6538 16.6554 21.533 16.9572 21.3519C17.3797 21.0983 18.1644 20.2046 19.5164 18.8761C20.3644 17.9833 21.1823 17.3664 21.4238 16.7626C21.6652 15.8568 21.3031 15.3737 20.7598 14.8785Z" stroke="currentColor" stroke-width="1.5" />
+                </svg>
+                Edit record
+            </a>
+
+            <a href="" title="Delete record" class="flex items-center gap-2 py-2 px-2.5 rounded-xl text-whiteColor bg-danger hover:bg-red-600 transition-all duration-300 ease-linear">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none">
+                    <path d="M19.5 5.5L18.8803 15.5251C18.7219 18.0864 18.6428 19.3671 18.0008 20.2879C17.6833 20.7431 17.2747 21.1273 16.8007 21.416C15.8421 22 14.559 22 11.9927 22C9.42312 22 8.1383 22 7.17905 21.4149C6.7048 21.1257 6.296 20.7408 5.97868 20.2848C5.33688 19.3626 5.25945 18.0801 5.10461 15.5152L4.5 5.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+                    <path d="M9 11.7349H15" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+                    <path d="M10.5 15.6543H13.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+                    <path d="M3 5.5H21M16.0555 5.5L15.3729 4.09173C14.9194 3.15626 14.6926 2.68852 14.3015 2.39681C14.2148 2.3321 14.1229 2.27454 14.0268 2.2247C13.5937 2 13.0739 2 12.0343 2C10.9686 2 10.4358 2 9.99549 2.23412C9.89791 2.28601 9.80479 2.3459 9.7171 2.41317C9.32145 2.7167 9.10044 3.20155 8.65842 4.17126L8.05273 5.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+                </svg>
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock body %}

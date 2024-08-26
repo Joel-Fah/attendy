@@ -1,6 +1,8 @@
 from django.db import models
 from datetime import datetime, timedelta
 
+from slugify import slugify
+
 
 # Create your models here.
 
@@ -93,8 +95,8 @@ class TeachingRecord(models.Model):
         verbose_name_plural = "Teaching Records"
 
     class QualityChoices(models.TextChoices):
-        APPROVED = 'APPROVED', 'Approved'
-        REJECTED = 'REJECTED', 'Rejected'
+        APPROVED = 'Approved', 'Approved'
+        REJECTED = 'Rejected', 'Rejected'
 
     course = models.ForeignKey(
         'Course', on_delete=models.CASCADE, related_name='courses', null=False, blank=False, help_text="Course taught")
@@ -104,7 +106,7 @@ class TeachingRecord(models.Model):
     description = models.TextField(
         null=False, blank=False, help_text="What was taught in the course")
     quality_assurance = models.CharField(
-        max_length=255, choices=QualityChoices.choices, null=True, blank=True,
+        max_length=255, choices=QualityChoices.choices, null=True, blank=True, default=QualityChoices.APPROVED,
         help_text="Quality assurance of the course")
 
     created_at = models.DateTimeField(auto_now_add=True, help_text="Date and time this teaching record was added")
@@ -124,10 +126,11 @@ class Course(models.Model):
         SPRING = 'SPRING', 'SPRING'
         SUMMER = 'SUMMER', 'SUMMER'
 
-    title = models.CharField(max_length=255, null=False,
-                             blank=False, help_text="Name of the course")
     code = models.CharField(max_length=255, null=False,
                             blank=False, unique=True, help_text="Course code")
+    title = models.CharField(max_length=255, null=False,
+                             blank=False, help_text="Name of the course")
+    slug = models.SlugField(max_length=255, editable=False, null=False, blank=False, help_text="Slug of the course")
     start_time = models.TimeField(
         null=False, blank=False, help_text="Start time of the course")
     end_time = models.TimeField(
@@ -158,10 +161,11 @@ class Course(models.Model):
             if self.duration < timedelta(0):
                 self.duration += timedelta(days=1)
 
+        self.slug = slugify(self.title)
         super().save(*args, **kwargs)
 
     def __str__(self):
-        return f'{self.code}-{self.title}'
+        return f'{self.code} {self.title}'
 
 
 class Enrollment(models.Model):
