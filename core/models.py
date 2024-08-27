@@ -22,6 +22,7 @@ class Student(models.Model):
 
     name = models.CharField(max_length=255, null=False,
                             blank=False, help_text="Name of the student")
+    slug = models.SlugField(max_length=255, editable=False, null=False, blank=False, help_text="Slug of the student")
     matricule = models.CharField(max_length=255, null=False, blank=False,
                                  unique=True, default='ICTUXXXXxxxx', help_text="Student matricule")
     email = models.EmailField(
@@ -39,6 +40,10 @@ class Student(models.Model):
 
     created_at = models.DateTimeField(auto_now_add=True, help_text="Date and time this student was added")
     updated_at = models.DateTimeField(auto_now=True, help_text="Date and time this student was last updated")
+
+    def save(self, *args, **kwargs):
+        self.slug = slugify(self.name)
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return self.name
@@ -75,6 +80,7 @@ class Lecturer(models.Model):
 
     name = models.CharField(max_length=255, null=False,
                             blank=False, help_text="Name of the lecturer")
+    slug = models.SlugField(max_length=255, editable=False, null=False, blank=False, help_text="Slug of the lecturer")
     is_present = models.BooleanField(
         default=True, help_text="Is the lecturer present?")
     arrival = models.TimeField(
@@ -84,6 +90,10 @@ class Lecturer(models.Model):
 
     created_at = models.DateTimeField(auto_now_add=True, help_text="Date and time this lecturer was added")
     updated_at = models.DateTimeField(auto_now=True, help_text="Date and time this lecturer was last updated")
+
+    def save(self, *args, **kwargs):
+        self.slug = slugify(self.name)
+        super().save()
 
     def __str__(self):
         return self.name
