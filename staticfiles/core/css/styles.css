@@ -1,0 +1,20 @@
+#typewriter {
+    display: inline-block;
+    overflow: hidden;
+    white-space: nowrap;
+    border-right: 0.08em solid #FFF5EA;
+    /* Cursor effect */
+    animation: blink-caret 0.75s step-end infinite;
+}
+
+@keyframes blink-caret {
+
+    from,
+    to {
+        border-color: transparent;
+    }
+
+    50% {
+        border-color: #FFF5EA;
+    }
+}

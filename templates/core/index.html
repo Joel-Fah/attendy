@@ -27,7 +27,7 @@
             </h2>
         </div>
         <img src="{% static 'core/images/logo-shapes.svg' %}" alt=""
-            class="absolute -bottom-20 w-full lg:scale-125 lg:w-1/2">
+            class="absolute -bottom-20 md:-bottom-32 lg:-bottom-20 w-full md:scale-75 lg:scale-125 lg:w-1/2">
     </div>
 
     <section id="courses" class="max-w-screen-lg m-auto my-5 px-4 py-6">
@@ -40,9 +40,9 @@
             <img src="{% static 'core/images/attendy-dashboard.png' %}" alt="Attendy Dashboard"
                 class="border-2 border-primaryColor rounded-xl shadow-xl">
 
-            <div class="features grid grid-cols-12 gap-4 items-center justify-center w-full">
+            <div class="features grid grid-cols-12 gap-2 md:gap-4 items-center justify-center w-full">
                 <div
-                    class="feature__item col-span-6 flex flex-col gap-6 border border-secondaryColor py-2.5 px-4 rounded-2xl text-whiteColor bg-secondaryColor">
+                    class="feature__item h-full col-span-12 md:col-span-6 flex flex-col gap-6 border border-secondaryColor py-2.5 px-4 rounded-2xl text-whiteColor bg-secondaryColor">
                     <div class="">
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none">
                             <path
@@ -69,7 +69,7 @@
                 </div>
 
                 <div
-                    class="feature__item col-span-6 flex flex-col gap-6 border border-secondaryColor py-2.5 px-4 rounded-2xl">
+                    class="feature__item h-full col-span-12 md:col-span-6 flex flex-col gap-6 border border-secondaryColor py-2.5 px-4 rounded-2xl">
                     <div class="">
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none"
                             class="">
@@ -99,7 +99,7 @@
                 </div>
 
                 <div
-                    class="feature__item col-span-4 flex flex-col gap-6 border border-secondaryColor py-2.5 px-4 rounded-2xl">
+                    class="feature__item h-full col-span-12 md:col-span-6 lg:col-span-4 flex flex-col gap-6 border border-secondaryColor py-2.5 px-4 rounded-2xl">
                     <div class="">
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none"
                             class="">
@@ -128,7 +128,7 @@
                 </div>
 
                 <div
-                    class="feature__item col-span-4 flex flex-col gap-6 border border-secondaryColor py-2.5 px-4 rounded-2xl">
+                    class="feature__item h-full col-span-12 md:col-span-6 lg:col-span-4 flex flex-col gap-6 border border-secondaryColor py-2.5 px-4 rounded-2xl">
                     <div class="">
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none">
                             <path d="M13 15C10.7083 21 4.29167 15 2 21" stroke="currentColor" stroke-width="1.5"
@@ -153,7 +153,7 @@
                 </div>
 
                 <div
-                    class="feature__item col-span-4 flex flex-col gap-6 border border-secondaryColor py-2.5 px-4 rounded-2xl">
+                    class="feature__item h-full col-span-12 md:col-span-6 lg:col-span-4 flex flex-col gap-6 border border-secondaryColor py-2.5 px-4 rounded-2xl">
                     <div class="">
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none"
                             class="">
@@ -186,10 +186,10 @@
     </div>
 
     <section id="scan" class="max-w-screen-lg m-auto my-5 px-4 py-6">
-        <div class="flex justify-between">
-            <img src="{% static 'core/images/scan.png' %}" alt="">
+        <div class="flex flex-col-reverse md:flex-row justify-center md:justify-between gap-2 md:gap-4">
+            <img src="{% static 'core/images/scan.png' %}" alt="" class="w-full md:w-1/2">
 
-            <div class="flex flex-col items-start gap-4 space-y-2 w-full">
+            <div class="flex flex-col items-center md:items-start text-center md:text-left gap-4 space-y-2 w-full">
 
                 <div class="h-3"></div>
                 <small class="text-sm py-0.5 px-2.5 border border-1 border-darkColor rounded-full">
