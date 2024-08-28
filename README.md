@@ -23,7 +23,7 @@ Attendy is built with the goal of providing a user-friendly platform for educati
 - **Student Management**: Maintain detailed records of student attendance.
 - **Lecturers Management**: Empower lecturers to manage class attendance easily.
 - **Teaching Records Management**: Log and track teaching sessions and attendance data.
-- 
+  
 ![Admin/Delegate Dashboard screen](./static/core/images/attendy-dashboard.png)
 
 ## **Project Setup**

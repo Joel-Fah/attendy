@@ -44,7 +44,7 @@
         </div>
 
         <div class="w-full grid grid-cols-12 gap-2">
-            <div class="col-span-7 flex flex-col gap-2">
+            <div class="col-span-9 flex flex-col gap-2">
                 <div class="relative right-0">
                     <ul class="relative flex flex-wrap p-1 list-none rounded-xl bg-blue-gray-50/60" data-tabs="tabs"
                         role="list">
@@ -61,13 +61,14 @@
                                 data-tab-target="" role="tab" aria-selected="false" aria-controls="message">
                                 <span class="ml-1 flex items-center gap-2">
                                     Enrolled students
-                                    <span class="text-sm bg-darkColor/10 px-2.5 py-0.5 rounded-xl"> {{ enrolled_students.count }}
+                                    <span class="text-sm bg-darkColor/10 px-2.5 py-0.5 rounded-md"> {{
+                                        enrolled_students.count }}
                                     </span>
                                 </span>
                             </a>
                         </li>
                     </ul>
-    
+
                     <div data-tab-content="" class="p-2">
                         <div class="block opacity-100" id="app" role="tabpanel">
                             <ul class="space-y-4">
@@ -114,45 +115,82 @@
                                 </li>
                             </ul>
                         </div>
-    
+
                         <div class="hidden opacity-0" id="message" role="tabpanel">
-                            <ul class="space-y-2">
-                                {% for enrollment in enrolled_students %}
-                                <li>
-                                    <div
-                                        class="flex items-center justify-between px-4 py-2 transition-all duration-300 ease-linear hover:bg-secondaryColor/5">
-                                        <div class="flex items-center gap-4">
-                                            <span> {{ forloop.counter }}. </span>
-                                            <div class="flex flex-col gap-0.5">
-                                                {{ enrollment.student.name }}
-                                                <small class="text-sm text-darkColor/50">
-                                                    {{ enrollment.student.email }} | {{ enrollment.student.department }} | {{ enrollment.student.phone }}
-                                                </small>
-                                            </div>
-                                        </div>
-                                        {% if enrollment.student.is_delegate %}
-                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24"
-                                            fill="none" class="text-secondaryColor">
-                                            <path
-                                                d="M13.7276 3.44418L15.4874 6.99288C15.7274 7.48687 16.3673 7.9607 16.9073 8.05143L20.0969 8.58575C22.1367 8.92853 22.6167 10.4206 21.1468 11.8925L18.6671 14.3927C18.2471 14.8161 18.0172 15.6327 18.1471 16.2175L18.8571 19.3125C19.417 21.7623 18.1271 22.71 15.9774 21.4296L12.9877 19.6452C12.4478 19.3226 11.5579 19.3226 11.0079 19.6452L8.01827 21.4296C5.8785 22.71 4.57865 21.7522 5.13859 19.3125L5.84851 16.2175C5.97849 15.6327 5.74852 14.8161 5.32856 14.3927L2.84884 11.8925C1.389 10.4206 1.85895 8.92853 3.89872 8.58575L7.08837 8.05143C7.61831 7.9607 8.25824 7.48687 8.49821 6.99288L10.258 3.44418C11.2179 1.51861 12.7777 1.51861 13.7276 3.44418Z"
-                                                stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
-                                                stroke-linejoin="round" />
-                                        </svg>
-                                        {% endif %}
-                                    </div>
-                                </li>
-                                {% empty %}
-                                <p class="px-4 py-2 text-disabledColor">No students enrolled in this course.</p>
-                                {% endfor %}
-                            </ul>
+                            {% if enrolled_students.count > 0 %}
+                            <div class="relative overflow-x-auto">
+                                <table class="w-full text-sm text-left">
+                                    <thead class="text-primaryColor uppercase">
+                                        <tr class="border-b border-darkColor/10">
+                                            <th scope="col" class="p-4">
+                                                S/N
+                                            </th>
+                                            <th scope="col" class="px-6 py-3">
+                                                Names
+                                            </th>
+                                            <th scope="col" class="px-6 py-3">
+                                                Email
+                                            </th>
+                                            <th scope="col" class="px-6 py-3">
+                                                Dep't
+                                            </th>
+                                            <th scope="col" class="px-6 py-3">
+                                                Phone No
+                                            </th>
+                                            <th scope="col" class="px-6 py-3">
+                                                Observation
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for enrollment in enrolled_students %}
+                                        <tr class="border-b border-darkColor/10 hover:bg-secondaryColor/5">
+                                            <td class="w-4 p-4">
+                                                {{ forloop.counter }}
+                                            </td>
+                                            <th scope="row"
+                                                class="flex items-center gap-1 px-6 py-4 font-medium whitespace-nowrap">
+                                                {{ enrollment.student.name}}
+                                                {% if enrollment.student.is_delegate %}
+                                                <div class="w-1.5 h-1.5 rounded-full bg-secondaryColor"></div>
+                                                {% endif %}
+                                            </th>
+                                            <td class="px-6 py-4">
+                                                {{ enrollment.student.email }}
+                                            </td>
+                                            <td class="px-6 py-4">
+                                                {{ enrollment.student.department}}
+                                            </td>
+                                            <td class="px-6 py-4">
+                                                {{ enrollment.student.phone }}
+                                            </td>
+                                            <td class="px-6 py-4">
+                                                {% if enrollment.student.is_present %}
+                                                <span class="text-success">
+                                                    Present
+                                                </span>
+                                                {% else %}
+                                                <span class="text-danger">
+                                                    Absent
+                                                </span>
+                                                {% endif %}
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                            {% else %}
+                            <p class="m-auto py-4 px-8">> No enrolled students..</p>
+                            {% endif %}
                         </div>
                     </div>
                 </div>
             </div>
 
-            <div class=" flex flex-col gap-6 col-start-9 col-span-3">
+            <div class=" flex flex-col gap-6 col-start-10 col-span-3">
                 <h3 class="">Intervenants</h3>
-                
+
                 <div class="flex flex-col gap-2">
                     <div class="flex flex-col items-start bg-darkColor/5 rounded-2xl px-4 py-1.5 wma">
                         <small class="text-darkColor/50">Lecturer</small>
@@ -166,19 +204,19 @@
                     <div class="flex flex-col items-start bg-darkColor/5 rounded-2xl px-4 py-1.5 wma">
                         <small class="text-darkColor/50">Course delegate(s)</small>
                         {% for enrollment in enrolled_students %}
-                            {% if enrollment.student.is_delegate %}
-                                <p class="text-darkColor block">{{ enrollment.student.name }}</p>
-                            {% endif %}
-                            {% empty %}
-                            <p class="text-danger block"> No course delegate(s) </p>
+                        {% if enrollment.student.is_delegate %}
+                        <p class="text-darkColor block">{{ enrollment.student.name }}</p>
+                        {% endif %}
+                        {% empty %}
+                        <p class="text-danger block"> No course delegate(s) </p>
                         {% endfor %}
                     </div>
 
                     <small class="mt-5 px-2">
-                        You are viewing this course as it was lastly edited on 
+                        You are viewing this course as it was lastly edited on
                         <span class="text-secondaryColor">
                             {{ course.updated_at|format_date }}
-                        </span> 
+                        </span>
                     </small>
                 </div>
             </div>

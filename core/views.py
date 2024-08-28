@@ -54,7 +54,7 @@ class CourseView(LoginRequiredMixin, CommonContextMixin, ListView):
 
 class CourseDetailView(LoginRequiredMixin, DetailView):
     model = Course
-    template_name = 'core/courses/course_detail.html'
+    template_name = 'core/courses/course_details.html'
     context_object_name = 'course'
 
     def get_object(self, queryset=None):
@@ -83,6 +83,23 @@ class StudentView(LoginRequiredMixin, CommonContextMixin, ListView):
         return context
 
 
+class StudentDetailView(LoginRequiredMixin, DetailView):
+    model = Student
+    template_name = 'core/students/student_details.html'
+    context_object_name = 'student'
+
+    def get_object(self, queryset=None):
+        queryset = self.get_queryset()
+        return queryset.get(id=self.kwargs['pk'], slug=self.kwargs['slug'])
+
+    def get_queryset(self):
+        return Student.objects.all()
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        return context
+
+
 class LecturerView(LoginRequiredMixin, CommonContextMixin, ListView):
     model = Lecturer
     template_name = 'core/lecturers/lecturers.html'
@@ -93,6 +110,23 @@ class LecturerView(LoginRequiredMixin, CommonContextMixin, ListView):
         context = super().get_context_data(**kwargs)
         grouped_lecturers = group_items_by_week(Lecturer)
         context['grouped_lecturers'] = dict(grouped_lecturers)
+        return context
+
+
+class LecturerDetailView(LoginRequiredMixin, DetailView):
+    model = Lecturer
+    template_name = 'core/lecturers/lecturer_details.html'
+    context_object_name = 'lecturer'
+
+    def get_object(self, queryset=None):
+        queryset = self.get_queryset()
+        return queryset.get(id=self.kwargs['pk'], slug=self.kwargs['slug'])
+
+    def get_queryset(self):
+        return Lecturer.objects.all()
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
         return context
 
 
@@ -117,7 +151,7 @@ class TeachingRecordView(LoginRequiredMixin, CommonContextMixin, ListView):
 
 class TeachingRecordDetailView(LoginRequiredMixin, DetailView):
     model = TeachingRecord
-    template_name = 'core/records/record_detail.html'
+    template_name = 'core/records/record_details.html'
     context_object_name = 'record'
 
     def get_object(self, queryset=None):

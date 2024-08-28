@@ -180,7 +180,7 @@ class Course(models.Model):
 
         # Automatically create a TeachingRecord if it doesn't exist for the newly created course
         if not TeachingRecord.objects.filter(course=self).exists():
-            TeachingRecord.objects.create(course=self, lecturer=self.lecturer,
+            TeachingRecord.objects.create(course=self,
                                           description=f'Teaching record for the course: {self.code} {self.title}')
 
     def has_teaching_record(self):
