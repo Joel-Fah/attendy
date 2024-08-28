@@ -42,17 +42,31 @@
                 <ul class="border-l border-secondaryColor/20">
                     {% for course in courses %}
                     <li>
-                        <a href="" class="flex items-center justify-between w-full px-4 py-2 hover:bg-secondaryColor/5 transition-all duration-300 ease-linear">
-                            <div class="flex items-center gap-4">
-                                <span> {{ forloop.counter }}. </span>
-                                <div class="">
-                                    <small class="text-xs text-darkColor/50"> {{ course.created_at }} | {{ course.semester }} {{ course.year }} </small>
-                                    <h3 class="text-xl font-medium"> {{ course.code }} {{ course.title }} </h3>
+                        <a href="{% url 'core:course_detail' pk=course.id slug=course.slug %}" class="">
+                            <div class="flex items-center justify-between w-full px-4 py-2 hover:bg-secondaryColor/5 transition-all duration-300 ease-linear">
+                                <div class="flex items-center gap-4">
+                                    <span> {{ forloop.counter }}. </span>
+                                    <div class="">
+                                        <small class="text-xs text-darkColor/50"> {{ course.created_at }} | {{ course.semester }} {{ course.year }} </small>
+                                        <h3 class="text-xl font-medium"> {{ course.code }} {{ course.title }} </h3>
+                                    </div>
+                                </div>
+                                <div class="flex items-center gap-4">
+                                
+                                    {% if course.has_teaching_record %}
+                                      <a href="{% url 'core:record_detail' pk=course.id slug=course.slug %}" class="text-nowrap px-4 py-2 rounded-xl bg-secondaryColor text-white text-sm">
+                                        View associated record
+                                      </a>
+                                      {% else %}
+                                      <a href="" class="text-nowrap px-4 py-2 rounded-xl outline outline-1 outline-secondaryColor text-secondaryColor text-sm">
+                                        Add a teaching record
+                                      </a>
+                                    {% endif %}
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none" class="text-secondaryColor">
+                                        <path d="M9.00005 6C9.00005 6 15 10.4189 15 12C15 13.5812 9 18 9 18" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                                    </svg>
                                 </div>
                             </div>
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none" class="text-secondaryColor">
-                                <path d="M9.00005 6C9.00005 6 15 10.4189 15 12C15 13.5812 9 18 9 18" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
-                            </svg>
                         </a>
                     </li>
                     {% endfor %}

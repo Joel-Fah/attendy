@@ -1,6 +1,6 @@
 from datetime import timedelta
 from django.shortcuts import render
-from django.views.generic import TemplateView, ListView, DetailView
+from django.views.generic import TemplateView, ListView, DetailView, UpdateView, DeleteView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from .models import Course, Student, Lecturer, TeachingRecord, StudentDelegate, Enrollment
 from .mixins import CommonContextMixin
@@ -38,7 +38,7 @@ def group_items_by_week(model):
 
 class CourseView(LoginRequiredMixin, CommonContextMixin, ListView):
     model = Course
-    template_name = 'core/courses.html'
+    template_name = 'core/courses/courses.html'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -52,9 +52,28 @@ class CourseView(LoginRequiredMixin, CommonContextMixin, ListView):
         return context
 
 
+class CourseDetailView(LoginRequiredMixin, DetailView):
+    model = Course
+    template_name = 'core/courses/course_detail.html'
+    context_object_name = 'course'
+
+    def get_object(self, queryset=None):
+        queryset = self.get_queryset()
+        return queryset.get(id=self.kwargs['pk'], slug=self.kwargs['slug'])
+
+    def get_queryset(self):
+        return Course.objects.all()
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        course = self.get_object()
+        context['enrolled_students'] = Enrollment.objects.filter(course=course).select_related('student')
+        return context
+
+
 class StudentView(LoginRequiredMixin, CommonContextMixin, ListView):
     model = Student
-    template_name = 'core/students.html'
+    template_name = 'core/students/students.html'
     paginate_by = 20
     context_object_name = 'students'
 
@@ -66,7 +85,7 @@ class StudentView(LoginRequiredMixin, CommonContextMixin, ListView):
 
 class LecturerView(LoginRequiredMixin, CommonContextMixin, ListView):
     model = Lecturer
-    template_name = 'core/lecturers.html'
+    template_name = 'core/lecturers/lecturers.html'
     paginate_by = 20
     context_object_name = 'lecturers'
 
@@ -79,7 +98,7 @@ class LecturerView(LoginRequiredMixin, CommonContextMixin, ListView):
 
 class TeachingRecordView(LoginRequiredMixin, CommonContextMixin, ListView):
     model = TeachingRecord
-    template_name = 'core/teaching_records.html'
+    template_name = 'core/records/records.html'
     paginate_by = 20
     context_object_name = 'records'
 
@@ -89,23 +108,24 @@ class TeachingRecordView(LoginRequiredMixin, CommonContextMixin, ListView):
         for week, records in grouped_records.items():
             for record in records:
                 record.course_title = record.course.title
-                record.lecturer_name = record.lecturer.name
+                record.course_lecturer_name = record.course.lecturer.name
                 record.course_delegate = StudentDelegate.objects.filter(course=record.course, role='delegate').first()
                 record.course_assistant = StudentDelegate.objects.filter(course=record.course, role='assistant').first()
         context['grouped_records'] = dict(grouped_records)
         return context
 
 
-class TeachingRecordDetailView(LoginRequiredMixin, CommonContextMixin, DetailView):
+class TeachingRecordDetailView(LoginRequiredMixin, DetailView):
     model = TeachingRecord
-    template_name = 'core/teaching_record_detail.html'
+    template_name = 'core/records/record_detail.html'
     context_object_name = 'record'
 
     def get_object(self, queryset=None):
-        return TeachingRecord.objects.get(id=self.kwargs['pk'], course__slug=self.kwargs['slug'])
+        queryset = self.get_queryset()
+        return queryset.get(id=self.kwargs['pk'], course__slug=self.kwargs['slug'])
 
     def get_queryset(self):
-        return TeachingRecord.objects.filter(id=self.kwargs['pk'], course__slug=self.kwargs['slug'])
+        return TeachingRecord.objects.all()
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

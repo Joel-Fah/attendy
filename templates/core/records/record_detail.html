@@ -74,7 +74,7 @@
             </small>
         </div>
 
-        <div class="grid grid-cols-12 gap-2">
+        <div class="grid grid-cols-12 grid-flow-row gap-2 w-full">
             <div class="col-span-full lg:col-span-8">
                 <h3 class="block text-xl text-secondaryColor font-medium">Lessons and Brief Content/Assignments</h3>
                 <div class="record-content">
@@ -82,12 +82,12 @@
                 </div>
             </div>
 
-            <div class="col-span-full lg:col-span-3 lg:col-start-10">
-                <div class="flex flex-col gap-2 w-full">
+            <div class="col-span-full lg:col-span-4 lg:col-start-10">
+                <div class="flex flex-col gap-2">
 
                     <div class="flex flex-col items-start py-2 px-4 rounded-2xl bg-secondaryColor/10">
                         <small class="text-darkColor/50 text-sm">Lecturer:</small>
-                        <span class="text-darkColor"> {{ record.lecturer.name }} </span>
+                        <span class="text-darkColor"> {{ record.course.lecturer.name }} </span>
                     </div>
 
                     <div class="flex flex-col items-start py-2 px-4 rounded-2xl bg-secondaryColor/10">

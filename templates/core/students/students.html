@@ -70,7 +70,7 @@
                                             <span> {{ forloop.counter }}. </span>
                                             <div class="flex flex-col gap-0.5">
                                                 {{ student.name }}
-                                                <small class="text-sm text-darkColor/50">{{ student.email }}</small>
+                                                <small class="text-sm text-darkColor/50">{{ student.email }} | {{ student.department }} | {{ student.phone }}</small>
                                             </div>
                                         </div>
                                         {% if student.is_delegate %}
@@ -92,7 +92,7 @@
                                         <span> {{ forloop.counter }}. </span>
                                         <div class="flex flex-col gap-0.5">
                                             {{ student.name }}
-                                            <small class="text-sm text-darkColor/50">{{ student.email }}</small>
+                                            <small class="text-sm text-darkColor/50">{{ student.email }} | {{ student.department }} | {{ student.phone }}</small>
                                         </div>
                                     </div>
                                 </li>

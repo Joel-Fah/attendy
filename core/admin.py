@@ -62,7 +62,7 @@ class TeachingRecordAdmin(SummernoteModelAdmin):
     model = TeachingRecord
     list_display = ['course_title', 'lecturer_name', 'quality_assurance']
     list_filter = ['quality_assurance']
-    search_fields = ['course__title', 'lecturer__name']
+    search_fields = ['course_title', 'lecturer_name']
 
     summernote_fields = ['description']
 
@@ -74,7 +74,7 @@ class TeachingRecordAdmin(SummernoteModelAdmin):
 
     # get lecturer name
     def lecturer_name(self, obj):
-        return obj.lecturer.name
+        return obj.course.lecturer.name
 
 
 class CourseAdmin(admin.ModelAdmin):
