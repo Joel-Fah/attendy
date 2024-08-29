@@ -36,43 +36,127 @@
         </div>
 
         <div class="w-full flex flex-col gap-2">
-            <div class="">
-                {% for week, lecturers in grouped_lecturers.items %}
-                <small class="block text-sm text-secondaryColor">{{ week }}</small>
-                <ul class="border-l border-secondaryColor/20">
-                    {% for lecturer in lecturers %}
-                    <li>
-                        <a href="" class="flex items-center justify-between w-full px-4 py-2 hover:bg-secondaryColor/5 transition-all duration-300 ease-linear">
-                            <div class="flex items-center gap-4">
-                                <span> {{ forloop.counter }}. </span>
-                                <div class="">
-                                    <small class="text-xs text-darkColor/50"> {{ lecturer.created_at }} </small>
-                                    <h3 class="text-xl font-medium"> {{ lecturer.name }} </h3>
+            {% if lecturers.count > 0 %}
+            <div class="relative overflow-x-auto">
+                <table class="w-full text-sm text-left">
+                    <thead class="text-primaryColor uppercase">
+                        <tr class="border-b border-darkColor/10">
+                            <th scope="col" class="p-4">
+                                S/N
+                            </th>
+                            <th scope="col" class="px-6 py-3">
+                                Names
+                            </th>
+                            <th scope="col" class="px-6 py-3">
+                                Dep't
+                            </th>
+                            <th scope="col" class="px-6 py-3">
+                                Phone No
+                            </th>
+                            <th scope="col" class="px-6 py-3">
+                                Actions
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for lecturer in lecturers %}
+                        <tr class="border-b border-darkColor/10 hover:bg-secondaryColor/5">
+                            <td class="w-4 p-4">
+                                {{ forloop.counter }}
+                            </td>
+                            <th scope="row" class="flex items-center gap-1 px-6 py-4 font-medium whitespace-nowrap">
+                                {{ lecturer.name}}
+                            </th>
+                            <td class="px-6 py-4">
+                                {{ lecturer.department }}
+                            </td>
+                            <td class="px-6 py-4">
+                                {% if lecturer.phone %}
+                                {{ lecturer.phone }}
+                                {% else %}
+                                N/A
+                                {% endif %}
+                            </td>
+                            <td class="px-6 py-4">
+                                <div class="flex gap-2">
+                                    <a href="#" class="font-medium text-primaryColor hover:underline">
+                                        Edit
+                                    </a>
+
+                                    <span>|</span>
+
+                                    <a href="#" class="font-medium text-danger hover:underline">
+                                        Delete
+                                    </a>
                                 </div>
-                            </div>
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none" class="text-secondaryColor">
-                                <path d="M9.00005 6C9.00005 6 15 10.4189 15 12C15 13.5812 9 18 9 18" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
-                            </svg>
-                        </a>
-                    </li>
-                    {% endfor %}
-                </ul>
-                {% empty %}
-                <p>No registered lecturer.</p>
-                {% endfor %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+
+                <nav class="flex items-center flex-column flex-wrap md:flex-row justify-between pt-4" aria-label="Table navigation">
+                    <span class="text-sm font-normal text-darkColor/50 mb-4 md:mb-0 block w-full md:inline md:w-auto">
+                        Showing 
+                        <span class="font-semibold text-primaryColor">{{ page_obj.start_index }}-{{ page_obj.end_index }}</span> 
+                        of 
+                        <span class="font-semibold text-primaryColor">{{ page_obj.paginator.count }}</span>
+                    </span>
+                        
+                        {% if is_paginated %}
+                        <ul class="inline-flex -space-x-px text-sm h-8">
+                            {% if page_obj.has_previous %}
+                                <li>
+                                    <a href="?page={{ page_obj.previous_page_number }}" class="flex items-center justify-center px-3 h-8 ms-0 leading-tight text-gray-500 bg-whiteColor border border-gray-300 rounded-s-lg hover:bg-primaryColor/5 hover:text-gray-700">Previous</a>
+                                </li>
+                            {% else %}
+                                <li>
+                                    <span class="flex items-center justify-center px-3 h-8 ms-0 leading-tight text-gray-500 bg-whiteColor border border-gray-300 rounded-s-lg cursor-not-allowed">Previous</span>
+                                </li>
+                            {% endif %}
+                    
+                            {% for num in page_obj.paginator.page_range %}
+                                {% if page_obj.number == num %}
+                                    <li>
+                                        <a href="?page={{ num }}" aria-current="page" class="flex items-center justify-center px-3 h-8 text-secondaryColor border border-gray-300 bg-secondaryColor/5 hover:bg-secondaryColor/10 hover:text-orange-600">{{ num }}</a>
+                                    </li>
+                                {% else %}
+                                    <li>
+                                        <a href="?page={{ num }}" class="flex items-center justify-center px-3 h-8 leading-tight text-gray-500 bg-whiteColor border border-gray-300 hover:bg-primaryColor/5 hover:text-gray-700">{{ num }}</a>
+                                    </li>
+                                {% endif %}
+                            {% endfor %}
+                    
+                            {% if page_obj.has_next %}
+                                <li>
+                                    <a href="?page={{ page_obj.next_page_number }}" class="flex items-center justify-center px-3 h-8 leading-tight text-gray-500 bg-whiteColor border border-gray-300 rounded-e-lg hover:bg-primaryColor/5 hover:text-gray-700">Next</a>
+                                </li>
+                            {% else %}
+                                <li>
+                                    <span class="flex items-center justify-center px-3 h-8 leading-tight text-gray-500 bg-whiteColor border border-gray-300 rounded-e-lg cursor-not-allowed">Next</span>
+                                </li>
+                            {% endif %}
+                        </ul>
+                    {% endif %}
+                </nav>
             </div>
-        </div>
+              {% else %}
+            <p class="text-lg">No lecturers have been registered yet.</p>
+            {% endif %}
+        </>
     </div>
 
-    <div title="Add course" 
+    <div title="Add a lecturer" 
     class="fixed p-3 bottom-2 right-2 flex items-center justify-center bg-primaryColor rounded-2xl shadow-md text-whiteColor">
-        <a href="">
+        <a href="{% url 'core:lecturer_add' %}">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none">
                 <path d="M12 4V20M20 12H4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
             </svg>
         </a>
     </div>
 </div>
+
+{% include "components/message.html" %}
 {% endblock body %}
 
 {# Additional javascript #}

@@ -1,11 +1,16 @@
 from datetime import timedelta
+
+from django.contrib import messages
 from django.shortcuts import render
-from django.views.generic import TemplateView, ListView, DetailView, UpdateView, DeleteView
+from django.urls import reverse_lazy
+from django.views.generic import TemplateView, ListView, DetailView, UpdateView, DeleteView, CreateView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from .models import Course, Student, Lecturer, TeachingRecord, StudentDelegate, Enrollment
 from .mixins import CommonContextMixin
+from .forms import CourseAddForm, LecturerAddForm, StudentAddForm
 from collections import defaultdict
 from slugify import slugify
+from django.utils.html import format_html
 
 
 # Create your views here.
@@ -52,7 +57,7 @@ class CourseView(LoginRequiredMixin, CommonContextMixin, ListView):
         return context
 
 
-class CourseDetailView(LoginRequiredMixin, DetailView):
+class CourseDetailView(LoginRequiredMixin, CommonContextMixin, DetailView):
     model = Course
     template_name = 'core/courses/course_details.html'
     context_object_name = 'course'
@@ -71,10 +76,16 @@ class CourseDetailView(LoginRequiredMixin, DetailView):
         return context
 
 
+class CourseAddView(LoginRequiredMixin, CommonContextMixin, CreateView):
+    model = Course
+    template_name = 'core/courses/course_add.html'
+    context_object_name = 'course'
+
+
 class StudentView(LoginRequiredMixin, CommonContextMixin, ListView):
     model = Student
     template_name = 'core/students/students.html'
-    paginate_by = 20
+    paginate_by = 25
     context_object_name = 'students'
 
     def get_context_data(self, **kwargs):
@@ -83,7 +94,7 @@ class StudentView(LoginRequiredMixin, CommonContextMixin, ListView):
         return context
 
 
-class StudentDetailView(LoginRequiredMixin, DetailView):
+class StudentDetailView(LoginRequiredMixin, CommonContextMixin, DetailView):
     model = Student
     template_name = 'core/students/student_details.html'
     context_object_name = 'student'
@@ -100,20 +111,44 @@ class StudentDetailView(LoginRequiredMixin, DetailView):
         return context
 
 
+class StudentAddView(LoginRequiredMixin, CommonContextMixin, CreateView):
+    model = Student
+    template_name = 'core/students/student_add.html'
+    context_object_name = 'form'
+    form_class = StudentAddForm
+    success_url = reverse_lazy('core:students')
+
+    def form_valid(self, form):
+        form.save()
+        name = form.cleaned_data['name']
+        message = format_html(
+            'Student added successfully.<br><a href="{}" class="font-bold underline">View</a>',
+            reverse_lazy('core:student_detail', kwargs={'pk': form.instance.pk, 'slug': form.instance.slug})
+        )
+        messages.success(
+            self.request,
+            message
+        )
+        return super().form_valid(form)
+
+    def form_invalid(self, form):
+        messages.error(
+            self.request,
+            format_html(
+                'An error occurred while adding the student.<br>Please try again.'
+            )
+        )
+        return super().form_invalid(form)
+
+
 class LecturerView(LoginRequiredMixin, CommonContextMixin, ListView):
     model = Lecturer
     template_name = 'core/lecturers/lecturers.html'
-    paginate_by = 20
+    paginate_by = 25
     context_object_name = 'lecturers'
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        grouped_lecturers = group_items_by_week(Lecturer)
-        context['grouped_lecturers'] = dict(grouped_lecturers)
-        return context
 
-
-class LecturerDetailView(LoginRequiredMixin, DetailView):
+class LecturerDetailView(LoginRequiredMixin, CommonContextMixin, DetailView):
     model = Lecturer
     template_name = 'core/lecturers/lecturer_details.html'
     context_object_name = 'lecturer'
@@ -130,10 +165,40 @@ class LecturerDetailView(LoginRequiredMixin, DetailView):
         return context
 
 
+class LecturerAddView(LoginRequiredMixin, CommonContextMixin, CreateView):
+    model = Lecturer
+    template_name = 'core/lecturers/lecturer_add.html'
+    context_object_name = 'form'
+    form_class = LecturerAddForm
+    success_url = reverse_lazy('core:lecturers')
+
+    def form_valid(self, form):
+        form.save()
+        name = form.cleaned_data['name']
+        message = format_html(
+            'Lecturer added successfully.<br><a href="{}" class="font-bold underline">View</a>',
+            reverse_lazy('core:lecturer_detail', kwargs={'pk': form.instance.pk, 'slug': form.instance.slug})
+        )
+        messages.success(
+            self.request,
+            message
+        )
+        return super().form_valid(form)
+
+    def form_invalid(self, form):
+        messages.error(
+            self.request,
+            format_html(
+                'An error occurred while adding the lecturer.<br>Please try again.'
+            )
+        )
+        return super().form_invalid(form)
+
+
 class TeachingRecordView(LoginRequiredMixin, CommonContextMixin, ListView):
     model = TeachingRecord
     template_name = 'core/records/records.html'
-    paginate_by = 20
+    paginate_by = 25
     context_object_name = 'records'
 
     def get_context_data(self, **kwargs):
@@ -149,7 +214,7 @@ class TeachingRecordView(LoginRequiredMixin, CommonContextMixin, ListView):
         return context
 
 
-class TeachingRecordDetailView(LoginRequiredMixin, DetailView):
+class TeachingRecordDetailView(LoginRequiredMixin, CommonContextMixin, DetailView):
     model = TeachingRecord
     template_name = 'core/records/record_details.html'
     context_object_name = 'record'

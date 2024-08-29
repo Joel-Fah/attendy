@@ -1,12 +1,12 @@
 {% if messages %}
-<ul class="fixed w-auto max-w48 top-4 right-4">
+<ul class="fixed w-auto max-w48 bottom-4 right-4 z-50">
     {% for msg in messages %}
     <li>
-        <div id="alert-{{ forloop.counter }}" class="flex items-center p-4 mb-4 rounded-2xl bg-slate-800 border
-                {% if msg.tags == 'info' %} text-primaryColor border-primaryColor
-                    {% elif msg.tags == 'error' %} text-danger border-danger
-                        {% elif msg.tags == 'success' %} text-success border-success
-                            {% else %} text-warning border-warning
+        <div id="alert-{{ forloop.counter }}" class="flex items-center p-4 mb-4 backdrop-blur-xl rounded-2xl border
+                {% if msg.tags == 'info' %} text-info border-info bg-info/10 
+                    {% elif msg.tags == 'error' %} text-danger border-danger bg-danger/10
+                        {% elif msg.tags == 'success' %} text-success border-success bg-success/10
+                            {% else %} text-warning border-warning bg-warning/10
                 {% endif %}" role="alert">
 
             {% if msg.tags == 'info' %}
@@ -64,7 +64,7 @@
                 {{ msg }}
             </div>
             <button type="button"
-                class="ms-auto -mx-1.5 -my-1.5 rounded-xl focus:ring-2 p-1.5 inline-flex items-center justify-center h-8 w-8 bg-slate-800 hover:bg-slate-700"
+                class="ms-auto ml-2 -mx-1.5 -my-1.5 rounded-xl focus:ring-2 p-1.5 inline-flex items-center justify-center h-8 w-8 hover:bg-darkColor/10 transition-all duration-100 ease-linear"
                 onclick="fadeOutAlert('alert-{{ forloop.counter }}')" aria-label="Close">
                 <span class="sr-only">Close</span>
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24"
@@ -93,9 +93,9 @@
         }
 
         // Automatically fade out after 10 seconds
-        // setTimeout(function () {
-        //  fadeOutAlert('alert-{{ forloop.counter }}');
-        // }, 10000);
+        setTimeout(function () {
+            fadeOutAlert('alert-{{ forloop.counter }}');
+        }, 10000);
     </script>
     {% endfor %}
 </ul>

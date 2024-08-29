@@ -16,7 +16,9 @@
 
 {# Body of the page #}
 {% block body %}
-<main>
+<main class="relative">
+   {% include 'components/message.html' %}
+
   <div class="p-4 sm:ml-64">
     <div class="rounded-lg mt-14">
        <h2 class="text-xl">This is not the dahsboard you think...</h2>

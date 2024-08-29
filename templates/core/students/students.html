@@ -31,8 +31,7 @@
                                 stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" />
                         </svg>
                     </div>
-                    <input type="search" name="search_students" id="search_courses"
-                        placeholder="search for a student..."
+                    <input type="search" name="search_students" id="search_courses" placeholder="search for a student..."
                         class="w-full rounded-2xl block ps-10 p-2.5 bg-whiteColor border-darkColor placeholder-darkColor/50 focus:ring-primaryColor focus:border-primaryColor transition-all duration-300 ease-in-out">
                 </div>
             </div>
@@ -46,8 +45,7 @@
                                 data-tab-target="" active="" role="tab" aria-selected="true" aria-controls="app">
                                 <span class="ml-1 flex items-center gap-2">
                                     Everyone
-                                    <span class="text-sm bg-secondaryColor/20 px-2.5 py-0.5 rounded-md"> {{
-                                        students.count }} </span>
+                                    <span class="text-sm bg-secondaryColor/20 px-2.5 py-0.5 rounded-md"> {{ students.count }} </span> 
                                 </span>
                             </a>
                         </li>
@@ -56,8 +54,7 @@
                                 data-tab-target="" role="tab" aria-selected="false" aria-controls="message">
                                 <span class="ml-1 flex items-center gap-2">
                                     Delegates
-                                    <span class="text-sm bg-secondaryColor/20 px-2.5 py-0.5 rounded-md"> {{
-                                        delegates.count }} </span>
+                                    <span class="text-sm bg-secondaryColor/20 px-2.5 py-0.5 rounded-md"> {{ delegates.count }} </span> 
                                 </span>
                             </a>
                         </li>
@@ -95,11 +92,10 @@
                                             <td class="w-4 p-4">
                                                 {{ forloop.counter }}
                                             </td>
-                                            <th scope="row"
-                                                class="flex items-center gap-1 px-6 py-4 font-medium whitespace-nowrap">
+                                            <th scope="row" class="flex items-center gap-1 px-6 py-4 font-medium whitespace-nowrap">
                                                 {{ student.name}}
                                                 {% if student.is_delegate %}
-                                                <div class="w-1.5 h-1.5 rounded-full bg-secondaryColor"></div>
+                                                  <div class="w-1.5 h-1.5 rounded-full bg-secondaryColor"></div>
                                                 {% endif %}
                                             </th>
                                             <td class="px-6 py-4">
@@ -129,60 +125,48 @@
                                     </tbody>
                                 </table>
 
-                                <nav class="flex items-center flex-column flex-wrap md:flex-row justify-between pt-4"
-                                    aria-label="Table navigation">
-                                    <span
-                                        class="text-sm font-normal text-darkColor/50 mb-4 md:mb-0 block w-full md:inline md:w-auto">
-                                        Showing
-                                        <span class="font-semibold text-primaryColor">{{ page_obj.start_index }}-{{
-                                            page_obj.end_index }}</span>
-                                        of
-                                        <span class="font-semibold text-primaryColor">{{ page_obj.paginator.count
-                                            }}</span>
+                                <nav class="flex items-center flex-column flex-wrap md:flex-row justify-between pt-4" aria-label="Table navigation">
+                                    <span class="text-sm font-normal text-darkColor/50 mb-4 md:mb-0 block w-full md:inline md:w-auto">
+                                        Showing 
+                                        <span class="font-semibold text-primaryColor">{{ page_obj.start_index }}-{{ page_obj.end_index }}</span> 
+                                        of 
+                                        <span class="font-semibold text-primaryColor">{{ page_obj.paginator.count }}</span>
                                     </span>
-
-                                    {% if is_paginated %}
-                                    <ul class="inline-flex -space-x-px text-sm h-8">
-                                        {% if page_obj.has_previous %}
-                                        <li>
-                                            <a href="?page={{ page_obj.previous_page_number }}"
-                                                class="flex items-center justify-center px-3 h-8 ms-0 leading-tight text-gray-500 bg-whiteColor border border-gray-300 rounded-s-lg hover:bg-primaryColor/5 hover:text-gray-700">Previous</a>
-                                        </li>
-                                        {% else %}
-                                        <li>
-                                            <span
-                                                class="flex items-center justify-center px-3 h-8 ms-0 leading-tight text-gray-500 bg-whiteColor border border-gray-300 rounded-s-lg cursor-not-allowed">Previous</span>
-                                        </li>
-                                        {% endif %}
-
-                                        {% for num in page_obj.paginator.page_range %}
-                                        {% if page_obj.number == num %}
-                                        <li>
-                                            <a href="?page={{ num }}" aria-current="page"
-                                                class="flex items-center justify-center px-3 h-8 text-secondaryColor border border-gray-300 bg-secondaryColor/5 hover:bg-secondaryColor/10 hover:text-orange-600">{{
-                                                num }}</a>
-                                        </li>
-                                        {% else %}
-                                        <li>
-                                            <a href="?page={{ num }}"
-                                                class="flex items-center justify-center px-3 h-8 leading-tight text-gray-500 bg-whiteColor border border-gray-300 hover:bg-primaryColor/5 hover:text-gray-700">{{
-                                                num }}</a>
-                                        </li>
-                                        {% endif %}
-                                        {% endfor %}
-
-                                        {% if page_obj.has_next %}
-                                        <li>
-                                            <a href="?page={{ page_obj.next_page_number }}"
-                                                class="flex items-center justify-center px-3 h-8 leading-tight text-gray-500 bg-whiteColor border border-gray-300 rounded-e-lg hover:bg-primaryColor/5 hover:text-gray-700">Next</a>
-                                        </li>
-                                        {% else %}
-                                        <li>
-                                            <span
-                                                class="flex items-center justify-center px-3 h-8 leading-tight text-gray-500 bg-whiteColor border border-gray-300 rounded-e-lg cursor-not-allowed">Next</span>
-                                        </li>
-                                        {% endif %}
-                                    </ul>
+                                        
+                                        {% if is_paginated %}
+                                        <ul class="inline-flex -space-x-px text-sm h-8">
+                                            {% if page_obj.has_previous %}
+                                                <li>
+                                                    <a href="?page={{ page_obj.previous_page_number }}" class="flex items-center justify-center px-3 h-8 ms-0 leading-tight text-gray-500 bg-whiteColor border border-gray-300 rounded-s-lg hover:bg-primaryColor/5 hover:text-gray-700">Previous</a>
+                                                </li>
+                                            {% else %}
+                                                <li>
+                                                    <span class="flex items-center justify-center px-3 h-8 ms-0 leading-tight text-gray-500 bg-whiteColor border border-gray-300 rounded-s-lg cursor-not-allowed">Previous</span>
+                                                </li>
+                                            {% endif %}
+                                    
+                                            {% for num in page_obj.paginator.page_range %}
+                                                {% if page_obj.number == num %}
+                                                    <li>
+                                                        <a href="?page={{ num }}" aria-current="page" class="flex items-center justify-center px-3 h-8 text-secondaryColor border border-gray-300 bg-secondaryColor/5 hover:bg-secondaryColor/10 hover:text-orange-600">{{ num }}</a>
+                                                    </li>
+                                                {% else %}
+                                                    <li>
+                                                        <a href="?page={{ num }}" class="flex items-center justify-center px-3 h-8 leading-tight text-gray-500 bg-whiteColor border border-gray-300 hover:bg-primaryColor/5 hover:text-gray-700">{{ num }}</a>
+                                                    </li>
+                                                {% endif %}
+                                            {% endfor %}
+                                    
+                                            {% if page_obj.has_next %}
+                                                <li>
+                                                    <a href="?page={{ page_obj.next_page_number }}" class="flex items-center justify-center px-3 h-8 leading-tight text-gray-500 bg-whiteColor border border-gray-300 rounded-e-lg hover:bg-primaryColor/5 hover:text-gray-700">Next</a>
+                                                </li>
+                                            {% else %}
+                                                <li>
+                                                    <span class="flex items-center justify-center px-3 h-8 leading-tight text-gray-500 bg-whiteColor border border-gray-300 rounded-e-lg cursor-not-allowed">Next</span>
+                                                </li>
+                                            {% endif %}
+                                        </ul>
                                     {% endif %}
                                 </nav>
                             </div>
@@ -236,9 +220,9 @@
                                                     <a href="#" class="font-medium text-primaryColor hover:underline">
                                                         Edit
                                                     </a>
-
+                            
                                                     <span>|</span>
-
+                            
                                                     <a href="#" class="font-medium text-danger hover:underline">
                                                         Delete
                                                     </a>
@@ -256,16 +240,17 @@
         </div>
     </div>
 
-    <div title="Add student"
-        class="fixed p-3 bottom-2 right-2 flex items-center justify-center bg-primaryColor rounded-2xl shadow-md text-whiteColor">
-        <a href="">
+    <div title="Add student" 
+    class="fixed p-3 bottom-2 right-2 flex items-center justify-center bg-primaryColor rounded-2xl shadow-md text-whiteColor">
+        <a href="{% url 'core:student_add' %}">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none">
-                <path d="M12 4V20M20 12H4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
-                    stroke-linejoin="round" />
+                <path d="M12 4V20M20 12H4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
             </svg>
         </a>
     </div>
 </div>
+
+{% include "components/message.html" %}
 {% endblock body %}
 
 {# Additional javascript #}

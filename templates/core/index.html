@@ -6,8 +6,16 @@
 {% block title %}Home{% endblock %}
 
 {# Body styles #}
-{% block body_styles %}
-{% endblock body_styles %}
+{% block styles %}
+<style>
+    #hero {
+        background: url("{% static 'core/images/stars_bg.svg' %}");
+        background-color: #050041;
+        background-size: cover;
+        background-repeat: no-repeat;
+    }
+</style>
+{% endblock styles %}
 
 {# Header of the page #}
 {% block header %}
@@ -16,9 +24,11 @@
 
 {# Body of the page #}
 {% block body %}
-<main>
+<main class="relative">
+    {% include "components/message.html" %}
+
     <div
-        class="relative h-dvh overflow-hidden bg-primaryColor bg-cover bg-no-repeat bg-[url('https://raw.githubusercontent.com/Joel-Fah/images/bdc0aba9f73a548b15c1d581b605c83664b3979b/stars_bg.svg')] flex items-center justify-center text-whiteColor">
+        id="hero" class="relative h-dvh overflow-hidden flex items-center justify-center text-whiteColor">
         <div class="flex flex-col items-center justify-center gap-2">
             <span class="outline outline-1 outline-whiteColor px-4 py-1 rounded-full text-sm opacity-80">no more</span>
             <h2 class="text-4xl text-center font-medium mb-20">
@@ -26,7 +36,7 @@
                 <span id="typewriter" class=""></span>
             </h2>
         </div>
-        <img src="{% static 'core/images/logo-shapes.svg' %}" alt=""
+        <img src="{% static 'core/images/logo-shapes.svg' %} " alt=""
             class="absolute -bottom-20 md:-bottom-32 lg:-bottom-20 w-full md:scale-75 lg:scale-125 lg:w-1/2">
     </div>
 
@@ -291,7 +301,7 @@
                     There's <span class="text-secondaryColor">more</span> you can get out of Attendy.
                 </h2>
 
-                <p class="max-w-lg">
+                <p class="max-w-lg m-auto">
                     Attendy is designed to make your life easier. It's a simple and efficient way to keep track of your
                     attendance and make sure you're on top of your studies.
                 </p>

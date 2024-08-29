@@ -9,8 +9,8 @@ from .models import Student, StudentDelegate, Lecturer, TeachingRecord, Course, 
 
 class StudentAdmin(admin.ModelAdmin):
     model = Student
-    list_display = ['name', 'matricule', 'phone', 'is_present']
-    list_filter = ['department', 'is_present', 'is_delegate']
+    list_display = ['name', 'matricule', 'phone']
+    list_filter = ['department', 'is_delegate']
     search_fields = ['name', 'matricule', 'email', 'department', 'phone']
     list_per_page = 25
 
@@ -50,9 +50,9 @@ class StudentDelegateAdmin(admin.ModelAdmin):
 
 class LecturerAdmin(admin.ModelAdmin):
     model = Lecturer
-    list_display = ['name', 'is_present', 'arrival', 'departure']
-    list_filter = ['is_present']
-    search_fields = ['name', 'arrival', 'departure']
+    list_display = ['name', 'department', 'phone']
+    list_filter = ['department']
+    search_fields = ['name', 'phone']
     list_per_page = 25
 
     readonly_fields = ['updated_at', 'created_at']
@@ -84,7 +84,7 @@ class CourseAdmin(admin.ModelAdmin):
     search_fields = ['title', 'code']
     list_per_page = 25
 
-    readonly_fields = ['slug', 'duration', 'updated_at', 'created_at']
+    readonly_fields = ['duration', 'updated_at', 'created_at']
 
     def semester_year(self, obj):
         return f'{obj.semester} {obj.year}'

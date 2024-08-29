@@ -3,6 +3,7 @@ from datetime import datetime, timedelta
 from django.utils import timezone
 
 from slugify import slugify
+from .utils import calculate_duration
 
 
 # Create your models here.
@@ -34,8 +35,6 @@ class Student(models.Model):
         help_text="Department of the student: BMS or ICT")
     phone = models.CharField(max_length=255, null=False,
                              blank=False, help_text="Student phone number")
-    is_present = models.BooleanField(
-        default=True, help_text="Is the student present?")
     is_delegate = models.BooleanField(
         default=False, help_text="Is the student a course delegate?")
 
@@ -79,15 +78,16 @@ class Lecturer(models.Model):
         verbose_name = "Lecturer"
         verbose_name_plural = "Lecturers"
 
+    class DepartmentChoices(models.TextChoices):
+        BMS = 'BMS', 'BMS'
+        ICT = 'ICT', 'ICT'
+
     name = models.CharField(max_length=255, null=False,
                             blank=False, help_text="Name of the lecturer")
     slug = models.SlugField(max_length=255, editable=False, null=False, blank=False, help_text="Slug of the lecturer")
-    is_present = models.BooleanField(
-        default=True, help_text="Is the lecturer present?")
-    arrival = models.TimeField(
-        null=False, blank=False, help_text="Time of arrival of the lecturer")
-    departure = models.TimeField(
-        null=False, blank=False, help_text="Time of departure of the lecturer")
+    department = models.CharField(max_length=255, choices=DepartmentChoices.choices, null=False, blank=False,
+                                  help_text="Department of the lecturer: BMS or ICT", default=DepartmentChoices.ICT)
+    phone = models.CharField(max_length=255, null=True, blank=True, help_text="Lecturer's phone number: 6xx xx xx xx")
 
     created_at = models.DateTimeField(auto_now_add=True, help_text="Date and time this lecturer was added")
     updated_at = models.DateTimeField(auto_now=True, help_text="Date and time this lecturer was last updated")
@@ -117,9 +117,23 @@ class TeachingRecord(models.Model):
     quality_assurance = models.CharField(
         max_length=255, choices=QualityChoices.choices, null=True, blank=True, default=QualityChoices.APPROVED,
         help_text="Quality assurance of the course")
+    is_present = models.BooleanField(
+        default=True, help_text="Was the lecturer present?")
+    arrival = models.TimeField(
+        null=False, blank=False, help_text="Time of arrival of the lecturer")
+    departure = models.TimeField(
+        null=False, blank=False, help_text="Time of departure of the lecturer")
+    lecture_duration = models.DurationField(
+        editable=False,
+        help_text="Actual duration of the course by the lecturer (Automatically calculated)")
 
     created_at = models.DateTimeField(auto_now_add=True, help_text="Date and time this teaching record was added")
     updated_at = models.DateTimeField(auto_now=True, help_text="Date and time this teaching record was last updated")
+
+    def save(self, *args, **kwargs):
+        if self.arrival and self.departure:
+            self.lecture_duration = calculate_duration(self.arrival, self.departure)
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return f"Record for {self.course.title} by {self.course.lecturer.name}"
@@ -144,12 +158,13 @@ class Course(models.Model):
         help_text="Lecturer teaching the course")
     slug = models.SlugField(max_length=255, editable=False, null=False, blank=False, help_text="Slug of the course")
     date = models.DateField(
-        null=False, blank=False, default=timezone.now().date(), help_text="Date the course is taught")
+        null=False, blank=False, default=timezone.now, help_text="Date the course is taught")
     start_time = models.TimeField(
         null=False, blank=False, help_text="Start time of the course")
     end_time = models.TimeField(
         null=False, blank=False, help_text="End time of the course")
     duration = models.DurationField(
+        editable=False,
         help_text="Duration of the course (Automatically calculated)")
     is_catchup = models.BooleanField(
         default=False, help_text="Is this a catch-up class?")
@@ -163,22 +178,9 @@ class Course(models.Model):
 
     def save(self, *args, **kwargs):
         if self.start_time and self.end_time:
-            # Assuming the date part is not important, use today's date for both times
-            today = datetime.today().date()
-            start_datetime = datetime.combine(today, self.start_time)
-            end_datetime = datetime.combine(today, self.end_time)
-
-            # Calculate the duration
-            self.duration = end_datetime - start_datetime
-
-            # If finish time is earlier than start time, assume it is on the next day
-            if self.duration < timedelta(0):
-                self.duration += timedelta(days=1)
-
+            self.duration = calculate_duration(self.start_time, self.end_time)
         self.slug = slugify(self.title)
         super().save(*args, **kwargs)
-
-        # Automatically create a TeachingRecord if it doesn't exist for the newly created course
         if not TeachingRecord.objects.filter(course=self).exists():
             TeachingRecord.objects.create(course=self,
                                           description=f'Teaching record for the course: {self.code} {self.title}')

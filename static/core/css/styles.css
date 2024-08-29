@@ -1,3 +1,16 @@
+/* Import Patrick Font */
+@font-face {
+    font-family: "Patrick Hand";
+    src: url('../fonts/PatrickHand-Regular.ttf') format('truetype');
+    font-weight: 400;
+    font-style: normal;
+}
+
+html, body {
+    font-family: "Patrick Hand", system-ui;
+}
+
+
 #typewriter {
     display: inline-block;
     overflow: hidden;

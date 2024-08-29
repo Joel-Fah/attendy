@@ -65,6 +65,7 @@
                         </small>
                         {% endif %}
                     </div>
+
                     {# Password field #}
                     <div class="">
                         <div class="relative">
@@ -92,11 +93,12 @@
                         {% if form.password.errors %}
                         <small class="text-sm text-danger">
                             {% for error in form.password.errors %}
-                            {{ error }}
+                                {{ error }}
                             {% endfor %}
                         </small>
                         {% endif %}
                     </div>
+                    
                     {# Submit button #}
                     <div class="text-whiteColor">
                         <button type="submit"

@@ -1,0 +1,146 @@
+{% extends 'core/base_app.html' %}
+{% load static %}
+{% load tailwind_tags %}
+{% load custom_date_formatter duration_formatter %}
+
+{# Title of the page #}
+{% block title %} Add a lecturer {% endblock %}
+
+{% block extra_styles %}
+<style>
+    #lect_img {
+        background: linear-gradient(170deg, rgba(0, 0, 0, 0.9) 25%, rgba(0, 0, 0, 0.1) 75%), url("{% static 'core/images/lecturer.jpg' %}");
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+    }
+</style>
+{% endblock extra_styles %}
+
+{# Header of the page #}
+{% block header %}
+{% include "components/header_app.html" %}
+{% endblock header %}
+
+{# Body of the page #}
+{% block body %}
+<div class="relative p-4 md:ml-64">
+    <div class="flex flex-col gap-4 items-start justify-center w-full mt-14">
+        <div class="grid grid-cols-12 items-center justify-center gap-2">
+            <div class="col-start-2 col-span-4 flex flex-col gap-4">
+                <div class="flex flex-col gap-2">
+                    <h2 class="text-2xl">Register a new lecturer</h2>
+                    <p class="text-sm">
+                        Adding a new lecturer to the system is easy. Just fill in the form below and submit. <br>
+                        This will make him/her available to be assigned to courses.
+                    </p>
+                </div>
+        
+                <form action="{% url 'core:lecturer_add' %}" method="post" class="max-w-sm w-full">
+                    {% csrf_token %}
+        
+                    <!-- Display non fields errors -->
+                    {% if form.non_field_errors %}
+                    <small class="text-sm text-danger bg-danger/10 rounded-xl px-2 py-1">
+                        {% for error in form.non_field_errors %}
+                        {{ error }}
+                        {% endfor %}
+                    </small>
+                    {% endif %}
+        
+                    <div class="flex flex-col gap-2">
+                        {# Name field #}
+                        <div class="">
+                            <div class="relative">
+                                <div class="absolute inset-y-0 start-0 flex items-center ps-2.5 pointer-events-none">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none">
+                                        <path d="M8.5 18C10.3135 16.0463 13.667 15.9543 15.5 18M13.9406 12C13.9406 13.1046 13.0688 14 11.9934 14C10.918 14 10.0462 13.1046 10.0462 12C10.0462 10.8954 10.918 10 11.9934 10C13.0688 10 13.9406 10.8954 13.9406 12Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+                                        <path d="M9.5 4.00195C6.85561 4.01181 5.44101 4.10427 4.52513 4.97195C3.5 5.94312 3.5 7.5062 3.5 10.6324V15.3692C3.5 18.4954 3.5 20.0584 4.52513 21.0296C5.55025 22.0008 7.20017 22.0008 10.5 22.0008H13.5C16.7998 22.0008 18.4497 22.0008 19.4749 21.0296C20.5 20.0584 20.5 18.4954 20.5 15.3692V10.6324C20.5 7.5062 20.5 5.94312 19.4749 4.97195C18.559 4.10427 17.1444 4.01181 14.5 4.00195" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                                        <path d="M9.77216 3.63163C9.8681 3.21682 9.91608 3.00942 10.0082 2.84004C10.2229 2.44546 10.6188 2.15548 11.0914 2.0467C11.2943 2 11.5296 2 12 2C12.4704 2 12.7057 2 12.9086 2.0467C13.3812 2.15548 13.7771 2.44545 13.9918 2.84004C14.0839 3.00942 14.1319 3.21682 14.2278 3.63163L14.3111 3.99176C14.4813 4.72744 14.5664 5.09528 14.438 5.37824C14.3549 5.5615 14.2132 5.71842 14.031 5.82911C13.7496 6 13.3324 6 12.4981 6H11.5019C10.6676 6 10.2504 6 9.96901 5.82911C9.78677 5.71842 9.6451 5.5615 9.56197 5.37824C9.43361 5.09528 9.51869 4.72744 9.68886 3.99176L9.77216 3.63163Z" stroke="currentColor" stroke-width="1.5" />
+                                    </svg>
+                                </div>
+                                {{ form.name }}
+                            </div>
+        
+                            {% if form.name.errors %}
+                            <small class="text-sm text-danger">
+                                {% for error in form.name.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </small>
+                            {% endif %}
+                        </div>
+        
+                        {# Department field #}
+                        <div class="">
+                            <div class="relative">
+                                <div class="absolute inset-y-0 start-0 flex items-center ps-2.5 pointer-events-none">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none">
+                                        <path d="M16.5956 20.6989L14.1508 21.3462C11.8879 21.9453 10.7564 22.2448 9.86986 21.7542C8.98333 21.2636 8.68795 20.1744 8.09718 17.996L6.63512 12.6048C6.04436 10.4264 5.74898 9.33725 6.26846 8.4744C6.78794 7.61155 7.91941 7.312 10.1824 6.7129L14.1827 5.65384C16.4457 5.05474 17.5771 4.75519 18.4637 5.2458C19.3502 5.73642 19.6456 6.82561 20.2363 9.00398L21.7042 14.4166C21.9554 15.343 22.0811 15.8062 21.943 16.2417M16.5956 20.6989C17.3477 20.4998 17.3537 20.4966 17.9386 19.9948L20.6824 17.6404C21.4308 16.9983 21.805 16.6772 21.943 16.2417M16.5956 20.6989C16.5956 20.6989 17.1837 16.1058 18.5 15.5C19.9932 14.8128 21.943 16.2417 21.943 16.2417" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" />
+                                        <path d="M17 5.00118C16.9356 3.92779 16.7573 3.2521 16.2484 2.76762C15.4689 2.02553 14.218 2.02184 11.716 2.01444L7.29321 2.00137C4.79129 1.99398 3.54033 1.99028 2.76535 2.72777C1.99037 3.46526 1.99402 4.65592 2.00132 7.03725L2.01938 12.9307C2.02668 15.3121 2.03033 16.5027 2.80984 17.2448C3.58935 17.9869 4.84031 17.9906 7.34224 17.998L8.02306 18" stroke="currentColor" stroke-width="1.5" />
+                                    </svg>
+                                </div>
+                                {{ form.department }}
+                            </div>
+        
+                            {% if form.department.errors %}
+                            <small class="text-sm text-danger">
+                                {% for error in form.department.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </small>
+                            {% endif %}
+                        </div>
+
+                        {# Phone number field #}
+                        <div class="">
+                            <div class="relative">
+                                <div class="absolute inset-y-0 start-0 flex items-center ps-2.5 pointer-events-none">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none">
+                                        <path d="M9.1585 5.71223L8.75584 4.80625C8.49256 4.21388 8.36092 3.91768 8.16405 3.69101C7.91732 3.40694 7.59571 3.19794 7.23592 3.08785C6.94883 3 6.6247 3 5.97645 3C5.02815 3 4.554 3 4.15597 3.18229C3.68711 3.39702 3.26368 3.86328 3.09497 4.3506C2.95175 4.76429 2.99278 5.18943 3.07482 6.0397C3.94815 15.0902 8.91006 20.0521 17.9605 20.9254C18.8108 21.0075 19.236 21.0485 19.6496 20.9053C20.137 20.7366 20.6032 20.3131 20.818 19.8443C21.0002 19.4462 21.0002 18.9721 21.0002 18.0238C21.0002 17.3755 21.0002 17.0514 20.9124 16.7643C20.8023 16.4045 20.5933 16.0829 20.3092 15.8362C20.0826 15.6393 19.7864 15.5077 19.194 15.2444L18.288 14.8417C17.6465 14.5566 17.3257 14.4141 16.9998 14.3831C16.6878 14.3534 16.3733 14.3972 16.0813 14.5109C15.7762 14.6297 15.5066 14.8544 14.9672 15.3038C14.4304 15.7512 14.162 15.9749 13.834 16.0947C13.5432 16.2009 13.1588 16.2403 12.8526 16.1951C12.5071 16.1442 12.2426 16.0029 11.7135 15.7201C10.0675 14.8405 9.15977 13.9328 8.28011 12.2867C7.99738 11.7577 7.85602 11.4931 7.80511 11.1477C7.75998 10.8414 7.79932 10.457 7.90554 10.1663C8.02536 9.83828 8.24905 9.56986 8.69643 9.033C9.14586 8.49368 9.37058 8.22402 9.48939 7.91891C9.60309 7.62694 9.64686 7.3124 9.61719 7.00048C9.58618 6.67452 9.44362 6.35376 9.1585 5.71223Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+                                    </svg>
+                                </div>
+                                {{ form.phone }}
+                            </div>
+        
+                            {% if form.phone.errors %}
+                            <small class="text-sm text-danger">
+                                {% for error in form.phone.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </small>
+                            {% endif %}
+                        </div>
+                        
+                        {# Submit button #}
+                        <div class="text-whiteColor">
+                            <button type="submit"
+                                class="block mb-2 focus:outline-none rounded-2xl w-full px-5 py-2 text-center bg-primaryColor hover:bg-blue-950 focus:ring-2 focus:ring-secondaryColor focus:ring-offset-1 transition-all duration-300 ease-in-out">
+                                Add lecturer
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+    
+            <div id="lect_img" class="relative col-start-8 col-span-4 h-screen">
+                <blockquote class="flex flex-col gap-2 text-[16px] leading-tight text-whiteColor p-4 text-left max-w-64">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none" class="text-secondaryColor">
+                        <path d="M5.07579 17C4.08939 4.54502 12.9123 1.0121 19.9734 2.22417C20.2585 6.35185 18.2389 7.89748 14.3926 8.61125C15.1353 9.38731 16.4477 10.3639 16.3061 11.5847C16.2054 12.4534 15.6154 12.8797 14.4355 13.7322C11.8497 15.6004 8.85421 16.7785 5.07579 17Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                        <path d="M4 22C4 15.5 7.84848 12.1818 10.5 10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
+                    The mediocre teacher tells. The good teacher explains. The superior teacher demonstrates. The great teacher inspires.
+                    <cite class="block font-semibold mt-2 text-secondaryColor">William Arthur Ward</cite>
+                </blockquote>
+                <img src="{% static 'core/images/logo-shapes.svg' %}" alt="Attendy shapes" class="w-20 absolute bottom-3 right-3">
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock body %}
+
+{# Additional javascript #}
+{% block javascript %}
+<!-- from cdn -->
+<script src="{% static 'core/js/tabs.js' %}"></script>
+{% endblock javascript %}
