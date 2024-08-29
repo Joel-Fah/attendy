@@ -51,6 +51,7 @@
                     <div class="flex flex-col gap-2">
                         {# Name field #}
                         <div class="">
+                            <label for="{{ form.name.label }}" class="ps-4 text-xs text-gray-500"> {{ form.name.label }} </label>
                             <div class="relative">
                                 <div class="absolute inset-y-0 start-0 flex items-center ps-2.5 pointer-events-none">
                                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none">
@@ -73,6 +74,7 @@
         
                         {# Department field #}
                         <div class="">
+                            <label for="{{ form.department.label }}" class="ps-4 text-xs text-gray-500"> {{ form.department.label }} </label>
                             <div class="relative">
                                 <div class="absolute inset-y-0 start-0 flex items-center ps-2.5 pointer-events-none">
                                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none">
@@ -94,6 +96,7 @@
 
                         {# Phone number field #}
                         <div class="">
+                            <label for="{{ form.phone.label }}" class="ps-4 text-xs text-gray-500"> {{ form.phone.label }} </label>
                             <div class="relative">
                                 <div class="absolute inset-y-0 start-0 flex items-center ps-2.5 pointer-events-none">
                                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none">
@@ -141,6 +144,4 @@
 
 {# Additional javascript #}
 {% block javascript %}
-<!-- from cdn -->
-<script src="{% static 'core/js/tabs.js' %}"></script>
 {% endblock javascript %}

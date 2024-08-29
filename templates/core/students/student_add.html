@@ -9,7 +9,7 @@
 {% block extra_styles %}
 <style>
     #lect_img {
-        background: linear-gradient(170deg, rgba(0, 0, 0, 0.9) 25%, rgba(0, 0, 0, 0.1) 75%), url("{% static 'core/images/student.jpg' %}");
+        background: linear-gradient(170deg, rgba(0, 0, 0, 0.9) 25%, rgba(0, 0, 0, 0.1) 75%), url("{% static 'core/images/student2.jpg' %}");
         background-size: cover;
         background-position: center;
         background-repeat: no-repeat;
@@ -51,6 +51,7 @@
                     <div class="flex flex-col gap-2">
                         {# Matricule field #}
                         <div class="">
+                            <label for="{{ form.matricule.label }}" class="ps-4 text-xs text-gray-500"> {{ form.matricule.label }} </label>
                             <div class="relative">
                                 <div class="absolute inset-y-0 start-0 flex items-center ps-2.5 pointer-events-none">
                                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none">
@@ -74,6 +75,7 @@
         
                         {# Name field #}
                         <div class="">
+                            <label for="{{ form.name.label }}" class="ps-4 text-xs text-gray-500"> {{ form.name.label }} </label>
                             <div class="relative">
                                 <div class="absolute inset-y-0 start-0 flex items-center ps-2.5 pointer-events-none">
                                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none">
@@ -95,6 +97,7 @@
 
                         {# Email field #}
                         <div class="">
+                            <label for="{{ form.email.label }}" class="ps-4 text-xs text-gray-500"> {{ form.email.label }} </label>
                             <div class="relative">
                                 <div class="absolute inset-y-0 start-0 flex items-center ps-2.5 pointer-events-none">
                                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none">
@@ -115,6 +118,7 @@
 
                         {# Department field #}
                         <div class="">
+                            <label for="{{ form.department.label }}" class="ps-4 text-xs text-gray-500"> {{ form.department.label }} </label>
                             <div class="relative">
                                 <div class="absolute inset-y-0 start-0 flex items-center ps-2.5 pointer-events-none">
                                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none">
@@ -136,6 +140,7 @@
 
                         {# Phone number field #}
                         <div class="">
+                            <label for="{{ form.phone.label }}" class="ps-4 text-xs text-gray-500"> {{ form.phone.label }} </label>
                             <div class="relative">
                                 <div class="absolute inset-y-0 start-0 flex items-center ps-2.5 pointer-events-none">
                                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none">
@@ -159,7 +164,7 @@
                             <div class="relative">
                                 {{ form.is_delegate }}
                                 <label for="delegate" class="ms-2 text-sm font-medium">
-                                    {{ form.is_delegate.label }}
+                                    {{ form.is_delegate.help_text }}
                                 </label>
                             </div>
         

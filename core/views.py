@@ -48,7 +48,6 @@ class CourseView(LoginRequiredMixin, CommonContextMixin, ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         grouped_courses = group_items_by_week(Course)
-        # slugify the course title using slugify
         for week, courses in grouped_courses.items():
             for course in courses:
                 course.slug = slugify(course.title)
@@ -79,7 +78,34 @@ class CourseDetailView(LoginRequiredMixin, CommonContextMixin, DetailView):
 class CourseAddView(LoginRequiredMixin, CommonContextMixin, CreateView):
     model = Course
     template_name = 'core/courses/course_add.html'
-    context_object_name = 'course'
+    context_object_name = 'form'
+    form_class = CourseAddForm
+    success_url = reverse_lazy('core:courses')
+
+    def form_valid(self, form):
+        form.save()
+        message = format_html(
+            'Course added successfully.<br><a href="{}" class="font-bold underline">View</a>',
+            reverse_lazy('core:course_detail', kwargs={'pk': form.instance.pk, 'slug': form.instance.slug})
+        )
+        messages.success(
+            self.request,
+            message
+        )
+        messages.info(
+            self.request,
+            'A teaching record has also been created for this course.'
+        )
+        return super().form_valid(form)
+
+    def form_invalid(self, form):
+        messages.error(
+            self.request,
+            format_html(
+                'An error occurred while adding the course.<br>Please try again.'
+            )
+        )
+        return super().form_invalid(form)
 
 
 class StudentView(LoginRequiredMixin, CommonContextMixin, ListView):

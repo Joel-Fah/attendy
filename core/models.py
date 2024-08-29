@@ -120,11 +120,11 @@ class TeachingRecord(models.Model):
     is_present = models.BooleanField(
         default=True, help_text="Was the lecturer present?")
     arrival = models.TimeField(
-        null=False, blank=False, help_text="Time of arrival of the lecturer")
+        null=True, blank=True, help_text="Time of arrival of the lecturer")
     departure = models.TimeField(
-        null=False, blank=False, help_text="Time of departure of the lecturer")
+        null=True, blank=True, help_text="Time of departure of the lecturer")
     lecture_duration = models.DurationField(
-        editable=False,
+        editable=False, null=True, blank=True,
         help_text="Actual duration of the course by the lecturer (Automatically calculated)")
 
     created_at = models.DateTimeField(auto_now_add=True, help_text="Date and time this teaching record was added")

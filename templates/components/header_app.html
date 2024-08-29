@@ -61,7 +61,7 @@
                             <li>
                                 <a href="{% url 'core:home' %}"
                                     class="block px-4 py-2 text-sm hover:bg-secondaryColor/10" role="menuitem">
-                                    Get started
+                                    Back to home
                                 </a>
                             </li>
                             <li>
@@ -110,8 +110,8 @@
                 </a>
             </li>
             <li>
-                <a href="{% if url_name == 'courses' %} # {% else %} {% url 'core:courses' %} {% endif %}"
-                    class="flex items-center p-2 rounded-xl transition-all duration-300 ease-linear hover:bg-primaryColor/10 group {% if url_name == 'courses' %} bg-secondaryColor/10 hover:bg-secondaryColor/20 shadow-sm border border-secondaryColor {% endif %}">
+                <a href="{% if url_name == 'courses' or url_name == 'course_detail' or url_name == 'course_add' %} # {% else %} {% url 'core:courses' %} {% endif %}"
+                    class="flex items-center p-2 rounded-xl transition-all duration-300 ease-linear hover:bg-primaryColor/10 group {% if url_name == 'courses' or url_name == 'course_detail' or url_name == 'course_add' %} bg-secondaryColor/10 hover:bg-secondaryColor/20 shadow-sm border border-secondaryColor {% endif %}">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none"
                         class="">
                         <path
@@ -140,8 +140,8 @@
                 </a>
             </li>
             <li>
-                <a href="{% if url_name == 'students' %} # {% else %} {% url 'core:students' %} {% endif %}"
-                    class="flex items-center p-2 rounded-xl transition-all duration-300 ease-linear hover:bg-primaryColor/10 group {% if url_name == 'students' %} bg-secondaryColor/10 hover:bg-secondaryColor/20 shadow-sm border border-secondaryColor {% endif %}">
+                <a href="{% if url_name == 'students' or url_name == 'student_detail' or url_name == 'student_add' %} # {% else %} {% url 'core:students' %} {% endif %}"
+                    class="flex items-center p-2 rounded-xl transition-all duration-300 ease-linear hover:bg-primaryColor/10 group {% if url_name == 'students' or url_name == 'student_detail' or url_name == 'student_add' %} bg-secondaryColor/10 hover:bg-secondaryColor/20 shadow-sm border border-secondaryColor {% endif %}">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none"
                         class="">
                         <path
@@ -171,8 +171,8 @@
                 </a>
             </li>
             <li>
-                <a href="{% if url_name == 'lecturers' %} # {% else %} {% url 'core:lecturers' %} {% endif %}"
-                    class="flex items-center p-2 rounded-xl transition-all duration-300 ease-linear hover:bg-primaryColor/10 group {% if url_name == 'lecturers' %} bg-secondaryColor/10 hover:bg-secondaryColor/20 shadow-sm border border-secondaryColor {% endif %}">
+                <a href="{% if url_name == 'lecturers' or url_name == 'lecturer_detail' or url_name == 'lecturer_add' %} # {% else %} {% url 'core:lecturers' %} {% endif %}"
+                    class="flex items-center p-2 rounded-xl transition-all duration-300 ease-linear hover:bg-primaryColor/10 group {% if url_name == 'lecturers' or url_name == 'lecturer_detail' or url_name == 'lecturer_add' %} bg-secondaryColor/10 hover:bg-secondaryColor/20 shadow-sm border border-secondaryColor {% endif %}">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none">
                         <path d="M13 15C10.7083 21 4.29167 15 2 21" stroke="currentColor" stroke-width="1.5"
                             stroke-linecap="round" stroke-linejoin="round" />

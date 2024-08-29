@@ -54,7 +54,7 @@
                                 <div class="flex items-center gap-4">
                                 
                                     {% if course.has_teaching_record %}
-                                      <a href="{% url 'core:record_detail' pk=course.id slug=course.slug %}" class="text-nowrap px-4 py-2 rounded-xl bg-secondaryColor text-white text-sm">
+                                      <a href="{% url 'core:record_detail' pk=course.teaching_record.id slug=course.slug %}" class="text-nowrap px-4 py-2 rounded-xl bg-secondaryColor text-white text-sm">
                                         View associated record
                                       </a>
                                       {% else %}
@@ -80,13 +80,15 @@
 
     <div title="Add course" 
     class="fixed p-3 bottom-2 right-2 flex items-center justify-center bg-primaryColor rounded-2xl shadow-md text-whiteColor">
-        <a href="">
+        <a href="{% url 'core:course_add' %}">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none">
                 <path d="M12 4V20M20 12H4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
             </svg>
         </a>
     </div>
 </div>
+
+{% include "components/message.html" %}
 {% endblock body %}
 
 {# Additional javascript #}
