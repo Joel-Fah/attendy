@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django_summernote.admin import SummernoteModelAdmin
 from django import forms
-from .models import Student, StudentDelegate, Lecturer, TeachingRecord, Course, Enrollment
+from .models import Student, StudentDelegate, Lecturer, TeachingRecord, Course, Enrollment, CourseAttendance
 
 
 # Register your models here.
@@ -9,7 +9,7 @@ from .models import Student, StudentDelegate, Lecturer, TeachingRecord, Course, 
 
 class StudentAdmin(admin.ModelAdmin):
     model = Student
-    list_display = ['name', 'matricule', 'phone']
+    list_display = ['name', 'matricule', 'phone', 'is_delegate']
     list_filter = ['department', 'is_delegate']
     search_fields = ['name', 'matricule', 'email', 'department', 'phone']
     list_per_page = 25
@@ -60,21 +60,21 @@ class LecturerAdmin(admin.ModelAdmin):
 
 class TeachingRecordAdmin(SummernoteModelAdmin):
     model = TeachingRecord
-    list_display = ['course_title', 'lecturer_name', 'quality_assurance']
+    list_display = ['course_title', 'lecturer_name', 'lecturer_duration']
     list_filter = ['quality_assurance']
     search_fields = ['course_title', 'lecturer_name']
 
     summernote_fields = ['description']
 
-    readonly_fields = ['updated_at', 'created_at']
+    readonly_fields = ['lecturer_duration', 'updated_at', 'created_at']
 
     # get course title
     def course_title(self, obj):
-        return obj.course.title
+        return obj.teaching_record_attendance.course.title
 
     # get lecturer name
     def lecturer_name(self, obj):
-        return obj.course.lecturer.name
+        return obj.teaching_record_attendance.course.lecturer.name
 
 
 class CourseAdmin(admin.ModelAdmin):
@@ -84,7 +84,7 @@ class CourseAdmin(admin.ModelAdmin):
     search_fields = ['title', 'code']
     list_per_page = 25
 
-    readonly_fields = ['duration', 'updated_at', 'created_at']
+    readonly_fields = ['updated_at', 'created_at']
 
     def semester_year(self, obj):
         return f'{obj.semester} {obj.year}'
@@ -93,12 +93,26 @@ class CourseAdmin(admin.ModelAdmin):
 class EnrollmentAdmin(admin.ModelAdmin):
     model = Enrollment
     list_display = ['student_name', 'course_title']
-    list_filter = ['course']
+    list_filter = ['attendance']
     search_fields = ['student_name', 'course_title']
     list_per_page = 25
 
     def student_name(self, obj):
         return obj.student.name
+
+    def course_title(self, obj):
+        return obj.attendance.course.title
+
+
+class CourseAttendanceAdmin(admin.ModelAdmin):
+    model = CourseAttendance
+    list_display = ['course_title', 'lecturer_name']
+    list_filter = ['course_date', 'is_catchup']
+    search_fields = ['course_title']
+    list_per_page = 25
+
+    def lecturer_name(self, obj):
+        return obj.course.lecturer.name
 
     def course_title(self, obj):
         return obj.course.title
@@ -111,3 +125,4 @@ admin.site.register(Lecturer, LecturerAdmin)
 admin.site.register(TeachingRecord, TeachingRecordAdmin)
 admin.site.register(Course, CourseAdmin)
 admin.site.register(Enrollment, EnrollmentAdmin)
+admin.site.register(CourseAttendance, CourseAttendanceAdmin)

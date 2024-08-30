@@ -2,7 +2,7 @@ import datetime
 
 from django import forms
 from allauth.account.forms import LoginForm
-from .models import Course, Lecturer, Student
+from .models import Course, Lecturer, Student, DepartmentChoices
 
 
 # Create your forms here
@@ -245,7 +245,7 @@ class LecturerAddForm(forms.ModelForm):
         ),
         label='Department',
         help_text='Select the department of the lecturer.',
-        choices=Lecturer.DepartmentChoices.choices,
+        choices=DepartmentChoices.choices,
         required=True,
     )
 
@@ -267,7 +267,7 @@ class LecturerAddForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields['department'].default = Lecturer.DepartmentChoices.ICT
+        self.fields['department'].default = DepartmentChoices.ICT
 
 
 class StudentAddForm(forms.ModelForm):
@@ -342,7 +342,7 @@ class StudentAddForm(forms.ModelForm):
         ),
         label='Department',
         help_text='Select the department of the student.',
-        choices=Student.DepartmentChoices.choices,
+        choices=DepartmentChoices.choices,
         required=True,
     )
 
@@ -379,5 +379,5 @@ class StudentAddForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields['department'].default = Student.DepartmentChoices.ICT
+        self.fields['department'].default = DepartmentChoices.ICT
         self.fields['is_delegate'].default = False

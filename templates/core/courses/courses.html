@@ -11,84 +11,156 @@
 
 {# Header of the page #}
 {% block header %}
-{% include "components/header_app.html" %}
+    {% include "components/header_app.html" %}
 {% endblock header %}
 
 {# Body of the page #}
 {% block body %}
-<div class="relative p-4 md:ml-64">
-    <div class="flex flex-col gap-4 items-center justify-between mt-14">
-        <div class="flex flex-col items-start gap-2 w-full md:flex-row md:items-center md:justify-between">
-            <h2 class="text-2xl">Courses by week</h2>
-            <div class="relative w-full lg:w-1/3">
-                <div class="absolute inset-y-0 start-0 flex items-center ps-2.5 pointer-events-none">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none">
-                        <path d="M17.5 17.5L22 22" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
-                            stroke-linejoin="round" />
-                        <path
-                            d="M20 11C20 6.02944 15.9706 2 11 2C6.02944 2 2 6.02944 2 11C2 15.9706 6.02944 20 11 20C15.9706 20 20 15.9706 20 11Z"
-                            stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" />
-                    </svg>
+    <div class="relative p-4 md:ml-64">
+        <div class="flex flex-col gap-4 items-center justify-between mt-14">
+            <div class="flex flex-col items-start gap-2 w-full md:flex-row md:items-center md:justify-between">
+                <h2 class="text-2xl">Registered courses</h2>
+                <div class="relative w-full lg:w-1/3">
+                    <div class="absolute inset-y-0 start-0 flex items-center ps-2.5 pointer-events-none">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none">
+                            <path d="M17.5 17.5L22 22" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
+                                  stroke-linejoin="round"/>
+                            <path
+                                    d="M20 11C20 6.02944 15.9706 2 11 2C6.02944 2 2 6.02944 2 11C2 15.9706 6.02944 20 11 20C15.9706 20 20 15.9706 20 11Z"
+                                    stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
+                    <input type="search" name="search_courses" id="search_courses" placeholder="search for a course..."
+                           class="w-full rounded-2xl block ps-10 p-2.5 bg-whiteColor border-darkColor placeholder-darkColor/50 focus:ring-primaryColor focus:border-primaryColor transition-all duration-300 ease-in-out">
                 </div>
-                <input type="search" name="search_courses" id="search_courses" placeholder="search for a course..."
-                    class="w-full rounded-2xl block ps-10 p-2.5 bg-whiteColor border-darkColor placeholder-darkColor/50 focus:ring-primaryColor focus:border-primaryColor transition-all duration-300 ease-in-out">
             </div>
-        </div>
 
-        <div class="w-full flex flex-col gap-2">
-            <div class="">
-                {% for week, courses in grouped_courses.items %}
-                <small class="block text-sm text-secondaryColor">{{ week }}</small>
-                <ul class="border-l border-secondaryColor/20">
-                    {% for course in courses %}
-                    <li>
-                        <a href="{% url 'core:course_detail' pk=course.id slug=course.slug %}" class="">
-                            <div class="flex items-center justify-between w-full px-4 py-2 hover:bg-secondaryColor/5 transition-all duration-300 ease-linear">
-                                <div class="flex items-center gap-4">
-                                    <span> {{ forloop.counter }}. </span>
-                                    <div class="">
-                                        <small class="text-xs text-darkColor/50"> {{ course.created_at }} | {{ course.semester }} {{ course.year }} </small>
-                                        <h3 class="text-xl font-medium"> {{ course.code }} {{ course.title }} </h3>
+            <div class="w-full flex flex-col gap-2">
+                <div class="relative overflow-x-auto">
+                    <table class="w-full text-sm text-left">
+                        <thead class="text-primaryColor uppercase">
+                        <tr class="border-b border-darkColor/10">
+                            <th scope="col" class="p-4">
+                                S/N
+                            </th>
+                            <th scope="col" class="px-6 py-3">
+                                Code
+                            </th>
+                            <th scope="col" class="px-6 py-3">
+                                Name
+                            </th>
+                            <th scope="col" class="px-6 py-3">
+                                Lecturer
+                            </th>
+                            <th scope="col" class="px-6 py-3">
+                                Semester
+                            </th>
+                            <th scope="col" class="px-6 py-3">
+                                Year
+                            </th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for course in courses %}
+                            <tr class="border-b border-darkColor/10 hover:bg-secondaryColor/5">
+                                <td class="w-4 p-4">
+                                    {{ forloop.counter }}
+                                </td>
+                                <th scope="row" class="flex items-center gap-1 px-6 py-4 font-medium whitespace-nowrap">
+                                    {{ course.code }}
+                                </th>
+                                <td class="px-6 py-4">
+                                    {{ course.title }}
+                                </td>
+                                <td class="px-6 py-4">
+                                    {{ course.lecturer.name }}
+                                </td>
+                                <td class="px-6 py-4">
+                                    {{ course.semester }}
+                                </td>
+                                <td class="px-6 py-4">
+                                    <div class="flex gap-2">
+                                        <a href="#" class="font-medium text-primaryColor hover:underline">
+                                            Edit
+                                        </a>
+
+                                        <span>|</span>
+
+                                        <a href="#" class="font-medium text-danger hover:underline">
+                                            Delete
+                                        </a>
                                     </div>
-                                </div>
-                                <div class="flex items-center gap-4">
-                                
-                                    {% if course.has_teaching_record %}
-                                      <a href="{% url 'core:record_detail' pk=course.teaching_record.id slug=course.slug %}" class="text-nowrap px-4 py-2 rounded-xl bg-secondaryColor text-white text-sm">
-                                        View associated record
-                                      </a>
-                                      {% else %}
-                                      <a href="" class="text-nowrap px-4 py-2 rounded-xl outline outline-1 outline-secondaryColor text-secondaryColor text-sm">
-                                        Add a teaching record
-                                      </a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+
+                    <nav class="flex items-center flex-column flex-wrap md:flex-row justify-between pt-4"
+                         aria-label="Table navigation">
+                                    <span class="text-sm font-normal text-darkColor/50 mb-4 md:mb-0 block w-full md:inline md:w-auto">
+                                        Showing 
+                                        <span class="font-semibold text-primaryColor">{{ page_obj.start_index }}-{{ page_obj.end_index }}</span> 
+                                        of 
+                                        <span class="font-semibold text-primaryColor">{{ page_obj.paginator.count }}</span>
+                                    </span>
+
+                        {% if is_paginated %}
+                            <ul class="inline-flex -space-x-px text-sm h-8">
+                                {% if page_obj.has_previous %}
+                                    <li>
+                                        <a href="?page={{ page_obj.previous_page_number }}"
+                                           class="flex items-center justify-center px-3 h-8 ms-0 leading-tight text-gray-500 bg-whiteColor border border-gray-300 rounded-s-lg hover:bg-primaryColor/5 hover:text-gray-700">Previous</a>
+                                    </li>
+                                {% else %}
+                                    <li>
+                                        <span class="flex items-center justify-center px-3 h-8 ms-0 leading-tight text-gray-500 bg-whiteColor border border-gray-300 rounded-s-lg cursor-not-allowed">Previous</span>
+                                    </li>
+                                {% endif %}
+
+                                {% for num in page_obj.paginator.page_range %}
+                                    {% if page_obj.number == num %}
+                                        <li>
+                                            <a href="?page={{ num }}" aria-current="page"
+                                               class="flex items-center justify-center px-3 h-8 text-secondaryColor border border-gray-300 bg-secondaryColor/5 hover:bg-secondaryColor/10 hover:text-orange-600">{{ num }}</a>
+                                        </li>
+                                    {% else %}
+                                        <li>
+                                            <a href="?page={{ num }}"
+                                               class="flex items-center justify-center px-3 h-8 leading-tight text-gray-500 bg-whiteColor border border-gray-300 hover:bg-primaryColor/5 hover:text-gray-700">{{ num }}</a>
+                                        </li>
                                     {% endif %}
-                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none" class="text-secondaryColor">
-                                        <path d="M9.00005 6C9.00005 6 15 10.4189 15 12C15 13.5812 9 18 9 18" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
-                                    </svg>
-                                </div>
-                            </div>
-                        </a>
-                    </li>
-                    {% endfor %}
-                </ul>
-                {% empty %}
-                <p>No courses available.</p>
-                {% endfor %}
+                                {% endfor %}
+
+                                {% if page_obj.has_next %}
+                                    <li>
+                                        <a href="?page={{ page_obj.next_page_number }}"
+                                           class="flex items-center justify-center px-3 h-8 leading-tight text-gray-500 bg-whiteColor border border-gray-300 rounded-e-lg hover:bg-primaryColor/5 hover:text-gray-700">Next</a>
+                                    </li>
+                                {% else %}
+                                    <li>
+                                        <span class="flex items-center justify-center px-3 h-8 leading-tight text-gray-500 bg-whiteColor border border-gray-300 rounded-e-lg cursor-not-allowed">Next</span>
+                                    </li>
+                                {% endif %}
+                            </ul>
+                        {% endif %}
+                    </nav>
+                </div>
             </div>
+        </div>
+
+        <div title="Add course"
+             class="fixed p-3 bottom-2 right-2 flex items-center justify-center bg-primaryColor rounded-2xl shadow-md text-whiteColor">
+            <a href="{% url 'core:course_add' %}">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none">
+                    <path d="M12 4V20M20 12H4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
+                          stroke-linejoin="round"/>
+                </svg>
+            </a>
         </div>
     </div>
 
-    <div title="Add course" 
-    class="fixed p-3 bottom-2 right-2 flex items-center justify-center bg-primaryColor rounded-2xl shadow-md text-whiteColor">
-        <a href="{% url 'core:course_add' %}">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none">
-                <path d="M12 4V20M20 12H4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
-            </svg>
-        </a>
-    </div>
-</div>
-
-{% include "components/message.html" %}
+    {% include "components/message.html" %}
 {% endblock body %}
 
 {# Additional javascript #}

@@ -19,7 +19,7 @@
 <div class="p-4 sm:ml-64">
     <div class="flex flex-col gap-4 items-center justify-between mt-14">
         <div class="flex flex-col items-start gap-2 w-full md:flex-row md:items-center md:justify-between">
-            <h2 class="text-2xl">Teaching Records</h2>
+            <h2 class="text-2xl">Teaching Records by week</h2>
             <div class="relative w-full lg:w-1/3">
                 <div class="absolute inset-y-0 start-0 flex items-center ps-2.5 pointer-events-none">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none">
@@ -42,19 +42,18 @@
                 <ul class="border-l border-secondaryColor/20">
                     {% for record in records %}
                     <li>
-                        <a href="{% url 'core:record_detail' pk=record.id slug=record.course.slug %}"
+                        <a href="{% url 'core:record_detail' pk=record.id slug=record.teaching_record_attendance.course.slug %}"
                             class="flex items-center justify-between w-full px-4 py-2 hover:bg-secondaryColor/5 transition-all duration-300 ease-linear">
                             <div class="flex items-center gap-4">
                                 <span> {{ forloop.counter }}. </span>
                                 <div class="">
-                                    <small class="text-xs text-darkColor/50"> {{ record.created_at }} | {{
-                                        record.course.semester }} {{ record.course.year }} </small>
-                                    <h3 class="text-xl font-medium"> {{ record.course.code }} {{ record.course.title }}
+                                    <small class="text-xs text-darkColor/50"> {{ record.created_at }} | {{ record.teaching_record_attendance.course.semester }} {{ record.teaching_record_attendance.course.year }} </small>
+                                    <h3 class="text-xl font-medium"> {{ record.teaching_record_attendance.course.code }} {{ record.teaching_record_attendance.course.title }}
                                     </h3>
                                     <small class="flex items-center gap-4">
                                         <div class="">
                                             <span class="text-darkColor/50"> Lecturer: </span>
-                                            {{ record.course.lecturer.name }}
+                                            {{ record.teaching_record_attendance.course.lecturer.name }}
                                         </div>
 
                                         {% if record.course_delegate %}

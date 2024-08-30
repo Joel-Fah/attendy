@@ -4,7 +4,7 @@
 {% load custom_date_formatter %}
 
 {# Title of the page #}
-{% block title %} {{ record.course.title }} {% endblock %}
+{% block title %} {{ record.teaching_record_attendance.course.title }} {% endblock %}
 
 {% block extra_styles %}
 <style>
@@ -55,7 +55,7 @@
                 <a href="{% url 'core:records' %}" class="text-secondaryColor">Teaching records</a> /
             </small>
             <h2 class="text-3xl">
-                {{ record.course.code }} {{ record.course.title }}
+                {{ record.teaching_record_attendance.course.code }} {{ record.teaching_record_attendance.course.title }}
             </h2>
             <small class="flex items-center gap-4">
                 <span class="text-darkColor flex gap-1 px-2.5 rounded-xl bg-darkColor/5">
@@ -87,39 +87,55 @@
 
                     <div class="flex flex-col items-start py-2 px-4 rounded-2xl bg-secondaryColor/10">
                         <small class="text-darkColor/50 text-sm">Lecturer:</small>
-                        <span class="text-darkColor"> {{ record.course.lecturer.name }} </span>
+                        <span class="text-darkColor"> {{ record.teaching_record_attendance.course.lecturer.name }} </span>
                     </div>
 
                     <div class="flex flex-col items-start py-2 px-4 rounded-2xl bg-secondaryColor/10">
-                        <small class="text-darkColor/50 text-sm">Course delegate:</small>
-                        <span class="text-darkColor"> {{ course_delegate.student.name }} </span>
+                        <small class="text-darkColor/50 text-sm">Course delegate & assistant(s):</small>
+                        {% for delegate in course_delegates %}
+                            {% if delegate.role == 'delegate' %}
+                            <span class="text-darkColor"> {{ delegate.student.name }} </span>
+                            <hr class="w-full border-secondaryColor/10 my-2">
+                            {% endif %}
+
+                            {% if delegate.role == 'assistant' %}
+                            <span class="text-darkColor"> {{ delegate.student.name }} </span>
+                            {% endif %}
+                        {% empty %}
+                        <span class="text-danger"> No course delegate </span>
+                        {% endfor %}
                     </div>
 
                     <div class="flex flex-col items-start gap-0.5 py-2 px-4 rounded-2xl bg-secondaryColor/10">
                         <small class="text-darkColor/50 text-sm">Start - Finish time:</small>
-                        <span class="text-darkColor"> {{ record.course.start_time }} ~ {{ record.course.end_time }}
-                        </span>
+                        {% if record.lecturer_arrival_time and record.lecturer_departure_time %}
+                        <span class="text-darkColor"> {{ record.lecturer_arrival_time }} ~ {{ record.lecturer_departure_time }}</span>
+                        {% else %}
+                        <span class="text-danger"> No time recorded </span>
+                        {% endif %}
                     </div>
 
                     <div class="flex flex-col items-start gap-0.5 py-2 px-4 rounded-2xl bg-secondaryColor/10">
                         <small class="text-darkColor/50 text-sm">Duration:</small>
-                        <span class="text-darkColor"> {{ record.course.duration }} </span>
+                        {% if record.lecturer_duration %}
+                        <span class="text-darkColor"> {{ record.lecturer_duration }} </span>
+                        {% else %}
+                        <span class="text-danger"> Set start and end time first </span>
+                        {% endif %}
                     </div>
 
                     <div class="flex flex-col items-start gap-0.5 py-2 px-4 rounded-2xl bg-secondaryColor/10">
                         <small class="text-darkColor/50 text-sm">Semester:</small>
-                        <span class="text-darkColor"> {{ record.course.semester }} {{ record.course.year }} </span>
+                        <span class="text-darkColor"> {{ record.teaching_record_attendance.course.semester }} {{ record.teaching_record_attendance.course.year }} </span>
                     </div>
 
                     <div class="flex flex-col items-start gap-0.5 py-2 px-4 rounded-2xl bg-secondaryColor/10">
                         <small class="text-darkColor/50 text-sm">Number of students:</small>
-                        <span class="text-darkColor">
                             {% if enrollments > 0 %}
-                            {{ enrollments }}
+                                <span class="text-darkColor">{{ enrollments }}</span>
                             {% else %}
-                            No students enrolled.
+                                <span class="text-warning">No students enrolled</span>
                             {% endif %}
-                        </span>
                     </div>
 
                     <div class="flex flex-col items-start gap-0.5 py-2 px-4 rounded-2xl bg-secondaryColor/10">

@@ -5,7 +5,7 @@ from django.shortcuts import render
 from django.urls import reverse_lazy
 from django.views.generic import TemplateView, ListView, DetailView, UpdateView, DeleteView, CreateView
 from django.contrib.auth.mixins import LoginRequiredMixin
-from .models import Course, Student, Lecturer, TeachingRecord, StudentDelegate, Enrollment
+from .models import Course, Student, Lecturer, TeachingRecord, StudentDelegate, Enrollment, CourseAttendance
 from .mixins import CommonContextMixin
 from .forms import CourseAddForm, LecturerAddForm, StudentAddForm
 from collections import defaultdict
@@ -21,6 +21,20 @@ class HomeView(TemplateView):
 # Dashboard views
 class DashboardView(LoginRequiredMixin, CommonContextMixin, TemplateView):
     template_name = 'core/dashboard.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        grouped_attendances = group_items_by_week(CourseAttendance)
+        for week, attendances in grouped_attendances.items():
+            for attendance in attendances:
+                attendance.course_title = attendance.course.title
+                attendance.course_lecturer_name = attendance.course.lecturer.name
+                attendance.course_delegate = StudentDelegate.objects.filter(course=attendance.course,
+                                                                            role='delegate').first()
+                attendance.course_assistant = StudentDelegate.objects.filter(course=attendance.course,
+                                                                             role='assistant').first()
+        context['grouped_attendances'] = dict(grouped_attendances)
+        return context
 
 
 def group_items_by_week(model):
@@ -44,16 +58,8 @@ def group_items_by_week(model):
 class CourseView(LoginRequiredMixin, CommonContextMixin, ListView):
     model = Course
     template_name = 'core/courses/courses.html'
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        grouped_courses = group_items_by_week(Course)
-        for week, courses in grouped_courses.items():
-            for course in courses:
-                course.slug = slugify(course.title)
-        context['grouped_courses'] = dict(grouped_courses)
-
-        return context
+    paginate_by = 25
+    context_object_name = 'courses'
 
 
 class CourseDetailView(LoginRequiredMixin, CommonContextMixin, DetailView):
@@ -232,10 +238,12 @@ class TeachingRecordView(LoginRequiredMixin, CommonContextMixin, ListView):
         grouped_records = group_items_by_week(TeachingRecord)
         for week, records in grouped_records.items():
             for record in records:
-                record.course_title = record.course.title
-                record.course_lecturer_name = record.course.lecturer.name
-                record.course_delegate = StudentDelegate.objects.filter(course=record.course, role='delegate').first()
-                record.course_assistant = StudentDelegate.objects.filter(course=record.course, role='assistant').first()
+                record.course_title = record.teaching_record_attendance.course.title
+                record.course_lecturer_name = record.teaching_record_attendance.course.lecturer.name
+                record.course_delegate = StudentDelegate.objects.filter(course=record.teaching_record_attendance.course,
+                                                                        role='delegate').first()
+                record.course_assistant = StudentDelegate.objects.filter(
+                    course=record.teaching_record_attendance.course, role='assistant').first()
         context['grouped_records'] = dict(grouped_records)
         return context
 
@@ -247,15 +255,15 @@ class TeachingRecordDetailView(LoginRequiredMixin, CommonContextMixin, DetailVie
 
     def get_object(self, queryset=None):
         queryset = self.get_queryset()
-        return queryset.get(id=self.kwargs['pk'], course__slug=self.kwargs['slug'])
+        return queryset.get(id=self.kwargs['pk'], teaching_record_attendance__course__slug=self.kwargs['slug'])
 
     def get_queryset(self):
         return TeachingRecord.objects.all()
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['course_delegate'] = StudentDelegate.objects.filter(course=self.object.course, role='delegate').first()
-        context['course_assistant'] = StudentDelegate.objects.filter(course=self.object.course,
-                                                                     role='assistant').first()
-        context['enrollments'] = Enrollment.objects.filter(course=self.object.course).count()
+        context['course_delegates'] = StudentDelegate.objects.filter(
+            course=self.object.teaching_record_attendance.course,
+            student__is_delegate=True)
+        context['enrollments'] = Enrollment.objects.filter(attendance__course=self.object.teaching_record_attendance.course).count()
         return context

@@ -109,6 +109,7 @@
                     <span class="flex-1 ms-3 whitespace-nowrap">Dashboard</span>
                 </a>
             </li>
+            <hr class="border-secondaryColor/20 w-full">
             <li>
                 <a href="{% if url_name == 'courses' or url_name == 'course_detail' or url_name == 'course_add' %} # {% else %} {% url 'core:courses' %} {% endif %}"
                     class="flex items-center p-2 rounded-xl transition-all duration-300 ease-linear hover:bg-primaryColor/10 group {% if url_name == 'courses' or url_name == 'course_detail' or url_name == 'course_add' %} bg-secondaryColor/10 hover:bg-secondaryColor/20 shadow-sm border border-secondaryColor {% endif %}">
@@ -222,9 +223,7 @@
                     {% endif %}
                 </a>
             </li>
-            <li>
-                <hr class="border border-secondaryColor/20 w-full">
-            </li>
+            <hr class="border-secondaryColor/20 w-full">
             <li>
                 <a href=""
                     class="flex items-center p-2 rounded-xl transition-all duration-300 ease-linear text-whiteColor bg-secondaryColor hover:bg-orange-600 group">
