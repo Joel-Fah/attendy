@@ -23,6 +23,10 @@ class Student(models.Model):
         verbose_name = "Student"
         verbose_name_plural = "Students"
 
+    class GenderChoices(models.TextChoices):
+        MALE = 'Male', 'Male'
+        FEMALE = 'Female', 'Female'
+
     name = models.CharField(max_length=255, null=False,
                             blank=False, help_text="Name of the student")
     slug = models.SlugField(max_length=255, editable=False, null=False, blank=False, help_text="Slug of the student")
@@ -36,6 +40,9 @@ class Student(models.Model):
         help_text="Department of the student: BMS or ICT")
     phone = models.CharField(max_length=255, null=False,
                              blank=False, help_text="Student phone number")
+    gender = models.CharField(
+        max_length=255, choices=GenderChoices.choices, null=False, blank=False,
+        help_text="Gender of the student: Male or Female")
     is_delegate = models.BooleanField(
         default=False, help_text="Is the student a course delegate?")
 

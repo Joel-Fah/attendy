@@ -7,13 +7,13 @@ from django.urls import reverse_lazy
 from django.utils.html import format_html
 from django.views.generic import TemplateView, ListView, DetailView, CreateView, UpdateView
 
-from .forms import CourseAddForm, LecturerAddForm, StudentAddForm
+from .forms import CourseForm, LecturerForm, StudentForm
 from .mixins import CommonContextMixin
 from .models import Course, Student, Lecturer, TeachingRecord, StudentDelegate, Enrollment, CourseAttendance
 
 
 # Create your views here.
-class HomeView(TemplateView):
+class HomeView(CommonContextMixin, TemplateView):
     template_name = 'core/index.html'
 
 
@@ -98,7 +98,7 @@ class CourseAddView(LoginRequiredMixin, CommonContextMixin, CreateView):
     model = Course
     template_name = 'core/courses/course_add.html'
     context_object_name = 'form'
-    form_class = CourseAddForm
+    form_class = CourseForm
     success_url = reverse_lazy('core:courses')
 
     def form_valid(self, form):
@@ -131,7 +131,7 @@ class CourseUpdateView(LoginRequiredMixin, CommonContextMixin, UpdateView):
     model = Course
     template_name = 'core/courses/course_update.html'
     context_object_name = 'form'
-    form_class = CourseAddForm
+    form_class = CourseForm
     success_url = reverse_lazy('core:courses')
 
     def get_object(self, queryset=None):
@@ -179,6 +179,18 @@ class StudentView(LoginRequiredMixin, CommonContextMixin, ListView):
         context['delegates'] = Student.objects.filter(is_delegate=True).order_by('name')
         return context
 
+    def post(self, request, *args, **kwargs):
+        if 'delete_student' in request.POST or 'delete_delegate' in request.POST:
+            student_id = request.POST.get('student_id')
+            student = Student.objects.get(id=student_id)
+            student.delete()
+            message = format_html(
+                '<strong>{}</strong> was deleted successfully.',
+                student.name
+            )
+            messages.success(request, message)
+        return self.get(request, *args, **kwargs)
+
 
 class StudentDetailView(LoginRequiredMixin, CommonContextMixin, DetailView):
     model = Student
@@ -201,7 +213,7 @@ class StudentAddView(LoginRequiredMixin, CommonContextMixin, CreateView):
     model = Student
     template_name = 'core/students/student_add.html'
     context_object_name = 'form'
-    form_class = StudentAddForm
+    form_class = StudentForm
     success_url = reverse_lazy('core:students')
 
     def form_valid(self, form):
@@ -226,11 +238,64 @@ class StudentAddView(LoginRequiredMixin, CommonContextMixin, CreateView):
         return super().form_invalid(form)
 
 
+class StudentUpdateView(LoginRequiredMixin, CommonContextMixin, UpdateView):
+    model = Student
+    template_name = 'core/students/student_update.html'
+    context_object_name = 'form'
+    form_class = StudentForm
+    success_url = reverse_lazy('core:students')
+
+    def get_object(self, queryset=None):
+        queryset = self.get_queryset()
+        return queryset.get(id=self.kwargs['pk'], slug=self.kwargs['slug'])
+
+    def get_queryset(self):
+        return Student.objects.all()
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['student'] = self.get_object()
+        return context
+
+    def form_valid(self, form):
+        form.save()
+        message = format_html(
+            'Student updated successfully.<br><a href="{}" class="font-bold underline">View</a>',
+            reverse_lazy('core:student_detail', kwargs={'pk': form.instance.pk, 'slug': form.instance.slug})
+        )
+        messages.success(
+            self.request,
+            message
+        )
+        return super().form_valid(form)
+
+    def form_invalid(self, form):
+        messages.error(
+            self.request,
+            format_html(
+                'An error occurred while updating the student.<br>Please try again.'
+            )
+        )
+        return super().form_invalid(form)
+
+
 class LecturerView(LoginRequiredMixin, CommonContextMixin, ListView):
     model = Lecturer
     template_name = 'core/lecturers/lecturers.html'
     paginate_by = 25
     context_object_name = 'lecturers'
+
+    def post(self, request, *args, **kwargs):
+        if 'delete_lecturer' in request.POST:
+            lecturer_id = request.POST.get('lecturer_id')
+            lecturer = Lecturer.objects.get(id=lecturer_id)
+            lecturer.delete()
+            message = format_html(
+                '<strong>{}</strong> was deleted successfully.',
+                lecturer.name
+            )
+            messages.success(request, message)
+        return self.get(request, *args, **kwargs)
 
 
 class LecturerDetailView(LoginRequiredMixin, CommonContextMixin, DetailView):
@@ -254,7 +319,7 @@ class LecturerAddView(LoginRequiredMixin, CommonContextMixin, CreateView):
     model = Lecturer
     template_name = 'core/lecturers/lecturer_add.html'
     context_object_name = 'form'
-    form_class = LecturerAddForm
+    form_class = LecturerForm
     success_url = reverse_lazy('core:lecturers')
 
     def form_valid(self, form):
@@ -274,6 +339,47 @@ class LecturerAddView(LoginRequiredMixin, CommonContextMixin, CreateView):
             self.request,
             format_html(
                 'An error occurred while adding the lecturer.<br>Please try again.'
+            )
+        )
+        return super().form_invalid(form)
+
+
+class LecturerUpdateView(LoginRequiredMixin, CommonContextMixin, UpdateView):
+    model = Lecturer
+    template_name = 'core/lecturers/lecturer_update.html'
+    context_object_name = 'form'
+    form_class = LecturerForm
+    success_url = reverse_lazy('core:lecturers')
+
+    def get_object(self, queryset=None):
+        queryset = self.get_queryset()
+        return queryset.get(id=self.kwargs['pk'], slug=self.kwargs['slug'])
+
+    def get_queryset(self):
+        return Lecturer.objects.all()
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['lecturer'] = self.get_object()
+        return context
+
+    def form_valid(self, form):
+        form.save()
+        message = format_html(
+            'Lecturer updated successfully.<br><a href="{}" class="font-bold underline">View</a>',
+            reverse_lazy('core:lecturer_detail', kwargs={'pk': form.instance.pk, 'slug': form.instance.slug})
+        )
+        messages.success(
+            self.request,
+            message
+        )
+        return super().form_valid(form)
+
+    def form_invalid(self, form):
+        messages.error(
+            self.request,
+            format_html(
+                'An error occurred while updating the lecturer.<br>Please try again.'
             )
         )
         return super().form_invalid(form)

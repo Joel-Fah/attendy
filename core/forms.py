@@ -41,7 +41,7 @@ class UserLoginForm(LoginForm):
         self.fields['password'].required = True
 
 
-class CourseAddForm(forms.ModelForm):
+class CourseForm(forms.ModelForm):
     class Meta:
         model = Course
         fields = '__all__'
@@ -137,7 +137,7 @@ class CourseAddForm(forms.ModelForm):
         self.fields['semester'].default = Course.SemesterChoices.FALL
 
 
-class LecturerAddForm(forms.ModelForm):
+class LecturerForm(forms.ModelForm):
     class Meta:
         model = Lecturer
         fields = '__all__'
@@ -195,7 +195,7 @@ class LecturerAddForm(forms.ModelForm):
         self.fields['department'].default = DepartmentChoices.ICT
 
 
-class StudentAddForm(forms.ModelForm):
+class StudentForm(forms.ModelForm):
     class Meta:
         model = Student
         fields = '__all__'
@@ -284,6 +284,22 @@ class StudentAddForm(forms.ModelForm):
         label='Phone number',
         help_text='Enter the phone number of the student.',
         error_messages={'required': 'Please enter the phone number of the student'},
+        required=True,
+    )
+
+    gender = forms.ChoiceField(
+        widget=forms.Select(
+            attrs={
+                'id': 'gender',
+                'name': 'gender',
+                'placeholder': 'Select gender',
+                'class': 'rounded-2xl block w-full ps-10 p-2.5 bg-whiteColor border-darkColor placeholder-darkColor/50 '
+                         'focus:ring-primaryColor focus:border-primaryColor transition-all duration-300 ease-in-out',
+            }
+        ),
+        label='Gender',
+        help_text='Select the gender of the student.',
+        choices=Student.GenderChoices.choices,
         required=True,
     )
 

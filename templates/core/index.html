@@ -14,6 +14,19 @@
         background-size: cover;
         background-repeat: no-repeat;
     }
+
+    #numbers_img {
+        background-image: url("{% static 'core/images/abstract.svg' %}"), url("{% static 'core/images/bg-ad.png' %}");
+        background-color: #050041;
+        background-size: cover;
+        background-repeat: no-repeat;
+    }
+
+    .text-outline {
+        -webkit-text-fill-color: transparent;
+        -webkit-text-stroke-width: 1px;
+        -webkit-text-stroke-color: #fff5ea;
+    }
 </style>
 {% endblock styles %}
 
@@ -41,14 +54,14 @@
     </div>
 
     <section id="courses" class="max-w-screen-lg m-auto my-5 px-4 py-6">
-        <div class="header flex flex-col gap-4 items-center justify-center">
+        <div class="flex flex-col gap-4 items-center justify-center">
             <h2 class="text-3xl text-center font-bold">
-                Attendy comes in hand for our lovely <br>
-                <span class="text-secondaryColor"> `course delegates` </span>
+                Attendy comes in hand for our lovely
+                <span class="block text-secondaryColor"> `course delegates` </span>
             </h2>
 
             <img src="{% static 'core/images/attendy-dashboard.png' %}" alt="Attendy Dashboard"
-                class="border-2 border-primaryColor rounded-xl shadow-xl">
+                class="border-2 border-primaryColor rounded-xl shadow-xl select-none pointer-events-none">
 
             <div class="features grid grid-cols-12 gap-2 md:gap-4 items-center justify-center w-full">
                 <div
@@ -184,6 +197,131 @@
                         Record every session and attendance with ease. A simple way to make sure every class and every
                         student is accounted for.
                     </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div class="separator flex gap-2 items-center justify-center max-w-screen-lg m-auto">
+        <hr class="w-full border-primaryColor">
+        <img src="{% static 'core/images/logo-shapes-primary.svg' %}" alt="" class="w-20">
+        <hr class="w-full border-primaryColor">
+    </div>
+
+    <section id="numbers" class="max-w-screen-lg m-auto my-5 px-4 py-6">
+        <div class="flex flex-col gap-4 items-center justify-center">
+            <h2 class="text-3xl text-center font-bold">
+                Building the community
+                <span class="block text-secondaryColor">`a student, lecturer... one after the other`</span>
+            </h2>
+            <small class="px-4  text-gray-500 outline outline-1 outline-gray-500 bg-whiteColor rounded-full">
+                Let the numbers talk about themselves
+            </small>
+            
+            <div class="-space-y-2">
+                <img src="{% static 'core/images/numbers.svg' %}" alt="Attendy community" class="relative z-0 w-10/12 m-auto select-none pointer-events-none">
+                
+                <div id="numbers_img" class="relative z-10 flex items-center justify-evenly w-full h-40 rounded-3xl shadow-lg text-whiteColor">
+                    {# courses count #}
+                    <div class="flex flex-col gap-2.5">
+                        <div class="relative">
+                            <h3 class="font-bold inline text-6xl"> {{ course_attendance_count }}+ </h3>
+                            <span class="text-outline absolute left-1 top-1 text-6xl"> {{ course_attendance_count }}+ </span>
+                        </div>
+                        <div class="flex gap-2">
+                            <div class="flex items-center h-max p-1.5 bg-white bg-opacity-10 border-[1.5px] border-whiteColor backdrop-blur-sm rounded-xl">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M6.5 22C8.70914 22 10.5 20.2091 10.5 18C10.5 15.7909 8.70914 14 6.5 14C4.29086 14 2.5 15.7909 2.5 18C2.5 20.2091 4.29086 22 6.5 22Z" stroke="#FFF5EA" stroke-width="3" stroke-linejoin="round"/>
+                                    <path d="M17.5 10C19.7091 10 21.5 8.20914 21.5 6C21.5 3.79086 19.7091 2 17.5 2C15.2909 2 13.5 3.79086 13.5 6C13.5 8.20914 15.2909 10 17.5 10Z" stroke="#FFF5EA" stroke-width="3" stroke-linejoin="round"/>
+                                    <path d="M6 10C8.20914 10 10 8.20914 10 6C10 3.79086 8.20914 2 6 2C3.79086 2 2 3.79086 2 6C2 8.20914 3.79086 10 6 10Z" fill="#FFF5EA" stroke="#FFF5EA" stroke-width="3" stroke-linejoin="round"/>
+                                    <path d="M21.4999 14.5L14.5 21.5M14.5001 14.5L21.5 21.5" stroke="#FFF5EA" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>    
+                            </div>
+                            <div class="leading-tight -space-y-1">
+                                <span class="block">Attendances</span>
+                                <span class="block text-sm text-whiteColor/50">monitored</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    {# courses count #}
+                    <div class="flex flex-col gap-2.5">
+                        <div class="relative">
+                            <h3 class="font-bold inline text-6xl"> {{ courses.count }}+ </h3>
+                            <span class="text-outline absolute left-1 top-1 text-6xl"> {{ courses.count }}+ </span>
+                        </div>
+                        <div class="flex gap-2">
+                            <div class="flex items-center h-max p-1.5 bg-white bg-opacity-10 border-[1.5px] border-whiteColor backdrop-blur-sm rounded-xl">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none" class="w-6 h-6">
+                                    <path d="M14.5 5L12.5 5C9.67157 5 8.25736 5 7.37868 5.87868C6.5 6.75736 6.5 8.17157 6.5 11L6.5 16C6.5 18.8284 6.5 20.2426 7.37868 21.1213C8.25736 22 9.67157 22 12.5 22H13.8431C14.6606 22 15.0694 22 15.4369 21.8478C15.8045 21.6955 16.0935 21.4065 16.6716 20.8284L19.3284 18.1716C19.9065 17.5935 20.1955 17.3045 20.3478 16.9369C20.5 16.5694 20.5 16.1606 20.5 15.3431V11C20.5 8.17157 20.5 6.75736 19.6213 5.87868C18.7426 5 17.3284 5 14.5 5Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                                    <path d="M15 21.5L15 20.5C15 18.6144 15 17.6716 15.5858 17.0858C16.1716 16.5 17.1144 16.5 19 16.5L20 16.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                                    <path d="M6.5 19C4.84315 19 3.5 17.6569 3.5 16L3.5 8C3.5 5.17157 3.5 3.75736 4.37868 2.87868C5.25736 2 6.67157 2 9.5 2L14.5004 2C16.1572 2.00001 17.5004 3.34319 17.5004 5.00003" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                                    <path d="M10.0011 13L14.0011 13M10.0011 9L17.0011 9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                                </svg>
+                            </div>
+                            <div class="leading-tight -space-y-1">
+                                <span class="block">Courses</span>
+                                <span class="block text-sm text-whiteColor/50">registered</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    {# students count #}
+                    <div class="flex flex-col gap-2.5">
+                        <div class="relative">
+                            <h3 class="font-bold inline text-6xl"> {{ students.count }}+ </h3>
+                            <span class="text-outline absolute left-1 top-1 text-6xl"> {{ students.count }}+ </span>
+                        </div>
+                        <div class="flex gap-2">
+                            <div class="flex items-center h-max p-1.5 bg-white bg-opacity-10 border-[1.5px] border-whiteColor backdrop-blur-sm rounded-xl">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none">
+                                    <path
+                                        d="M20.7739 18C21.5232 18 22.1192 17.5285 22.6543 16.8691C23.7498 15.5194 21.9512 14.4408 21.2652 13.9126C20.5679 13.3756 19.7893 13.0714 18.9999 13M17.9999 11C19.3806 11 20.4999 9.88071 20.4999 8.5C20.4999 7.11929 19.3806 6 17.9999 6"
+                                        stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+                                    <path
+                                        d="M3.2259 18C2.47659 18 1.88061 17.5285 1.34548 16.8691C0.250028 15.5194 2.04861 14.4408 2.73458 13.9126C3.43191 13.3756 4.21052 13.0714 4.99994 13M5.49994 11C4.11923 11 2.99994 9.88071 2.99994 8.5C2.99994 7.11929 4.11923 6 5.49994 6"
+                                        stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+                                    <path
+                                        d="M8.08368 15.1112C7.0619 15.743 4.38286 17.0331 6.01458 18.6474C6.81166 19.436 7.6994 20 8.8155 20H15.1843C16.3004 20 17.1881 19.436 17.9852 18.6474C19.6169 17.0331 16.9379 15.743 15.9161 15.1112C13.52 13.6296 10.4797 13.6296 8.08368 15.1112Z"
+                                        stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                                    <path
+                                        d="M15.4999 7.5C15.4999 9.433 13.9329 11 11.9999 11C10.0669 11 8.49988 9.433 8.49988 7.5C8.49988 5.567 10.0669 4 11.9999 4C13.9329 4 15.4999 5.567 15.4999 7.5Z"
+                                        stroke="currentColor" stroke-width="1.5" />
+                                </svg>
+                            </div>
+                            <div class="leading-tight -space-y-1">
+                                <span class="block">Students</span>
+                                <span class="block text-sm text-whiteColor/50">consented</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    {# lecturers count #}
+                    <div class="flex flex-col gap-2.5">
+                        <div class="relative">
+                            <h3 class="font-bold inline text-6xl"> {{ lecturers.count}}+ </h3>
+                            <span class="text-outline absolute left-1 top-1 text-6xl"> {{ lecturers.count}}+ </span>
+                        </div>
+                        <div class="flex gap-2">
+                            <div class="flex items-center h-max p-1.5 bg-white bg-opacity-10 border-[1.5px] border-whiteColor backdrop-blur-sm rounded-xl">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none">
+                                    <path d="M13 15C10.7083 21 4.29167 15 2 21" stroke="currentColor" stroke-width="1.5"
+                                        stroke-linecap="round" stroke-linejoin="round" />
+                                    <path
+                                        d="M15.5 15H17.0013C19.3583 15 20.5368 15 21.2691 14.2678C22.0013 13.5355 22.0013 12.357 22.0013 10V8C22.0013 5.64298 22.0013 4.46447 21.2691 3.73223C20.5368 3 19.3583 3 17.0013 3H13.0013C10.6443 3 9.46576 3 8.73353 3.73223C8.11312 4.35264 8.01838 5.29344 8.00391 7"
+                                        stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                                    <circle cx="7.5" cy="12.5" r="2.5" stroke="currentColor" stroke-width="1.5"
+                                        stroke-linecap="round" stroke-linejoin="round" />
+                                    <path d="M12 7H18M18 11H15" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
+                                        stroke-linejoin="round" />
+                                </svg>
+                            </div>
+                            <div class="leading-tight -space-y-1">
+                                <span class="block">Lecturers</span>
+                                <span class="block text-sm text-whiteColor/50">approved</span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

@@ -9,9 +9,9 @@ from .models import Student, StudentDelegate, Lecturer, TeachingRecord, Course, 
 
 class StudentAdmin(admin.ModelAdmin):
     model = Student
-    list_display = ['name', 'matricule', 'phone', 'is_delegate']
-    list_filter = ['department', 'is_delegate']
-    search_fields = ['name', 'matricule', 'email', 'department', 'phone']
+    list_display = ['name', 'matricule', 'phone', 'is_delegate', 'gender']
+    list_filter = ['department', 'is_delegate', 'gender']
+    search_fields = ['name', 'matricule', 'email', 'phone']
     list_per_page = 25
 
     readonly_fields = ['updated_at', 'created_at']
@@ -37,10 +37,12 @@ class StudentDelegateAdmin(admin.ModelAdmin):
     search_fields = ['student_name', 'course_title']
     list_per_page = 25
 
-    def student_name(self, obj):
+    @staticmethod
+    def student_name(obj):
         return obj.student.name
 
-    def course_title(self, obj):
+    @staticmethod
+    def course_title(obj):
         return obj.course.title
 
     def save_model(self, request, obj, form, change):
@@ -69,11 +71,13 @@ class TeachingRecordAdmin(SummernoteModelAdmin):
     readonly_fields = ['lecturer_duration', 'updated_at', 'created_at']
 
     # get course title
-    def course_title(self, obj):
+    @staticmethod
+    def course_title(obj):
         return obj.teaching_record_attendance.course.title
 
     # get lecturer name
-    def lecturer_name(self, obj):
+    @staticmethod
+    def lecturer_name(obj):
         return obj.teaching_record_attendance.course.lecturer.name
 
 
@@ -86,7 +90,8 @@ class CourseAdmin(admin.ModelAdmin):
 
     readonly_fields = ['updated_at', 'created_at']
 
-    def semester_year(self, obj):
+    @staticmethod
+    def semester_year(obj):
         return f'{obj.semester} {obj.year}'
 
 
@@ -97,10 +102,12 @@ class EnrollmentAdmin(admin.ModelAdmin):
     search_fields = ['student_name', 'course_title']
     list_per_page = 25
 
-    def student_name(self, obj):
+    @staticmethod
+    def student_name(obj):
         return obj.student.name
 
-    def course_title(self, obj):
+    @staticmethod
+    def course_title(obj):
         return obj.attendance.course.title
 
 
@@ -111,10 +118,12 @@ class CourseAttendanceAdmin(admin.ModelAdmin):
     search_fields = ['course_title']
     list_per_page = 25
 
-    def lecturer_name(self, obj):
+    @staticmethod
+    def lecturer_name(obj):
         return obj.course.lecturer.name
 
-    def course_title(self, obj):
+    @staticmethod
+    def course_title(obj):
         return obj.course.title
 
 

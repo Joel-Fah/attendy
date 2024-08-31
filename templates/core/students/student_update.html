@@ -4,7 +4,7 @@
 {% load custom_date_formatter duration_formatter %}
 
 {# Title of the page #}
-{% block title %} Update for {{ student.name }} {% endblock %}
+{% block title %} Add a student {% endblock %}
 
 {% block extra_styles %}
 <style>
@@ -29,14 +29,20 @@
         <div class="grid grid-cols-12 items-center justify-center gap-2">
             <div class="col-start-2 col-span-4 flex flex-col gap-4">
                 <div class="flex flex-col gap-2">
-                    <h2 class="text-2xl">Register a new student</h2>
+                    <h2 class="text-2xl">
+                        You're updating
+                        <span class="block text-primaryColor">{{ student.name }}</span>
+                    </h2>
+                    <small class="w-max px-2.5 rounded-xl bg-darkColor/5">
+                        <span class="text-gray-500">Last update:</span>
+                        {{ student.updated_at|format_date }}
+                    </small>
                     <p class="text-sm">
-                        Adding a new student to the system is easy. Just fill in the form below and submit. <br>
-                        This will make him/her available throughout the system.
+                        Update the student's information below. It will take effect immediately.
                     </p>
                 </div>
         
-                <form action="{% url 'core:student_add' %}" method="post" class="max-w-sm w-full">
+                <form action="" method="post" class="max-w-sm w-full">
                     {% csrf_token %}
         
                     <!-- Display non fields errors -->
@@ -204,7 +210,7 @@
                         <div class="text-whiteColor">
                             <button type="submit"
                                 class="block mb-2 focus:outline-none rounded-2xl w-full px-5 py-2 text-center bg-primaryColor hover:bg-blue-950 focus:ring-2 focus:ring-secondaryColor focus:ring-offset-1 transition-all duration-300 ease-in-out">
-                                Add student
+                                Update student
                             </button>
                         </div>
                     </div>
@@ -229,4 +235,6 @@
 
 {# Additional javascript #}
 {% block javascript %}
+<!-- from cdn -->
+<script src="{% static 'core/js/tabs.js' %}"></script>
 {% endblock javascript %}
