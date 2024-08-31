@@ -132,7 +132,7 @@ After setting up the project, access the application by navigating to `http://12
 
 ## **Contributing**
 
-We welcome contributions from the community! Whether it's reporting bugs, suggesting features, or submitting pull requests, your involvement is crucial to the project's growth. Please read our [Code of Conduct](./CODE_OF_CONDUCT.md) before contributing.
+We welcome contributions from the community! Whether it's reporting bugs, suggesting features, or submitting pull requests, your involvement is crucial to the project's growth. Please read our [Code of Conduct](./CODE_OF_CONDUCT.md) and [Contributing Guidelines](./CONTRIBUTING.md) before contributing.
 
 ## **License**
 
