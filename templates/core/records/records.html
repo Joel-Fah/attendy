@@ -47,18 +47,18 @@
                             <div class="flex items-center gap-4">
                                 <span> {{ forloop.counter }}. </span>
                                 <div class="">
-                                    <small class="text-xs text-darkColor/50"> {{ record.created_at }} | {{ record.teaching_record_attendance.course.semester }} {{ record.teaching_record_attendance.course.year }} </small>
+                                    <small class="text-xs text-gray-500"> {{ record.created_at }} | {{ record.teaching_record_attendance.course.semester }} {{ record.teaching_record_attendance.course.year }} </small>
                                     <h3 class="text-xl font-medium"> {{ record.teaching_record_attendance.course.code }} {{ record.teaching_record_attendance.course.title }}
                                     </h3>
                                     <small class="flex items-center gap-4">
                                         <div class="">
-                                            <span class="text-darkColor/50"> Lecturer: </span>
+                                            <span class="text-gray-500"> Lecturer: </span>
                                             {{ record.teaching_record_attendance.course.lecturer.name }}
                                         </div>
 
                                         {% if record.course_delegate %}
                                         <div class="">
-                                            <span class="text-darkColor/50">Delegate: </span>
+                                            <span class="text-gray-500">Delegate: </span>
                                             {{ record.course_delegate.student.name }}
                                         </div>
                                         {% else %}
@@ -67,7 +67,7 @@
 
                                         {% if record.course_assistant %}
                                         <div class="">
-                                            <span class="text-darkColor/50">Assistant: </span>
+                                            <span class="text-gray-500">Assistant: </span>
                                             {{ record.course_assistant.student.name }}
                                         </div>
                                         {% endif %}

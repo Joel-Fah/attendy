@@ -99,74 +99,6 @@ class CourseAddForm(forms.ModelForm):
         required=True,
     )
 
-    date = forms.DateField(
-        widget=forms.DateInput(
-            attrs={
-                'id': 'date',
-                'name': 'date',
-                'type': 'date',
-                'placeholder': 'Course date',
-                'class': 'rounded-2xl block w-full ps-10 p-2.5 bg-whiteColor border-darkColor placeholder-darkColor/50 '
-                         'focus:ring-primaryColor focus:border-primaryColor transition-all duration-300 ease-in-out',
-            },
-        ),
-        initial=datetime.date.today,
-        label='Course date',
-        help_text='Enter the date the course is taught.',
-        error_messages={'required': 'Please enter the date the course is taught'},
-        required=True,
-    )
-
-    start_time = forms.TimeField(
-        widget=forms.TimeInput(
-            attrs={
-                'id': 'start_time',
-                'name': 'start_time',
-                'type': 'time',
-                'placeholder': 'Course start time',
-                'class': 'rounded-2xl block w-full ps-10 p-2.5 bg-whiteColor border-darkColor placeholder-darkColor/50 '
-                         'focus:ring-primaryColor focus:border-primaryColor transition-all duration-300 ease-in-out',
-            }
-        ),
-        label='Course start time',
-        help_text='Enter the start time of the course.',
-        error_messages={'required': 'Please enter the start time of the course'},
-        required=True,
-        initial=datetime.datetime.now().time()
-    )
-
-    end_time = forms.TimeField(
-        widget=forms.TimeInput(
-            attrs={
-                'id': 'end_time',
-                'name': 'end_time',
-                'type': 'time',
-                'placeholder': 'Course end time',
-                'class': 'rounded-2xl block w-full ps-10 p-2.5 bg-whiteColor border-darkColor placeholder-darkColor/50 '
-                         'focus:ring-primaryColor focus:border-primaryColor transition-all duration-300 ease-in-out',
-            }
-        ),
-        label='Course end time',
-        help_text='Enter the end time of the course.',
-        error_messages={'required': 'Please enter the end time of the course'},
-        required=True,
-        initial=datetime.datetime.now().time()
-    )
-
-    is_catchup = forms.BooleanField(
-        widget=forms.CheckboxInput(
-            attrs={
-                'id': 'is_catchup',
-                'name': 'is_catchup',
-                'class': 'w-4 h-4 border rounded-md focus:ring-3 bg-slate-700 border-slate-600 '
-                         'focus:ring-primaryColor ring-offset-slate-800 focus:ring-offset-slate-800',
-            }
-        ),
-        label='Catch-up class',
-        help_text='Is this a catch-up class?',
-        required=False,
-    )
-
     semester = forms.ChoiceField(
         widget=forms.Select(
             attrs={
@@ -203,13 +135,6 @@ class CourseAddForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['semester'].default = Course.SemesterChoices.FALL
-        self.fields['is_catchup'].default = False
-
-    def clean_date(self):
-        date = self.cleaned_data['date']
-        if date > datetime.date.today():
-            raise forms.ValidationError("The course date cannot be in the future.")
-        return date
 
 
 class LecturerAddForm(forms.ModelForm):

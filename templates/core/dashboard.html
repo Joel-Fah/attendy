@@ -169,7 +169,26 @@
 
                     <div id="ad"
                          class="col-span-12 relative flex flex-col items-start justify-center overflow-hidden px-8 h-52 bg-primaryColor rounded-3xl shadow-lg">
-                        <small class="text-whiteColor/50 text-sm">Attendy, the game changer.</small>
+                        <div class="flex items-center gap-1">
+                           <svg width="25" height="24" viewBox="0 0 25 24" fill="none"
+                                     xmlns="http://www.w3.org/2000/svg" class="w-4 h-5 text-gray-500">
+                                    <path
+                                            d="M7 22C9.20914 22 11 20.2091 11 18C11 15.7909 9.20914 14 7 14C4.79086 14 3 15.7909 3 18C3 20.2091 4.79086 22 7 22Z"
+                                            stroke="#6b7280" stroke-width="3" stroke-linejoin="round"/>
+                                    <path
+                                            d="M18 10C20.2091 10 22 8.20914 22 6C22 3.79086 20.2091 2 18 2C15.7909 2 14 3.79086 14 6C14 8.20914 15.7909 10 18 10Z"
+                                            stroke="#6b7280" stroke-width="3" stroke-linejoin="round"/>
+                                    <path
+                                            d="M6.5 10C8.70914 10 10.5 8.20914 10.5 6C10.5 3.79086 8.70914 2 6.5 2C4.29086 2 2.5 3.79086 2.5 6C2.5 8.20914 4.29086 10 6.5 10Z"
+                                            fill="#6b7280" stroke="#6b7280" stroke-width="3" stroke-linejoin="round"/>
+                                    <path d="M21.9999 14.5L15 21.5M15.0001 14.5L22 21.5" stroke="#6b7280"
+                                          stroke-width="3"
+                                          stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                           <small class="text-whiteColor/50 text-sm">
+                              Attendy, the game changer.
+                           </small>
+                        </div>
                         <h2 class="text-3xl font-bold max-w-sm my-2 text-whiteColor">
                             Your delegate journey must not always be a boring and loaded one.
                         </h2>
@@ -208,19 +227,19 @@
                                             <a href="" class="flex items-center gap-4">
                                                 <span> {{ forloop.counter }}. </span>
                                                 <div class="">
-                                                    <small class="text-xs text-darkColor/50"> {{ attendance.created_at }}
+                                                    <small class="text-xs text-gray-500"> {{ attendance.created_at }}
                                                         | {{ attendance.course.semester }} {{ attendance.course.year }} </small>
                                                     <h3 class="text-xl font-medium"> {{ attendance.course.code }} {{ attendance.course.title }}
                                                     </h3>
                                                     <small class="flex items-center gap-4">
                                                         <div class="">
-                                                            <span class="text-darkColor/50"> Lecturer: </span>
+                                                            <span class="text-gray-500"> Lecturer: </span>
                                                             {{ attendance.course.lecturer.name }}
                                                         </div>
 
                                                         {% if attendance.course_delegate %}
                                                             <div class="">
-                                                                <span class="text-darkColor/50">Delegate: </span>
+                                                                <span class="text-gray-500">Delegate: </span>
                                                                 {{ attendance.course_delegate.student.name }}
                                                             </div>
                                                         {% else %}
@@ -229,7 +248,7 @@
 
                                                         {% if attendance.enrollment_count > 0 %}
                                                             <div class="">
-                                                                <span class="text-darkColor/50">No. Students: </span>
+                                                                <span class="text-gray-500">No. Students: </span>
                                                                 {{ attendance.enrollment_count }}
                                                             </div>
                                                         {% else %}

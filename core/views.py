@@ -5,7 +5,7 @@ from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse_lazy
 from django.utils.html import format_html
-from django.views.generic import TemplateView, ListView, DetailView, CreateView
+from django.views.generic import TemplateView, ListView, DetailView, CreateView, UpdateView
 
 from .forms import CourseAddForm, LecturerAddForm, StudentAddForm
 from .mixins import CommonContextMixin
@@ -34,7 +34,6 @@ class DashboardView(LoginRequiredMixin, CommonContextMixin, TemplateView):
                                                                              role='assistant').first()
                 attendance.enrollment_count = Enrollment.objects.filter(attendance=attendance).count()
         context['grouped_attendances'] = dict(grouped_attendances)
-        context['course_attendance_count'] = CourseAttendance.objects.count()
         return context
 
 
@@ -61,6 +60,19 @@ class CourseView(LoginRequiredMixin, CommonContextMixin, ListView):
     template_name = 'core/courses/courses.html'
     paginate_by = 25
     context_object_name = 'courses'
+
+    def post(self, request, *args, **kwargs):
+        if 'delete_course' in request.POST:
+            course_id = request.POST.get('course_id')
+            course = Course.objects.get(id=course_id)
+            course.delete()
+            message = format_html(
+                '<strong>{} {}</strong> was deleted successfully.',
+                course.code,
+                course.title
+            )
+            messages.success(request, message)
+        return self.get(request, *args, **kwargs)
 
 
 class CourseDetailView(LoginRequiredMixin, CommonContextMixin, DetailView):
@@ -110,6 +122,47 @@ class CourseAddView(LoginRequiredMixin, CommonContextMixin, CreateView):
             self.request,
             format_html(
                 'An error occurred while adding the course.<br>Please try again.'
+            )
+        )
+        return super().form_invalid(form)
+
+
+class CourseUpdateView(LoginRequiredMixin, CommonContextMixin, UpdateView):
+    model = Course
+    template_name = 'core/courses/course_update.html'
+    context_object_name = 'form'
+    form_class = CourseAddForm
+    success_url = reverse_lazy('core:courses')
+
+    def get_object(self, queryset=None):
+        queryset = self.get_queryset()
+        return queryset.get(id=self.kwargs['pk'], slug=self.kwargs['slug'])
+
+    def get_queryset(self):
+        return Course.objects.all()
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['course'] = self.get_object()
+        return context
+
+    def form_valid(self, form):
+        form.save()
+        message = format_html(
+            'Course updated successfully.<br><a href="{}" class="font-bold underline">View</a>',
+            reverse_lazy('core:course_detail', kwargs={'pk': form.instance.pk, 'slug': form.instance.slug})
+        )
+        messages.success(
+            self.request,
+            message
+        )
+        return super().form_valid(form)
+
+    def form_invalid(self, form):
+        messages.error(
+            self.request,
+            format_html(
+                'An error occurred while updating the course.<br>Please try again.'
             )
         )
         return super().form_invalid(form)

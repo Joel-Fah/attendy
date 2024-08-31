@@ -4,7 +4,7 @@
 {% load custom_date_formatter duration_formatter %}
 
 {# Title of the page #}
-{% block title %} Add a course {% endblock %}
+{% block title %} Update for {{ course.code }} {{ course.title }} {% endblock %}
 
 {% block extra_styles %}
     <style>
@@ -29,14 +29,21 @@
             <div class="grid grid-cols-12 items-center justify-center gap-2">
                 <div class="col-start-2 col-span-4 flex flex-col gap-4">
                     <div class="flex flex-col gap-2">
-                        <h2 class="text-2xl">Register a course for this week</h2>
+                        <h2 class="text-2xl">
+                            You're updating
+                            <span class="block text-primaryColor">{{ course.code }} {{ course.title }}</span>
+                        </h2>
+                        <small class="w-max px-2.5 rounded-xl bg-darkColor/5">
+                            <span class="text-gray-500">Last update:</span>
+                            {{ course.updated_at|format_date }}
+                        </small>
                         <p class="text-sm">
                             Keep track of your course activity by adding them to the platform on a weekly basis as they
                             are being taught in class.
                         </p>
                     </div>
 
-                    <form action="{% url 'core:course_add' %}" method="post" class="max-w-sm w-full">
+                    <form action="" method="post" class="max-w-sm w-full">
                         {% csrf_token %}
 
                         <!-- Display non fields errors -->
@@ -211,7 +218,7 @@
                             <div class="text-whiteColor">
                                 <button type="submit"
                                         class="block mb-2 focus:outline-none rounded-2xl w-full px-5 py-2 text-center bg-primaryColor hover:bg-blue-950 focus:ring-2 focus:ring-secondaryColor focus:ring-offset-1 transition-all duration-300 ease-in-out">
-                                    Add course
+                                    Update course
                                 </button>
                             </div>
                         </div>

@@ -59,7 +59,7 @@
             </h2>
             <small class="flex items-center gap-4">
                 <span class="text-darkColor flex gap-1 px-2.5 rounded-xl bg-darkColor/5">
-                    <span class="text-darkColor/50">Quality assurance: </span>
+                    <span class="text-gray-500">Quality assurance: </span>
                     {% if record.quality_assurance == 'Approved' %}
                     <span class="text-success">{{ record.quality_assurance }}</span>
                     {% else %}
@@ -68,7 +68,7 @@
                 </span>
 
                 <span class="text-darkColor flex gap-1 px-2.5 rounded-xl bg-darkColor/5">
-                    <span class="text-darkColor/50">Last update: </span>
+                    <span class="text-gray-500">Last update: </span>
                     {{ record.updated_at|format_date }}
                 </span>
             </small>
@@ -86,12 +86,12 @@
                 <div class="flex flex-col gap-2">
 
                     <div class="flex flex-col items-start py-2 px-4 rounded-2xl bg-secondaryColor/10">
-                        <small class="text-darkColor/50 text-sm">Lecturer:</small>
+                        <small class="text-gray-500 text-sm">Lecturer:</small>
                         <span class="text-darkColor"> {{ record.teaching_record_attendance.course.lecturer.name }} </span>
                     </div>
 
                     <div class="flex flex-col items-start py-2 px-4 rounded-2xl bg-secondaryColor/10">
-                        <small class="text-darkColor/50 text-sm">Course delegate & assistant(s):</small>
+                        <small class="text-gray-500 text-sm">Course delegate & assistant(s):</small>
                         {% for delegate in course_delegates %}
                             {% if delegate.role == 'delegate' %}
                             <span class="text-darkColor"> {{ delegate.student.name }} </span>
@@ -107,7 +107,7 @@
                     </div>
 
                     <div class="flex flex-col items-start gap-0.5 py-2 px-4 rounded-2xl bg-secondaryColor/10">
-                        <small class="text-darkColor/50 text-sm">Start - Finish time:</small>
+                        <small class="text-gray-500 text-sm">Start - Finish time:</small>
                         {% if record.lecturer_arrival_time and record.lecturer_departure_time %}
                         <span class="text-darkColor"> {{ record.lecturer_arrival_time }} ~ {{ record.lecturer_departure_time }}</span>
                         {% else %}
@@ -116,7 +116,7 @@
                     </div>
 
                     <div class="flex flex-col items-start gap-0.5 py-2 px-4 rounded-2xl bg-secondaryColor/10">
-                        <small class="text-darkColor/50 text-sm">Duration:</small>
+                        <small class="text-gray-500 text-sm">Duration:</small>
                         {% if record.lecturer_duration %}
                         <span class="text-darkColor"> {{ record.lecturer_duration }} </span>
                         {% else %}
@@ -125,12 +125,12 @@
                     </div>
 
                     <div class="flex flex-col items-start gap-0.5 py-2 px-4 rounded-2xl bg-secondaryColor/10">
-                        <small class="text-darkColor/50 text-sm">Semester:</small>
+                        <small class="text-gray-500 text-sm">Semester:</small>
                         <span class="text-darkColor"> {{ record.teaching_record_attendance.course.semester }} {{ record.teaching_record_attendance.course.year }} </span>
                     </div>
 
                     <div class="flex flex-col items-start gap-0.5 py-2 px-4 rounded-2xl bg-secondaryColor/10">
-                        <small class="text-darkColor/50 text-sm">Number of students:</small>
+                        <small class="text-gray-500 text-sm">Number of students:</small>
                             {% if enrollments > 0 %}
                                 <span class="text-darkColor">{{ enrollments }}</span>
                             {% else %}
@@ -139,7 +139,7 @@
                     </div>
 
                     <div class="flex flex-col items-start gap-0.5 py-2 px-4 rounded-2xl bg-secondaryColor/10">
-                        <small class="text-darkColor/50 text-sm">Date:</small>
+                        <small class="text-gray-500 text-sm">Date:</small>
                         <span class="text-darkColor"> {{ record.created_at|format_date }} </span>
                     </div>
                 </div>
