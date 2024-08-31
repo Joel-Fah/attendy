@@ -79,6 +79,12 @@
                             </td>
                             <td class="px-6 py-4">
                                 <div class="flex gap-2">
+                                    <a href="{% url 'core:lecturer_detail' pk=lecturer.id slug=lecturer.slug %}" class="font-medium text-primaryColor hover:underline">
+                                        View
+                                    </a>
+            
+                                    <span>|</span>
+                                    
                                     <a href="#" class="font-medium text-primaryColor hover:underline">
                                         Edit
                                     </a>

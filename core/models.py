@@ -1,9 +1,9 @@
-from django.db import models
-from datetime import datetime, timedelta
-from django.utils import timezone
+from datetime import datetime
 
+from django.db import models
 from slugify import slugify
-from .utils import calculate_duration
+
+from .utils import calculate_duration, is_valid_time
 
 
 # Create your models here.
@@ -124,7 +124,10 @@ class TeachingRecord(models.Model):
 
     def save(self, *args, **kwargs):
         if self.lecturer_arrival_time and self.lecturer_departure_time:
-            self.lecturer_duration = calculate_duration(self.lecturer_arrival_time, self.lecturer_departure_time)
+            if is_valid_time(self.lecturer_arrival_time, self.lecturer_departure_time):
+                self.lecturer_duration = calculate_duration(self.lecturer_arrival_time, self.lecturer_departure_time)
+            else:
+                raise ValueError("Invalid time range")
         super().save(*args, **kwargs)
 
     def __str__(self):
@@ -142,7 +145,7 @@ class Course(models.Model):
         SPRING = 'SPRING', 'SPRING'
         SUMMER = 'SUMMER', 'SUMMER'
 
-    code = models.CharField(max_length=255, null=False,
+    code = models.CharField(max_length=7, null=False,
                             blank=False, unique=True, help_text="Course code")
     title = models.CharField(max_length=255, null=False,
                              blank=False, help_text="Name of the course")
@@ -210,10 +213,14 @@ class CourseAttendance(models.Model):
                 description=f"Teaching record for {self.course.title} by {self.course.lecturer.name}",
             )
 
+        # Validate times
+        if not is_valid_time(self.course_start_time, self.course_end_time):
+            raise ValueError("Invalid time range")
+
         # Calculate course duration
         if self.course_start_time and self.course_end_time:
             self.course_duration = calculate_duration(self.course_start_time, self.course_end_time)
         super().save(*args, **kwargs)
 
     def __str__(self):
-        return f"Attendance for {self.course.title} on {self.course_date}"
+        return f"Attendance for {self.course.code} {self.course.title} on {self.course_date}"

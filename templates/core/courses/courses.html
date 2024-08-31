@@ -80,6 +80,12 @@
                                 </td>
                                 <td class="px-6 py-4">
                                     <div class="flex gap-2">
+                                        <a href="{% url 'core:course_detail' pk=course.id slug=course.slug %}" class="font-medium text-primaryColor hover:underline">
+                                            View
+                                        </a>
+
+                                        <span>|</span>
+
                                         <a href="#" class="font-medium text-primaryColor hover:underline">
                                             Edit
                                         </a>
@@ -98,12 +104,12 @@
 
                     <nav class="flex items-center flex-column flex-wrap md:flex-row justify-between pt-4"
                          aria-label="Table navigation">
-                                    <span class="text-sm font-normal text-darkColor/50 mb-4 md:mb-0 block w-full md:inline md:w-auto">
-                                        Showing 
-                                        <span class="font-semibold text-primaryColor">{{ page_obj.start_index }}-{{ page_obj.end_index }}</span> 
-                                        of 
-                                        <span class="font-semibold text-primaryColor">{{ page_obj.paginator.count }}</span>
-                                    </span>
+                        <span class="text-sm font-normal text-darkColor/50 mb-4 md:mb-0 block w-full md:inline md:w-auto">
+                            Showing
+                            <span class="font-semibold text-primaryColor">{{ page_obj.start_index }}-{{ page_obj.end_index }}</span>
+                            of
+                            <span class="font-semibold text-primaryColor">{{ page_obj.paginator.count }}</span>
+                        </span>
 
                         {% if is_paginated %}
                             <ul class="inline-flex -space-x-px text-sm h-8">

@@ -1,7 +1,7 @@
 {% extends 'core/base_app.html' %}
 {% load static %}
 {% load tailwind_tags %}
-{% load custom_date_formatter duration_formatter %}
+{% load custom_date_formatter %}
 
 {# Title of the page #}
 {% block title %} {{ course.title }} {% endblock %}
@@ -29,18 +29,10 @@
             <h2 class="text-3xl">
                 {{ course.code }} {{ course.title }}
             </h2>
-            <div class="flex items-center gap-2">
-                <small class="text-darkColor flex gap-1 px-2.5 rounded-xl bg-darkColor/5 w-">
-                    <span class="text-darkColor/50">Done on: </span>
-                    {{ course.date|format_date }}
-                </small>
-
-                {% if course.is_catchup %}
-                <small class="text-danger flex gap-1 px-2.5 rounded-xl bg-danger/5 w-">
-                    catchup class
-                </small>
-                {% endif %}
-            </div>
+            <small class="w-max text-darkColor flex gap-1 px-2.5 rounded-xl bg-darkColor/5 w-">
+                <span class="text-darkColor/50">Registered on: </span>
+                {{ course.created_at|format_date }}
+            </small>
         </div>
 
         <div class="w-full grid grid-cols-12 gap-2">
@@ -60,9 +52,7 @@
                             <a class="z-30 flex items-center justify-center w-full px-0 py-1 mb-0 transition-all ease-in-out border-0 rounded-lg cursor-pointer bg-inherit"
                                 data-tab-target="" role="tab" aria-selected="false" aria-controls="message">
                                 <span class="ml-1 flex items-center gap-2">
-                                    Enrolled students
-                                    <span class="text-sm bg-darkColor/10 px-2.5 py-0.5 rounded-md"> {{ enrolled_students.count }}
-                                    </span>
+                                    Statistics
                                 </span>
                             </a>
                         </li>
@@ -87,22 +77,8 @@
                                 <hr class="border-darkColor/10">
                                 <li class="">
                                     <div class="flex items-center justify-between">
-                                        <p class="text-darkColor/50">Start time:</p>
-                                        <p class="text-darkColor">{{ course.start_time }}</p>
-                                    </div>
-                                </li>
-                                <hr class="border-darkColor/10">
-                                <li class="">
-                                    <div class="flex items-center justify-between">
-                                        <p class="text-darkColor/50">End time:</p>
-                                        <p class="text-darkColor">{{ course.end_time }}</p>
-                                    </div>
-                                </li>
-                                <hr class="border-darkColor/10">
-                                <li class="">
-                                    <div class="flex items-center justify-between">
-                                        <p class="text-darkColor/50">Duration:</p>
-                                        <p class="text-darkColor">{{ course.duration|format_duration }}</p>
+                                        <p class="text-darkColor/50">Lecturer:</p>
+                                        <p class="text-darkColor">{{ course.lecturer.name }}</p>
                                     </div>
                                 </li>
                                 <hr class="border-darkColor/10">
@@ -116,97 +92,23 @@
                         </div>
     
                         <div class="hidden opacity-0" id="message" role="tabpanel">
-                            {% if enrolled_students.count > 0 %}
-                            <div class="relative overflow-x-auto">
-                                <table class="w-full text-sm text-left">
-                                    <thead class="text-primaryColor uppercase">
-                                        <tr class="border-b border-darkColor/10">
-                                            <th scope="col" class="p-4">
-                                                S/N
-                                            </th>
-                                            <th scope="col" class="px-6 py-3">
-                                                Names
-                                            </th>
-                                            <th scope="col" class="px-6 py-3">
-                                                Email
-                                            </th>
-                                            <th scope="col" class="px-6 py-3">
-                                                Dep't
-                                            </th>
-                                            <th scope="col" class="px-6 py-3">
-                                                Phone No
-                                            </th>
-                                            <th scope="col" class="px-6 py-3">
-                                                Observation
-                                            </th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {% for enrollment in enrolled_students %}
-                                        <tr class="border-b border-darkColor/10 hover:bg-secondaryColor/5">
-                                            <td class="w-4 p-4">
-                                                {{ forloop.counter }}
-                                            </td>
-                                            <th scope="row" class="flex items-center gap-1 px-6 py-4 font-medium whitespace-nowrap">
-                                                {{ enrollment.student.name}}
-                                                {% if enrollment.student.is_delegate %}
-                                                  <div class="w-1.5 h-1.5 rounded-full bg-secondaryColor"></div>
-                                                {% endif %}
-                                            </th>
-                                            <td class="px-6 py-4">
-                                                {{ enrollment.student.email }}
-                                            </td>
-                                            <td class="px-6 py-4">
-                                                {{ enrollment.student.department}}
-                                            </td>
-                                            <td class="px-6 py-4">
-                                                {{ enrollment.student.phone }}
-                                            </td>
-                                            <td class="px-6 py-4">
-                                                {% if enrollment.student.is_present %}
-                                                  <span class="text-success">
-                                                    Present
-                                                  </span>
-                                                  {% else %}
-                                                  <span class="text-danger">
-                                                    Absent
-                                                  </span>
-                                                {% endif %}
-                                            </td>
-                                        </tr>
-                                        {% endfor %}
-                                    </tbody>
-                                </table>
-                            </div>
-                              {% else %}
-                              <p class="m-auto py-4 px-8">> No enrolled students..</p>
-                            {% endif %}
+                              <p class="m-auto py-4 px-8">> Nothing yet to show here...</p>
                         </div>
                     </div>
                 </div>
             </div>
 
             <div class=" flex flex-col gap-6 col-start-10 col-span-3">
-                <h3 class="">Intervenants</h3>
+                <h3 class="">Course delegates and assistants</h3>
                 
                 <div class="flex flex-col gap-2">
-                    <div class="flex flex-col items-start bg-darkColor/5 rounded-2xl px-4 py-1.5 wma">
-                        <small class="text-darkColor/50">Lecturer</small>
-                        {% if course.lecturer %}
-                        <p class="text-darkColor">{{ course.lecturer }}</p>
-                        {% else %}
-                        <p class="text-danger"> No lecturer </p>
-                        {% endif %}
-                    </div>
-
-                    <div class="flex flex-col items-start bg-darkColor/5 rounded-2xl px-4 py-1.5 wma">
-                        <small class="text-darkColor/50">Course delegate(s)</small>
-                        {% for enrollment in enrolled_students %}
-                            {% if enrollment.student.is_delegate %}
-                                <p class="text-darkColor block">{{ enrollment.student.name }}</p>
+                    <div class="flex flex-col items-start bg-darkColor/5 rounded-2xl px-4 py-1.5 space-y-2">
+                        {% for delegate in delegates %}
+                            {% if delegate.student.is_delegate %}
+                                <p class="text-darkColor block">{{ delegate.student.name }}</p>
                             {% endif %}
                             {% empty %}
-                            <p class="text-danger block"> No course delegate(s) </p>
+                            <p class="text-danger text-sm block"> No course delegate(s) </p>
                         {% endfor %}
                     </div>
 

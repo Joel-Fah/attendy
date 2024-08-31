@@ -1,16 +1,15 @@
+from collections import defaultdict
 from datetime import timedelta
 
 from django.contrib import messages
-from django.shortcuts import render
-from django.urls import reverse_lazy
-from django.views.generic import TemplateView, ListView, DetailView, UpdateView, DeleteView, CreateView
 from django.contrib.auth.mixins import LoginRequiredMixin
-from .models import Course, Student, Lecturer, TeachingRecord, StudentDelegate, Enrollment, CourseAttendance
-from .mixins import CommonContextMixin
-from .forms import CourseAddForm, LecturerAddForm, StudentAddForm
-from collections import defaultdict
-from slugify import slugify
+from django.urls import reverse_lazy
 from django.utils.html import format_html
+from django.views.generic import TemplateView, ListView, DetailView, CreateView
+
+from .forms import CourseAddForm, LecturerAddForm, StudentAddForm
+from .mixins import CommonContextMixin
+from .models import Course, Student, Lecturer, TeachingRecord, StudentDelegate, Enrollment, CourseAttendance
 
 
 # Create your views here.
@@ -33,7 +32,9 @@ class DashboardView(LoginRequiredMixin, CommonContextMixin, TemplateView):
                                                                             role='delegate').first()
                 attendance.course_assistant = StudentDelegate.objects.filter(course=attendance.course,
                                                                              role='assistant').first()
+                attendance.enrollment_count = Enrollment.objects.filter(attendance=attendance).count()
         context['grouped_attendances'] = dict(grouped_attendances)
+        context['course_attendance_count'] = CourseAttendance.objects.count()
         return context
 
 
@@ -77,7 +78,7 @@ class CourseDetailView(LoginRequiredMixin, CommonContextMixin, DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         course = self.get_object()
-        context['enrolled_students'] = Enrollment.objects.filter(course=course).select_related('student')
+        context['delegates'] = StudentDelegate.objects.filter(course=course)
         return context
 
 
@@ -152,7 +153,6 @@ class StudentAddView(LoginRequiredMixin, CommonContextMixin, CreateView):
 
     def form_valid(self, form):
         form.save()
-        name = form.cleaned_data['name']
         message = format_html(
             'Student added successfully.<br><a href="{}" class="font-bold underline">View</a>',
             reverse_lazy('core:student_detail', kwargs={'pk': form.instance.pk, 'slug': form.instance.slug})
@@ -206,7 +206,6 @@ class LecturerAddView(LoginRequiredMixin, CommonContextMixin, CreateView):
 
     def form_valid(self, form):
         form.save()
-        name = form.cleaned_data['name']
         message = format_html(
             'Lecturer added successfully.<br><a href="{}" class="font-bold underline">View</a>',
             reverse_lazy('core:lecturer_detail', kwargs={'pk': form.instance.pk, 'slug': form.instance.slug})
@@ -265,5 +264,6 @@ class TeachingRecordDetailView(LoginRequiredMixin, CommonContextMixin, DetailVie
         context['course_delegates'] = StudentDelegate.objects.filter(
             course=self.object.teaching_record_attendance.course,
             student__is_delegate=True)
-        context['enrollments'] = Enrollment.objects.filter(attendance__course=self.object.teaching_record_attendance.course).count()
+        context['enrollments'] = Enrollment.objects.filter(
+            attendance__course=self.object.teaching_record_attendance.course).count()
         return context
