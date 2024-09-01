@@ -44,7 +44,7 @@
         id="hero" class="relative h-dvh overflow-hidden flex items-center justify-center text-whiteColor">
         <div class="flex flex-col items-center justify-center gap-2">
             <span class="outline outline-1 outline-whiteColor px-4 py-1 rounded-full text-sm opacity-80">no more</span>
-            <h2 class="text-4xl text-center font-medium mb-20">
+            <h2 class="text-3xl md:text-4xl text-center font-medium mb-20">
                 Délégué pleazzzzeeee,<br>
                 <span id="typewriter" class=""></span>
             </h2>
@@ -55,7 +55,7 @@
 
     <section id="courses" class="max-w-screen-lg m-auto my-5 px-4 py-6">
         <div class="flex flex-col gap-4 items-center justify-center">
-            <h2 class="text-3xl text-center font-bold">
+            <h2 class="text-2xl md:text-3xl text-center font-bold">
                 Attendy comes in hand for our lovely
                 <span class="block text-secondaryColor"> `course delegates` </span>
             </h2>
@@ -210,25 +210,25 @@
 
     <section id="numbers" class="max-w-screen-lg m-auto my-5 px-4 py-6">
         <div class="flex flex-col gap-4 items-center justify-center">
-            <h2 class="text-3xl text-center font-bold">
+            <h2 class="text-2xl md:text-3xl text-center font-bold">
                 Building the community
                 <span class="block text-secondaryColor">`a student, lecturer... one after the other`</span>
             </h2>
-            <small class="px-4  text-gray-500 outline outline-1 outline-gray-500 bg-whiteColor rounded-full">
+            <small class="px-4 text-gray-500 outline outline-1 outline-gray-500 bg-whiteColor rounded-full">
                 Let the numbers talk about themselves
             </small>
             
             <div class="-space-y-2">
-                <img src="{% static 'core/images/numbers.svg' %}" alt="Attendy community" class="relative z-0 w-10/12 m-auto select-none pointer-events-none">
+                <img src="{% static 'core/images/numbers.svg' %}" alt="Attendy community" class="relative z-0 w-full md:w-10/12 m-auto select-none pointer-events-none">
                 
-                <div id="numbers_img" class="relative z-10 flex items-center justify-evenly w-full h-40 rounded-3xl shadow-lg text-whiteColor">
+                <div id="numbers_img" class="relative z-10 py-2.5 flex flex-wrap md:flex-nowrap items-center justify-center md:justify-evenly w-full md:h-40 rounded-3xl shadow-lg text-whiteColor">
                     {# courses count #}
-                    <div class="flex flex-col gap-2.5">
+                    <div class="w-1/2 md:w-auto flex flex-col gap-2.5 items-center md:items-start">
                         <div class="relative">
-                            <h3 class="font-bold inline text-6xl"> {{ course_attendance_count }}+ </h3>
-                            <span class="text-outline absolute left-1 top-1 text-6xl"> {{ course_attendance_count }}+ </span>
+                            <h3 class="font-bold inline text-5xl md:text-6xl"> {{ course_attendance_count }}+ </h3>
+                            <span class="text-outline absolute left-1 top-1 text-5xl md:text-6xl"> {{ course_attendance_count }}+ </span>
                         </div>
-                        <div class="flex gap-2">
+                        <div class="flex gap-2 items-center">
                             <div class="flex items-center h-max p-1.5 bg-white bg-opacity-10 border-[1.5px] border-whiteColor backdrop-blur-sm rounded-xl">
                                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                     <path d="M6.5 22C8.70914 22 10.5 20.2091 10.5 18C10.5 15.7909 8.70914 14 6.5 14C4.29086 14 2.5 15.7909 2.5 18C2.5 20.2091 4.29086 22 6.5 22Z" stroke="#FFF5EA" stroke-width="3" stroke-linejoin="round"/>
@@ -238,19 +238,19 @@
                                 </svg>    
                             </div>
                             <div class="leading-tight -space-y-1">
-                                <span class="block">Attendances</span>
-                                <span class="block text-sm text-whiteColor/50">monitored</span>
+                                <span class="block text-sm md:text-base">Attendances</span>
+                                <span class="block text-xs md:text-sm text-whiteColor/50">monitored</span>
                             </div>
                         </div>
                     </div>
 
                     {# courses count #}
-                    <div class="flex flex-col gap-2.5">
+                    <div class="w-1/2 md:w-auto flex flex-col gap-2.5 items-center md:items-start">
                         <div class="relative">
-                            <h3 class="font-bold inline text-6xl"> {{ courses.count }}+ </h3>
-                            <span class="text-outline absolute left-1 top-1 text-6xl"> {{ courses.count }}+ </span>
+                            <h3 class="font-bold inline text-5xl md:text-6xl"> {{ courses.count }}+ </h3>
+                            <span class="text-outline absolute left-1 top-1 text-5xl md:text-6xl"> {{ courses.count }}+ </span>
                         </div>
-                        <div class="flex gap-2">
+                        <div class="flex gap-2 items-center">
                             <div class="flex items-center h-max p-1.5 bg-white bg-opacity-10 border-[1.5px] border-whiteColor backdrop-blur-sm rounded-xl">
                                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none" class="w-6 h-6">
                                     <path d="M14.5 5L12.5 5C9.67157 5 8.25736 5 7.37868 5.87868C6.5 6.75736 6.5 8.17157 6.5 11L6.5 16C6.5 18.8284 6.5 20.2426 7.37868 21.1213C8.25736 22 9.67157 22 12.5 22H13.8431C14.6606 22 15.0694 22 15.4369 21.8478C15.8045 21.6955 16.0935 21.4065 16.6716 20.8284L19.3284 18.1716C19.9065 17.5935 20.1955 17.3045 20.3478 16.9369C20.5 16.5694 20.5 16.1606 20.5 15.3431V11C20.5 8.17157 20.5 6.75736 19.6213 5.87868C18.7426 5 17.3284 5 14.5 5Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
@@ -260,19 +260,19 @@
                                 </svg>
                             </div>
                             <div class="leading-tight -space-y-1">
-                                <span class="block">Courses</span>
-                                <span class="block text-sm text-whiteColor/50">registered</span>
+                                <span class="block text-sm md:text-base">Courses</span>
+                                <span class="block text-xs md:text-sm text-whiteColor/50">registered</span>
                             </div>
                         </div>
                     </div>
 
                     {# students count #}
-                    <div class="flex flex-col gap-2.5">
+                    <div class="w-1/2 md:w-auto flex flex-col gap-2.5 items-center md:items-start mt-4 md:mt-0">
                         <div class="relative">
-                            <h3 class="font-bold inline text-6xl"> {{ students.count }}+ </h3>
-                            <span class="text-outline absolute left-1 top-1 text-6xl"> {{ students.count }}+ </span>
+                            <h3 class="font-bold inline text-5xl md:text-6xl"> {{ students.count }}+ </h3>
+                            <span class="text-outline absolute left-1 top-1 text-5xl md:text-6xl"> {{ students.count }}+ </span>
                         </div>
-                        <div class="flex gap-2">
+                        <div class="flex gap-2 items-center">
                             <div class="flex items-center h-max p-1.5 bg-white bg-opacity-10 border-[1.5px] border-whiteColor backdrop-blur-sm rounded-xl">
                                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none">
                                     <path
@@ -290,19 +290,19 @@
                                 </svg>
                             </div>
                             <div class="leading-tight -space-y-1">
-                                <span class="block">Students</span>
-                                <span class="block text-sm text-whiteColor/50">consented</span>
+                                <span class="block text-sm md:text-base">Students</span>
+                                <span class="block text-xs md:text-sm text-whiteColor/50">consented</span>
                             </div>
                         </div>
                     </div>
 
                     {# lecturers count #}
-                    <div class="flex flex-col gap-2.5">
+                    <div class="w-1/2 md:w-auto flex flex-col gap-2.5 items-center md:items-start mt-4 md:mt-0">
                         <div class="relative">
-                            <h3 class="font-bold inline text-6xl"> {{ lecturers.count}}+ </h3>
-                            <span class="text-outline absolute left-1 top-1 text-6xl"> {{ lecturers.count}}+ </span>
+                            <h3 class="font-bold inline text-5xl md:text-6xl"> {{ lecturers.count}}+ </h3>
+                            <span class="text-outline absolute left-1 top-1 text-5xl md:text-6xl"> {{ lecturers.count}}+ </span>
                         </div>
-                        <div class="flex gap-2">
+                        <div class="flex gap-2 items-center">
                             <div class="flex items-center h-max p-1.5 bg-white bg-opacity-10 border-[1.5px] border-whiteColor backdrop-blur-sm rounded-xl">
                                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none">
                                     <path d="M13 15C10.7083 21 4.29167 15 2 21" stroke="currentColor" stroke-width="1.5"
@@ -317,8 +317,8 @@
                                 </svg>
                             </div>
                             <div class="leading-tight -space-y-1">
-                                <span class="block">Lecturers</span>
-                                <span class="block text-sm text-whiteColor/50">approved</span>
+                                <span class="block text-sm md:text-base">Lecturers</span>
+                                <span class="block text-xs md:text-sm text-whiteColor/50">approved</span>
                             </div>
                         </div>
                     </div>
@@ -426,6 +426,63 @@
         </div>
     </section>
 
+    <section id="process" class="max-w-screen-lg rounded-3xl m-auto my-5 px-4 py-6">
+        <div class="flex flex-col items-center gap-8">
+            <div class="flex flex-col gap-2 text-center">
+                <small class="w-max m-auto px-4 text-gray-500 outline outline-1 outline-gray-500 bg-whiteColor rounded-full">
+                    Step 1
+                </small>
+                <h2 class="text-3xl text-center font-bold">
+                    Get your <span class="text-secondaryColor">courses</span>,
+                    <span class="text-secondaryColor">students</span> and
+                    <span class="text-secondaryColor">lecturers</span> on board.
+                </h2>
+
+                <p class="max-w-2xl m-auto">
+                    To get started, it is crucial you have records of courses, students and lecturers
+                    of the current semester. This will help you keep track of attendance and monitor
+                    the progress of your students. So, go on and register these entities from the dashboard.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-12 items-center justify-center w-full">
+                <img src="{% static 'core/images/process-courses.svg' %}" alt="Register your courses"
+                    class="col-span-4 h-full bg-white object-cover relative z-0 scale-90 -bottom-5 -right-3 -rotate-6 shadow-lg rounded-xl ring-2 ring-offset-2 ring-primaryColor">
+                <img src="{% static 'core/images/process-students.svg' %}" alt="Add students"
+                    class="col-span-4 h-full bg-white object-cover relative z-20 shadow-lg rounded-xl ring-2 ring-offset-2 ring-secondaryColor">
+                <img src="{% static 'core/images/process-lecturers.svg' %}" alt="Add lecturers"
+                    class="col-span-4 h-full bg-white object-cover relative z-10 scale-90 -bottom-5 -left-3 rotate-6 shadow-lg rounded-xl ring-2 ring-offset-2 ring-primaryColor">
+            </div>
+        </div>
+
+        <div class="h-20 w-0.5 rounded-full bg-secondaryColor m-auto"></div>
+
+        <div class="flex flex-col items-center gap-8 mt-2">
+            <div class="flex flex-col gap-2 text-center">
+                <small class="w-max m-auto px-4 text-gray-500 outline outline-1 outline-gray-500 bg-whiteColor rounded-full">
+                    Step 2
+                </small>
+                <h2 class="text-3xl text-center font-bold">
+                    From now on, create <span class="text-secondaryColor">attendances</span>
+                    and <span class="text-secondaryColor">monitor</span> your students.
+                </h2>
+
+                <p class="max-w-2xl m-auto">
+                    You can start creating attendances for your courses. Students will only have to scan to mark their presence.
+                    In addition, teaching records are automatically created and attached to course attendances.
+                    Just left for you to fill in the remaining details like the lecturer's departure time...
+                </p>
+            </div>
+
+            <div class="grid grid-cols-12 items-center justify-center w-full">
+                <img src="{% static 'core/images/process-attendance.svg' %}" alt="Manage attendances"
+                    class="col-span-6 h-full bg-white object-cover relative z-0 scale-90 -top-5 -right-2 md:-right-5 rotate-3 shadow-lg rounded-xl ring-2 ring-offset-2 ring-secondaryColor">
+                <img src="{% static 'core/images/process-monitor.svg' %}" alt="Interactive dashboard"
+                    class="col-span-6 h-full bg-white object-cover relative z-10 scale-90 -top-5 -left-2 md:-left-5 -rotate-3 shadow-lg rounded-xl ring-2 ring-offset-2 ring-primaryColor">
+            </div>
+        </div>
+    </section>
+
     <div class="separator flex gap-2 items-center justify-center max-w-screen-lg m-auto">
         <hr class="w-full border-primaryColor">
         <img src="{% static 'core/images/logo-shapes-primary.svg' %}" alt="" class="w-20">
@@ -478,7 +535,7 @@
 {% block javascript %}
 <script>
     document.addEventListener('DOMContentLoaded', function () {
-        const texts = ["I want to write my name", "Where is the list?", "I need the class list for X course", "No it's ok ... jk!"];
+        const texts = ["I want to write my name", "Where is the list?", "I need the class list for my course", "Where's attendance for last class?"];
         let index = 0;
         let charIndex = 0;
         const typewriterElement = document.getElementById('typewriter');

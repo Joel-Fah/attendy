@@ -2,7 +2,7 @@
 
 # **Attendy**
 
-Welcome to **Attendy**, a web application designed to make student attendance management seamless and efficient. Whether you're a student, educator, or administrator, Attendy simplifies tracking attendance, organizing courses, and managing student records.
+Welcome to **Attendy**, a web application designed to make student attendance management seamless and efficient. Whether you're a student, educator, or administrator, Attendy simplifies tracking attendance, organizing courses, and managing teaching records.
 
 **GitHub Repository**: [Attendy on GitHub](https://github.com/Joel-Fah/attendy)
 
@@ -12,9 +12,11 @@ Welcome to **Attendy**, a web application designed to make student attendance ma
 
 Attendy is built with the goal of providing a user-friendly platform for educational institutions to manage attendance across various courses. The platform is feature-rich, offering a dashboard for quick overviews, tools for managing courses, students, lecturers, and detailed logs for teaching sessions.
 
-![Welcome screen](./static/docs/attendy-hero.png)
+![Hero section](./static/docs/attendy-hero.png)
 
-![Welcome screen end](./static/docs/attendy-footer.png)
+![Community section](./static/docs/attendy-community.png)
+
+![CTA section](./static/docs/attendy-footer.png)
 
 ## **Features**
 
