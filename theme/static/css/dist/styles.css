@@ -962,6 +962,10 @@ select {
   z-index: 999;
 }
 
+.z-\[999px\] {
+  z-index: 999px;
+}
+
 .col-span-10 {
   grid-column: span 10 / span 10;
 }
