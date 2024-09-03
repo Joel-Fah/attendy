@@ -7,7 +7,7 @@ from django.urls import reverse_lazy
 from django.utils.html import format_html
 from django.views.generic import TemplateView, ListView, DetailView, CreateView, UpdateView
 
-from .forms import CourseForm, LecturerForm, StudentForm
+from .forms import CourseForm, LecturerForm, StudentForm, TeachingRecordForm
 from .mixins import CommonContextMixin
 from .models import Course, Student, Lecturer, TeachingRecord, StudentDelegate, Enrollment, CourseAttendance
 
@@ -426,3 +426,44 @@ class TeachingRecordDetailView(LoginRequiredMixin, CommonContextMixin, DetailVie
         context['enrollments'] = Enrollment.objects.filter(
             attendance__course=self.object.teaching_record_attendance.course).count()
         return context
+    
+class TeachingRecordUpdateView(LoginRequiredMixin, CommonContextMixin, UpdateView):
+    model = TeachingRecord
+    template_name = 'core/records/record_update.html'
+    context_object_name = 'form'
+    form_class = TeachingRecordForm
+
+    def get_object(self, queryset=None):
+        queryset = self.get_queryset()
+        return queryset.get(id=self.kwargs['pk'], teaching_record_attendance__course__slug=self.kwargs['slug'])
+
+    def get_queryset(self):
+        return TeachingRecord.objects.all()
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['record'] = self.get_object()
+        return context
+    
+    def get_success_url(self):
+        return reverse_lazy('core:record_detail', kwargs={'pk': self.object.pk, 'slug': self.object.teaching_record_attendance.course.slug})
+
+    def form_valid(self, form):
+        form.save()
+        message = format_html(
+            'Teaching record updated successfully.',
+        )
+        messages.success(
+            self.request,
+            message
+        )
+        return super().form_valid(form)
+
+    def form_invalid(self, form):
+        messages.error(
+            self.request,
+            format_html(
+                'An error occurred while updating the record.<br>Please try again.'
+            )
+        )
+        return super().form_invalid(form)

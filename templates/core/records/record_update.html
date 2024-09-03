@@ -1,0 +1,190 @@
+{% extends 'core/base_app.html' %}
+{% load static %}
+{% load tailwind_tags %}
+{% load custom_date_formatter duration_formatter %}
+
+{# Title of the page #}
+{% block title %} Update for {{ teaching_record_attendance.course.code }} {{ teaching_record_attendance.course.title }} {% endblock %}
+
+{% block extra_styles %}
+    <style>
+        #lect_img {
+            background: linear-gradient(135deg, rgba(0, 0, 0, 0.9) 25%, rgba(0, 0, 0, 0.1) 75%), url("{% static 'core/images/courses.jpg' %}");
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+    </style>
+{% endblock extra_styles %}
+
+{# Header of the page #}
+{% block header %}
+    {% include "components/header_app.html" %}
+{% endblock header %}
+
+{# Body of the page #}
+{% block body %}
+    <div class="relative p-4 md:ml-64">
+        <div class="flex flex-col gap-4 items-start justify-center w-full mt-14">
+            <div class="grid grid-cols-12 items-center justify-center gap-2 gap-y-4">
+                <div class="col-start-2 col-span-10 flex flex-col gap-4">
+                    <div class="flex flex-col gap-2">
+                        <h2 class="text-2xl">
+                            You're updating record for
+                            <span class="block text-primaryColor">{{ record.teaching_record_attendance.course.code }} {{ record.teaching_record_attendance.course.title }}</span>
+                        </h2>
+                        <small class="w-max px-2.5 rounded-xl bg-darkColor/5">
+                            <span class="text-gray-500">Last update:</span>
+                            {{ record.updated_at|format_date }}
+                        </small>
+                        <p class="text-sm">
+                            Teaching records are an essential part of tracking and managing educational activities. 
+                            They provide a detailed account of lectures, and other teaching-related information.
+                        </p>
+                    </div>
+
+                    <form action="" method="post" class="w-full">
+                        {% csrf_token %}
+
+                        <!-- Display non fields errors -->
+                        {% if form.non_field_errors %}
+                            <small class="text-sm text-danger bg-danger/10 rounded-xl px-2 py-1">
+                                {% for error in form.non_field_errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </small>
+                        {% endif %}
+
+                        <div class="flex flex-col gap-2 w-full">
+                            <div class="flex gap-2">
+                                {# Lecturer Arrival Time field #}
+                                <div class="w-1/3">
+                                    <label for="{{ form.lecturer_arrival_time.label }}"
+                                        class="ps-4 text-xs text-gray-500"> {{ form.lecturer_arrival_time.label }} </label>
+                                    <div class="relative">
+                                        <div class="absolute inset-y-0 start-0 flex items-center ps-2.5 pointer-events-none">
+                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none">
+                                                <path d="M2 15C2.14277 15.4274 2.31023 15.8431 2.50062 16.2452M4.12547 18.7463C4.44158 19.1137 4.781 19.4596 5.14137 19.7814M9 22C8.55224 21.8557 8.11701 21.6824 7.69641 21.4822" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                                                <path d="M12 13.5C12.8284 13.5 13.5 12.8284 13.5 12C13.5 11.1716 12.8284 10.5 12 10.5C11.1716 10.5 10.5 11.1716 10.5 12M12 13.5C11.1716 13.5 10.5 12.8284 10.5 12M12 13.5V16M10.5 12H6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+                                                <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+                                            </svg>
+                                        </div>
+                                        {{ form.lecturer_arrival_time }}
+                                    </div>
+
+                                    {% if form.lecturer_arrival_time.errors %}
+                                        <small class="text-sm text-danger">
+                                            {% for error in form.lecturer_arrival_time.errors %}
+                                                {{ error }}
+                                            {% endfor %}
+                                        </small>
+                                    {% endif %}
+                                </div>
+
+                                {# Lecturer Departure Time field #}
+                                <div class="w-1/3">
+                                    <label for="{{ form.lecturer_departure_time.label }}"
+                                        class="ps-4 text-xs text-gray-500"> {{ form.lecturer_departure_time.label }} </label>
+                                    <div class="relative">
+                                        <div class="absolute inset-y-0 start-0 flex items-center ps-2.5 pointer-events-none">
+                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none">
+                                                <path d="M8.37574 3C8.16183 3.07993 7.95146 3.16712 7.74492 3.26126M20.7177 16.3011C20.8199 16.0799 20.9141 15.8542 21 15.6245M18.4988 19.3647C18.6705 19.2044 18.8365 19.0381 18.9963 18.866M15.2689 21.3723C15.463 21.2991 15.6541 21.22 15.8421 21.1351M12.156 21.9939C11.9251 22.0019 11.6926 22.0019 11.4616 21.9939M7.78731 21.1404C7.96811 21.2217 8.15183 21.2978 8.33825 21.3683M4.67255 18.9208C4.80924 19.0657 4.95029 19.2064 5.0955 19.3428M2.6327 15.6645C2.70758 15.8622 2.78867 16.0569 2.87572 16.2483M2.00497 12.5053C1.99848 12.2972 1.9985 12.0878 2.00497 11.8794M2.62545 8.73714C2.69901 8.54165 2.77864 8.34913 2.8641 8.1598M4.65602 5.47923C4.80068 5.32514 4.95025 5.17573 5.1045 5.03124" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                                                <path d="M13.5 12C13.5 12.8284 12.8284 13.5 12 13.5C11.1716 13.5 10.5 12.8284 10.5 12C10.5 11.1716 11.1716 10.5 12 10.5M13.5 12C13.5 11.1716 12.8284 10.5 12 10.5M13.5 12H16M12 10.5V6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+                                                <path d="M22 12C22 6.47715 17.5228 2 12 2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+                                            </svg>
+                                        </div>
+                                        {{ form.lecturer_departure_time }}
+                                    </div>
+
+                                    {% if form.lecturer_departure_time.errors %}
+                                        <small class="text-sm text-danger">
+                                            {% for error in form.lecturer_departure_time.errors %}
+                                                {{ error }}
+                                            {% endfor %}
+                                        </small>
+                                    {% endif %}
+                                </div>
+
+                                {# Quality Assurance field #}
+                                <div class="w-1/3">
+                                    <label for="{{ form.quality_assurance.label }}"
+                                           class="ps-4 text-xs text-gray-500"> {{ form.quality_assurance.label }} </label>
+                                    <div class="relative">
+                                        <div class="absolute inset-y-0 start-0 flex items-center ps-2.5 pointer-events-none">
+                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none">
+                                                <path d="M9.99128 15C9.99128 14.0015 9.90819 11.6348 8.15796 8.26951C7.38157 6.77671 7.39203 5.2142 7.6806 3.98372C7.77486 3.58177 8.01266 3.37651 8.33553 3.15508C8.70845 2.89932 8.89491 2.77143 9.08803 2.66275C9.70688 2.31447 10.393 2.10186 11.1006 2.03909C11.6881 1.98697 12.3119 1.98697 12.8994 2.03909C13.607 2.10186 14.2931 2.31447 14.912 2.66275C15.1051 2.77143 15.2916 2.89932 15.6645 3.15508C15.9873 3.37651 16.2251 3.58177 16.3194 3.98372C16.608 5.2142 16.6184 6.77671 15.842 8.26951C14.0918 11.6348 14.0087 14.0015 14.0087 15" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                                                <path d="M7.0883 17.7351C7.52832 16.4151 7.74832 15.755 8.2721 15.3775C8.79587 15 9.49159 15 10.883 15H13.117C14.5084 15 15.2041 15 15.7279 15.3775C16.2517 15.755 16.4717 16.4151 16.9117 17.7351L17 18H7L7.0883 17.7351Z" stroke="currentColor" stroke-width="1.5" />
+                                                <path d="M4.25262 20.1823C4.46592 19.645 4.57257 19.3764 4.72208 19.1551C5.10369 18.5902 5.70937 18.1937 6.40325 18.0545C6.67511 18 6.97885 18 7.58633 18L16.4137 18C17.0212 18 17.3249 18 17.5967 18.0545C18.2906 18.1937 18.8963 18.5902 19.2779 19.1551C19.4274 19.3764 19.5341 19.645 19.7474 20.1823C19.9125 20.5983 19.9951 20.8063 19.9996 20.9744C20.0115 21.4099 19.7234 21.8025 19.2876 21.945C19.1194 22 18.8842 22 18.4139 22H5.5861C5.11579 22 4.88064 22 4.71244 21.945C4.27658 21.8025 3.98853 21.4099 4.00035 20.9744C4.00491 20.8063 4.08748 20.5983 4.25262 20.1823Z" stroke="currentColor" stroke-width="1.5" />
+                                            </svg>
+                                        </div>
+                                        {{ form.quality_assurance }}
+                                    </div>
+
+                                    {% if form.quality_assurance.errors %}
+                                        <small class="text-sm text-danger">
+                                            {% for error in form.quality_assurance.errors %}
+                                                {{ error }}
+                                            {% endfor %}
+                                        </small>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            {# Description field #}
+                            <div class="">
+                                <label for="{{ form.description.label }}"
+                                       class="ps-4 text-xs text-gray-500"> {{ form.description.help_text }} </label>
+                                <div class="max-w-[345px]">
+                                    {{ form.description }}
+                                </div>
+                                <small class="text-xs leading-tight text-gray-500">
+                                    Keyboard shortcuts are available for this field. For example, you can use <kbd class="px-2 py-1.5 font-semibold text-gray-800 bg-gray-100 border border-gray-200 rounded-lg">Ctrl + B</kbd> to make text bold.
+                                </small>
+
+                                {% if form.description.errors %}
+                                    <small class="text-sm text-danger">
+                                        {% for error in form.description.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </small>
+                                {% endif %}
+                            </div>
+
+                            {# Submit button #}
+                            <div class="text-whiteColor w-1/3 mt-2 ms-auto">
+                                <button type="submit"
+                                        class="block mb-2 focus:outline-none rounded-2xl w-full px-4 py-2 text-center bg-primaryColor hover:bg-blue-950 focus:ring-2 focus:ring-secondaryColor focus:ring-offset-1 transition-all duration-300 ease-in-out">
+                                    Update course
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+
+                <div id="lect_img" class="relative col-start-2 col-span-10 h-52">
+                    <blockquote
+                            class="flex flex-col gap-2 text-[16px] leading-tight text-whiteColor p-4 text-left max-w-64">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none"
+                             class="text-secondaryColor">
+                            <path d="M5.07579 17C4.08939 4.54502 12.9123 1.0121 19.9734 2.22417C20.2585 6.35185 18.2389 7.89748 14.3926 8.61125C15.1353 9.38731 16.4477 10.3639 16.3061 11.5847C16.2054 12.4534 15.6154 12.8797 14.4355 13.7322C11.8497 15.6004 8.85421 16.7785 5.07579 17Z"
+                                  stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
+                                  stroke-linejoin="round"/>
+                            <path d="M4 22C4 15.5 7.84848 12.1818 10.5 10" stroke="currentColor" stroke-width="1.5"
+                                  stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        Writing down teaching records may be boring, but it's crucial for preserving the core of each lesson and keeping us on track.
+                        <cite class="block font-semibold mt-2 text-secondaryColor">ChatGPT</cite>
+                    </blockquote>
+                    <img src="{% static 'core/images/logo-shapes.svg' %}" alt="Attendy shapes"
+                         class="w-20 absolute bottom-3 right-3">
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+{% endblock body %}
+
+{# Additional javascript #}
+{% block javascript %}
+{% endblock javascript %}

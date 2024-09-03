@@ -2,7 +2,9 @@ import datetime
 
 from django import forms
 from allauth.account.forms import LoginForm
-from .models import Course, Lecturer, Student, DepartmentChoices
+from .models import Course, Lecturer, Student, DepartmentChoices, TeachingRecord
+from django_summernote.fields import SummernoteTextField
+from django_summernote.widgets import SummernoteWidget, SummernoteInplaceWidget
 
 
 # Create your forms here
@@ -322,3 +324,81 @@ class StudentForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         self.fields['department'].default = DepartmentChoices.ICT
         self.fields['is_delegate'].default = False
+
+class TeachingRecordForm(forms.ModelForm):
+    class Meta:
+        model = TeachingRecord
+        fields = [
+            'description',
+            'lecturer_arrival_time',
+            'lecturer_departure_time',   
+            'quality_assurance',
+        ]
+        
+    description = forms.CharField(
+        widget=SummernoteWidget(),
+        label='Description',
+        help_text='Lessons and Brief Content/Assignments',
+        error_messages={'required': 'Please enter a description of the teaching record'},
+        required=True,
+    )
+    
+    lecturer_arrival_time = forms.TimeField(
+        widget=forms.TimeInput(
+            attrs={
+                'id': 'lecturer_arrival_time',
+                'name': 'lecturer_arrival_time',
+                'type': 'time',
+                'placeholder': 'HH:MM:SS',
+                'class': 'rounded-2xl block w-full ps-10 p-2.5 bg-whiteColor border-darkColor placeholder-darkColor/50 '
+                         'focus:ring-primaryColor focus:border-primaryColor transition-all duration-300 ease-in-out',
+            }
+        ),
+        label='Lecturer arrival time',
+        help_text='Enter the time the lecturer arrived.',
+        error_messages={'required': 'Please enter the time the lecturer arrived'},
+        required=True,
+    )
+    
+    lecturer_departure_time = forms.TimeField(
+        widget=forms.TimeInput(
+            attrs={
+                'id': 'lecturer_departure_time',
+                'name': 'lecturer_departure_time',
+                'type': 'time',
+                'placeholder': 'HH:MM:SS',
+                'class': 'rounded-2xl block w-full ps-10 p-2.5 bg-whiteColor border-darkColor placeholder-darkColor/50 '
+                         'focus:ring-primaryColor focus:border-primaryColor transition-all duration-300 ease-in-out',
+            }
+        ),
+        label='Lecturer departure time',
+        help_text='Enter the time the lecturer left.',
+        error_messages={'required': 'Please enter the time the lecturer left'},
+        required=True,
+    )
+    
+    quality_assurance = forms.ChoiceField(
+        widget=forms.Select(
+            attrs={
+                'id': 'quality_assurance',
+                'name': 'quality_assurance',
+                'placeholder': 'Select quality assurance',
+                'class': 'rounded-2xl block w-full ps-10 p-2.5 bg-whiteColor border-darkColor placeholder-darkColor/50 '
+                         'focus:ring-primaryColor focus:border-primaryColor transition-all duration-300 ease-in-out',
+            }
+        ),
+        label='Quality assurance',
+        help_text='Select the quality assurance of the teaching record.',
+        choices=TeachingRecord.QualityChoices.choices,
+        required=True,
+    )
+    
+    def clean(self):
+        cleaned_data = super().clean()
+        arrival_time = cleaned_data.get('lecturer_arrival_time')
+        departure_time = cleaned_data.get('lecturer_departure_time')
+
+        if arrival_time and departure_time and departure_time <= arrival_time:
+            raise forms.ValidationError("Lecturer departure time must come after arrival time.")
+
+        return cleaned_data

@@ -121,7 +121,7 @@
             </li>
             <li>
                 <a href="{% if url_name == 'records' %} # {% else %} {% url 'core:records' %} {% endif %}"
-                    class="flex items-center p-2 rounded-xl transition-all duration-300 ease-linear hover:bg-primaryColor/10 group {% if url_name == 'records' or url_name == 'record_detail' %} bg-secondaryColor/10 hover:bg-secondaryColor/20 shadow-sm border border-secondaryColor {% endif %}">
+                    class="flex items-center p-2 rounded-xl transition-all duration-300 ease-linear hover:bg-primaryColor/10 group {% if url_name == 'records' or url_name == 'record_detail' or url_name == 'record_update' %} bg-secondaryColor/10 hover:bg-secondaryColor/20 shadow-sm border border-secondaryColor {% endif %}">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none"
                         class="">
                         <path
