@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django_summernote.admin import SummernoteModelAdmin
 from django import forms
-from .models import Student, StudentDelegate, Lecturer, TeachingRecord, Course, Enrollment, CourseAttendance
+from .models import Student, StudentDelegate, Lecturer, TeachingRecord, Course, Enrollment, CourseAttendance, ClassLevel
 
 
 # Register your models here.
@@ -110,11 +110,29 @@ class EnrollmentAdmin(admin.ModelAdmin):
     def course_title(obj):
         return obj.attendance.course.title
 
+class ClassLevelAdmin(admin.ModelAdmin):
+    model = ClassLevel
+    list_display = ['level', 'group_number', 'department', 'semester_year']
+    list_filter = ['level', 'group', 'department']
+    search_fields = ['level', 'group']
+    list_per_page = 25
 
+    readonly_fields = ['updated_at', 'created_at']
+    
+    @staticmethod
+    def group_number(obj):
+        if obj.group:
+            return obj.group
+        return 'Only one group for this level'
+    
+    @staticmethod
+    def semester_year(obj):
+        return f'{obj.semester} {obj.year}'
+    
 class CourseAttendanceAdmin(admin.ModelAdmin):
     model = CourseAttendance
-    list_display = ['course_title', 'lecturer_name']
-    list_filter = ['course_date', 'is_catchup']
+    list_display = ['course_title', 'lecturer_name', 'class_level_name']
+    list_filter = ['course_date', 'is_catchup', 'class_level']
     search_fields = ['course_title']
     list_per_page = 25
 
@@ -125,6 +143,12 @@ class CourseAttendanceAdmin(admin.ModelAdmin):
     @staticmethod
     def course_title(obj):
         return obj.course.title
+    
+    @staticmethod
+    def class_level_name(obj):
+        if obj.class_level.group:
+            return f'{obj.class_level.get_level_display()} - Group {obj.class_level.group}'
+        return obj.class_level.get_level_display()
 
 
 # Register on dashboard admin
@@ -135,3 +159,4 @@ admin.site.register(TeachingRecord, TeachingRecordAdmin)
 admin.site.register(Course, CourseAdmin)
 admin.site.register(Enrollment, EnrollmentAdmin)
 admin.site.register(CourseAttendance, CourseAttendanceAdmin)
+admin.site.register(ClassLevel, ClassLevelAdmin)

@@ -1,6 +1,7 @@
 from datetime import datetime
 
 from django.db import models
+from django.db.models import UniqueConstraint
 from slugify import slugify
 
 from .utils import calculate_duration, is_valid_time
@@ -16,7 +17,11 @@ def get_current_year():
 class DepartmentChoices(models.TextChoices):
     BMS = 'BMS', 'BMS'
     ICT = 'ICT', 'ICT'
-
+    
+class SemesterChoices(models.TextChoices):
+        FALL = 'FALL', 'FALL'
+        SPRING = 'SPRING', 'SPRING'
+        SUMMER = 'SUMMER', 'SUMMER'
 
 class Student(models.Model):
     class Meta:
@@ -61,7 +66,6 @@ class StudentDelegate(models.Model):
     class Meta:
         verbose_name = "Student Delegate"
         verbose_name_plural = "Student Delegates"
-        unique_together = ('student', 'course', 'role')
 
     class RoleChoices(models.TextChoices):
         DELEGATE = 'delegate', 'Delegate'
@@ -147,11 +151,6 @@ class Course(models.Model):
         verbose_name = "Course"
         verbose_name_plural = "Courses"
 
-    class SemesterChoices(models.TextChoices):
-        FALL = 'FALL', 'FALL'
-        SPRING = 'SPRING', 'SPRING'
-        SUMMER = 'SUMMER', 'SUMMER'
-
     code = models.CharField(max_length=7, null=False,
                             blank=False, unique=True, help_text="Course code")
     title = models.CharField(max_length=255, null=False,
@@ -191,12 +190,56 @@ class Enrollment(models.Model):
     def __str__(self):
         return f"{self.student.name} enrolled in {self.attendance.course.title}"
 
+class ClassLevel(models.Model):
+    class Meta:
+        verbose_name = 'Class Level'
+        verbose_name_plural = 'Class Levels'
+        unique_together = ('level', 'group')
+        constraints = [
+            UniqueConstraint(fields=['level', 'group'], name='unique_level_group')
+        ]
+        
+    class LevelChoices(models.IntegerChoices):
+        LEVEL_1 = 1, 'Level 1'
+        LEVEL_2 = 2, 'Level 2'
+        LEVEL_3 = 3, 'Level 3'
+        LEVEL_4 = 4, 'Level 4'
+        
+    level = models.PositiveSmallIntegerField(choices=LevelChoices.choices, null=False, blank=False, help_text='Level of the class')
+    group = models.PositiveSmallIntegerField(unique=True, null=True, blank=True, help_text='Group of the class')
+    semester = models.CharField(
+        max_length=255, choices=SemesterChoices.choices, null=False, blank=False, help_text="Semester of the course")
+    year = models.IntegerField(
+        default=get_current_year, null=False, blank=False, help_text="Semesters' year of the course")
+    department = models.CharField(
+        max_length=255, choices=DepartmentChoices.choices, null=False, blank=False,
+        help_text="Department of the class: BMS or ICT")
+    slug = models.SlugField(max_length=255, editable=False, null=False, blank=False, help_text="Slug of the class")
+    about = models.TextField(max_length=255, null=True, blank=True)
+    main_hall = models.CharField(max_length=255, null=False, blank=False, help_text="Main hall of the class. Enter <strong>Online</strong> for not onsite levels.")
+    secondary_hall = models.CharField(max_length=255, null=True, blank=True, help_text="Secondary hall of the class")
+    
+    created_at = models.DateTimeField(auto_now_add=True, help_text="Date and time this class level was added")
+    updated_at = models.DateTimeField(auto_now=True, help_text="Date and time this class level was last updated")
+    
+    def save(self, *args, **kwargs):
+        self.slug = slugify(f'{self.get_level_display()} - Group {self.group} - {self.semester} {self.year} - {self.department}')
+        super().save(*args, **kwargs)
+    
+    def __str__(self):
+        if self.group:
+            return f'{self.get_level_display()} - Group {self.group}: {self.semester} {self.year} - {self.department}'
+        return f'{self.get_level_display()}: {self.semester} {self.year} - {self.department}'
 
 class CourseAttendance(models.Model):
     class Meta:
         verbose_name = "Course Attendance"
         verbose_name_plural = "Course Attendances"
+        constraints = [
+            UniqueConstraint(fields=['course', 'teaching_record'], name='unique_course_record')
+        ]
 
+    class_level = models.ForeignKey(ClassLevel, on_delete=models.CASCADE, related_name='class_level_attendance')
     course = models.OneToOneField(Course, on_delete=models.CASCADE, related_name='course_attendance')
     teaching_record = models.OneToOneField(TeachingRecord, on_delete=models.CASCADE, null=True, blank=True,
                                            related_name='teaching_record_attendance')

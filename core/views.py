@@ -9,13 +9,22 @@ from django.views.generic import TemplateView, ListView, DetailView, CreateView,
 
 from .forms import CourseForm, LecturerForm, StudentForm, TeachingRecordForm
 from .mixins import CommonContextMixin
-from .models import Course, Student, Lecturer, TeachingRecord, StudentDelegate, Enrollment, CourseAttendance
+from .models import Course, Student, Lecturer, TeachingRecord, StudentDelegate, Enrollment, CourseAttendance, ClassLevel
 
 
 # Create your views here.
 class HomeView(CommonContextMixin, TemplateView):
     template_name = 'core/index.html'
 
+
+class LevelView(TemplateView):
+    template_name = 'core/levels/levels.html'
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["levels"] = ClassLevel.objects.all()
+        return context
+    
 
 # Dashboard views
 class DashboardView(LoginRequiredMixin, CommonContextMixin, TemplateView):

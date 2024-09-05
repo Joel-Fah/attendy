@@ -2,7 +2,7 @@ import datetime
 
 from django import forms
 from allauth.account.forms import LoginForm
-from .models import Course, Lecturer, Student, DepartmentChoices, TeachingRecord
+from .models import Course, Lecturer, Student, DepartmentChoices, TeachingRecord, SemesterChoices
 from django_summernote.fields import SummernoteTextField
 from django_summernote.widgets import SummernoteWidget, SummernoteInplaceWidget
 
@@ -113,7 +113,7 @@ class CourseForm(forms.ModelForm):
         ),
         label='Semester',
         help_text='Select the semester of the course.',
-        choices=Course.SemesterChoices.choices,
+        choices=SemesterChoices.choices,
         required=True,
     )
 

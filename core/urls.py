@@ -1,7 +1,7 @@
 from django.urls import path
 from .views import HomeView, DashboardView, CourseView, StudentView, LecturerView, TeachingRecordView, \
     TeachingRecordDetailView, CourseDetailView, StudentDetailView, LecturerDetailView, LecturerAddView, StudentAddView, \
-    CourseAddView, CourseUpdateView, StudentUpdateView, LecturerUpdateView, TeachingRecordUpdateView
+    CourseAddView, CourseUpdateView, StudentUpdateView, LecturerUpdateView, TeachingRecordUpdateView, LevelView
 
 # Create your urls here
 app_name = 'core'
@@ -9,6 +9,10 @@ app_name = 'core'
 urlpatterns = [
     path('', HomeView.as_view(), name='home'),
     path('app/', DashboardView.as_view(), name='dashboard'),
+    
+    # Class levels URLs
+    path('levels/', LevelView.as_view(), name='levels'),
+    
     # Course URLs
     path('app/courses/', CourseView.as_view(), name='courses'),
     path('app/courses/<int:pk>/<slug:slug>', CourseDetailView.as_view(), name='course_detail'),
