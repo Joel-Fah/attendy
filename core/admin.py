@@ -1,7 +1,8 @@
 from django.contrib import admin
 from django_summernote.admin import SummernoteModelAdmin
 from django import forms
-from .models import Student, StudentDelegate, Lecturer, TeachingRecord, Course, Enrollment, CourseAttendance, ClassLevel
+from .models import Student, CourseDelegate, Lecturer, TeachingRecord, Course, CourseAttendance, \
+    ClassLevel, ClassLevelUser, Attendance
 
 
 # Register your models here.
@@ -9,19 +10,37 @@ from .models import Student, StudentDelegate, Lecturer, TeachingRecord, Course, 
 
 class StudentAdmin(admin.ModelAdmin):
     model = Student
-    list_display = ['name', 'matricule', 'phone', 'is_delegate', 'gender']
-    list_filter = ['department', 'is_delegate', 'gender']
-    search_fields = ['name', 'matricule', 'email', 'phone']
+    list_display = ['student_number', 'name', 'phone', 'gender', 'is_delegate']
+    list_filter = ['class_level__department', 'gender', 'is_delegate']
+    search_fields = ['name', 'student_number', 'email', 'phone']
     list_per_page = 25
 
     readonly_fields = ['updated_at', 'created_at']
 
 
-class StudentDelegateForm(forms.ModelForm):
+class CourseAdmin(admin.ModelAdmin):
+    model = Course
+    list_display = ['code', 'title', 'level_group', 'semester_year']
+    list_filter = ['class_level__semester', 'class_level__year']
+    search_fields = ['title', 'code']
+    list_per_page = 25
+
+    readonly_fields = ['updated_at', 'created_at']
+
+    @staticmethod
+    def semester_year(obj):
+        return f'{obj.class_level.semester} {obj.class_level.year}'
+
+    @staticmethod
+    def level_group(obj):
+        return f'{obj.class_level.get_level_display()} - Group {obj.class_level.group}'
+
+
+class CourseDelegateForm(forms.ModelForm):
     student = forms.ModelChoiceField(
         queryset=Student.objects.filter(is_delegate=True),
         required=True,
-        label="Student Delegate"
+        label="Course Delegate"
     )
 
     class Meta:
@@ -29,21 +48,13 @@ class StudentDelegateForm(forms.ModelForm):
         fields = '__all__'
 
 
-class StudentDelegateAdmin(admin.ModelAdmin):
-    model = StudentDelegate
-    form = StudentDelegateForm
-    list_display = ['student_name', 'course_title', 'role']
+class CourseDelegateAdmin(admin.ModelAdmin):
+    model = CourseDelegate
+    form = CourseDelegateForm
+    list_display = ['student__name', 'course__title', 'role']
     list_filter = ['role']
-    search_fields = ['student_name', 'course_title']
+    search_fields = ['student__name', 'course__title']
     list_per_page = 25
-
-    @staticmethod
-    def student_name(obj):
-        return obj.student.name
-
-    @staticmethod
-    def course_title(obj):
-        return obj.course.title
 
     def save_model(self, request, obj, form, change):
         super().save_model(request, obj, form, change)
@@ -62,7 +73,7 @@ class LecturerAdmin(admin.ModelAdmin):
 
 class TeachingRecordAdmin(SummernoteModelAdmin):
     model = TeachingRecord
-    list_display = ['course_title', 'lecturer_name', 'lecturer_duration']
+    list_display = ['course_title', 'lecturer_name', 'lecturer_duration', 'quality_assurance']
     list_filter = ['quality_assurance']
     search_fields = ['course_title', 'lecturer_name']
 
@@ -81,26 +92,13 @@ class TeachingRecordAdmin(SummernoteModelAdmin):
         return obj.teaching_record_attendance.course.lecturer.name
 
 
-class CourseAdmin(admin.ModelAdmin):
-    model = Course
-    list_display = ['title', 'code', 'semester_year']
-    list_filter = ['semester']
-    search_fields = ['title', 'code']
+class CourseAttendanceAdmin(admin.ModelAdmin):
+    model = CourseAttendance
+    list_display = ['student__name', 'attendance__course__title']
+    search_fields = ['student__name', 'student__student_number', 'attendance']
     list_per_page = 25
 
     readonly_fields = ['updated_at', 'created_at']
-
-    @staticmethod
-    def semester_year(obj):
-        return f'{obj.semester} {obj.year}'
-
-
-class EnrollmentAdmin(admin.ModelAdmin):
-    model = Enrollment
-    list_display = ['student_name', 'course_title']
-    list_filter = ['attendance']
-    search_fields = ['student_name', 'course_title']
-    list_per_page = 25
 
     @staticmethod
     def student_name(obj):
@@ -110,53 +108,50 @@ class EnrollmentAdmin(admin.ModelAdmin):
     def course_title(obj):
         return obj.attendance.course.title
 
+
 class ClassLevelAdmin(admin.ModelAdmin):
     model = ClassLevel
-    list_display = ['level', 'group_number', 'department', 'semester_year']
+    list_display = ['level', 'group', 'department', 'semester_year']
     list_filter = ['level', 'group', 'department']
     search_fields = ['level', 'group']
     list_per_page = 25
 
     readonly_fields = ['updated_at', 'created_at']
-    
-    @staticmethod
-    def group_number(obj):
-        if obj.group:
-            return obj.group
-        return 'Only one group for this level'
-    
+
     @staticmethod
     def semester_year(obj):
         return f'{obj.semester} {obj.year}'
-    
-class CourseAttendanceAdmin(admin.ModelAdmin):
-    model = CourseAttendance
-    list_display = ['course_title', 'lecturer_name', 'class_level_name']
+
+
+class ClassLevelUserAdmin(admin.ModelAdmin):
+    model = ClassLevelUser
+    list_display = ['user', 'class_level']
+    list_filter = ['class_level']
+    search_fields = ['user', 'class_level']
+    list_per_page = 25
+
+    readonly_fields = ['updated_at', 'created_at']
+
+
+class AttendanceAdmin(admin.ModelAdmin):
+    model = Attendance
+    list_display = ['course__title', 'course__lecturer__name', 'class_level_name']
     list_filter = ['course_date', 'is_catchup', 'class_level']
     search_fields = ['course_title']
     list_per_page = 25
 
     @staticmethod
-    def lecturer_name(obj):
-        return obj.course.lecturer.name
-
-    @staticmethod
-    def course_title(obj):
-        return obj.course.title
-    
-    @staticmethod
     def class_level_name(obj):
-        if obj.class_level.group:
-            return f'{obj.class_level.get_level_display()} - Group {obj.class_level.group}'
-        return obj.class_level.get_level_display()
+        return f'{obj.class_level.get_level_display()} - Group {obj.class_level.group}'
 
 
 # Register on dashboard admin
 admin.site.register(Student, StudentAdmin)
-admin.site.register(StudentDelegate, StudentDelegateAdmin)
+admin.site.register(CourseDelegate, CourseDelegateAdmin)
 admin.site.register(Lecturer, LecturerAdmin)
 admin.site.register(TeachingRecord, TeachingRecordAdmin)
 admin.site.register(Course, CourseAdmin)
-admin.site.register(Enrollment, EnrollmentAdmin)
 admin.site.register(CourseAttendance, CourseAttendanceAdmin)
+admin.site.register(Attendance, AttendanceAdmin)
 admin.site.register(ClassLevel, ClassLevelAdmin)
+admin.site.register(ClassLevelUser, ClassLevelUserAdmin)

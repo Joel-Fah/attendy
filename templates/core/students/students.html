@@ -115,13 +115,13 @@
                                             </td>
                                             <td class="px-6 py-4 bg-orange-100">
                                                 <div class="flex gap-2">
-                                                    <a href="{% url 'core:student_detail' pk=student.id slug=student.slug %}" class="font-medium text-primaryColor hover:underline">
+                                                    <a href="{% url 'core:student_detail' level_pk=level.id pk=student.id slug=student.slug %}" class="font-medium text-primaryColor hover:underline">
                                                         View
                                                     </a>
                             
                                                     <span>|</span>
                                                     
-                                                    <a href="{% url 'core:student_update' pk=student.id slug=student.slug %}" class="font-medium text-primaryColor hover:underline">
+                                                    <a href="{% url 'core:student_update' level_pk=level.id pk=student.id slug=student.slug %}" class="font-medium text-primaryColor hover:underline">
                                                         Edit
                                                     </a>
 
@@ -160,7 +160,7 @@
                                                                     class="px-6 py-3 mr-1 font-sans text-sm font-bold uppercase transition-all rounded-xl middle none center hover:bg-info/10">
                                                                     Cancel
                                                                 </button>
-                                                                <form action="{% url 'core:students' %}" method="post">
+                                                                <form action="{% url 'core:students' level_pk=level.id %}" method="post">
                                                                     {% csrf_token %}
                                                                     <input type="hidden" name="student_id" value="{{ student.id }}">
                                                                     <button name="delete_student" 
@@ -271,7 +271,7 @@
                                             </td>
                                             <td class="px-6 py-4 bg-orange-100">
                                                 <div class="flex gap-2">
-                                                    <a href="{% url 'core:student_detail' pk=student.id slug=student.slug %}" class="font-medium text-primaryColor hover:underline">
+                                                    <a href="{% url 'core:student_detail' level_pk=level.id pk=student.id slug=student.slug %}" class="font-medium text-primaryColor hover:underline">
                                                         View
                                                     </a>
                             
@@ -316,7 +316,7 @@
                                                                     class="px-6 py-3 mr-1 font-sans text-sm font-bold uppercase transition-all rounded-xl middle none center hover:bg-info/10">
                                                                     Cancel
                                                                 </button>
-                                                                <form action="{% url 'core:students' %}" method="post">
+                                                                <form action="{% url 'core:students' level_pk=level.id %}" method="post">
                                                                     {% csrf_token %}
                                                                     <input type="hidden" name="student_id" value="{{ student.id }}">
                                                                     <button name="delete_delegate" 
@@ -342,7 +342,7 @@
         </div>
     </div>
 
-    <a href="{% url 'core:student_add' %}" title="Add student"
+    <a href="{% url 'core:student_add' level_pk=level.id %}" title="Add student"
         class="fixed p-3 bottom-2 right-2 flex items-center justify-center bg-primaryColor rounded-2xl shadow-md text-whiteColor hover:scale-110 hover:bg-blue-950 transition-all duration-100 ease-linear">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none">
             <path d="M12 4V20M20 12H4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"

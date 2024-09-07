@@ -3,10 +3,10 @@
 {% load tailwind_tags custom_date_formatter number_formatting %}
 
 {# Title of the page #}
-{% block title %}Home{% endblock %}
+{% block title %}Sigin into a class{% endblock %}
 
 {# Body styles #}
-{% block body_styles %}
+{% block body_styles %} 
 {% endblock body_styles %}
 
 {# Body of the page #}
@@ -14,19 +14,22 @@
 <main>
     <div
         class="absolute inset-0 h-dvh w-full bg-whiteColor bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px]">
-        <div class="flex flex-col items-center justify-center gap-4 h-screen text-center px-4 lg:p-0">
+        <div class="overflow-hidden flex flex-col items-center justify-center gap-4 h-screen text-center px-4 lg:p-0">
+            <img src="{% static 'core/images/attendy-text.svg' %}" alt="">
             <div class="flex gap-2 outline outline-1 outline-gray-500 text-gray-500 ps-[3px] pe-4 py-0.5 rounded-full backdrop-blur-md">
                 <small class="flex items-center gap-1">
                     <span class="flex items-center gap-1 font-bold bg-primaryColor text-whiteColor px-3 py-0.5   rounded-full">
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none" class="w-4">
                             <path d="M17.5798 9.71016C17.0765 9.57314 16.5468 9.5 16 9.5C13.4668 9.5 11.3002 11.0699 10.4202 13.2898M17.5798 9.71016C20.1271 10.4036 22 12.7331 22 15.5C22 18.8137 19.3137 21.5 16 21.5C14.4633 21.5 13.0615 20.9223 12 19.9722M17.5798 9.71016C17.851 9.02618 18 8.2805 18 7.5C18 4.18629 15.3137 1.5 12 1.5C8.68629 1.5 6 4.18629 6 7.5C6 8.2805 6.14903 9.02618 6.42018 9.71016M10.4202 13.2898C10.149 13.9738 10 14.7195 10 15.5C10 17.277 10.7725 18.8736 12 19.9722M10.4202 13.2898C8.59146 12.792 7.11029 11.451 6.42018 9.71016M6.42018 9.71016C3.87294 10.4036 2 12.7331 2 15.5C2 18.8137 4.68629 21.5 8 21.5C9.53671 21.5 10.9385 20.9223 12 19.9722" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" />
                         </svg>
+                        {% if levels.count > 0 %}
                         {{ levels.count|thousand_separator }}+
+                        {% endif %}
                     </span> 
                     classes registered already ... and counting...
                 </small>
             </div>
-            <h1 class="text-3xl lg:text-6xl font-bold font-sans">
+            <h1 class="text-3xl lg:text-5xl font-bold font-sans">
                 So you're a course delegate uhh... <br>
                 for which level/group though?
             </h1>
@@ -34,94 +37,115 @@
                 Make man go see shege before say chopam. This life ehh ... e no fair!<br>
                 How much am I even making? pfff
             </p>
+
+            {% if levels.count < 1 %}
+            <div class="relative -bottom-20 max-w-screen-lg flex flex-col items-center gap-8">
+                <span href="{% url 'core:levels' %}"
+                        class="px-6 py-2 rounded-full border border-dashed border-gray-500 text-gray-500 text-base">
+                        classes coming soon
+                    </span>
+    
+                <div class="grid grid-cols-12 items-center justify-center -space-x-3 w-full">
+                    <img src="{% static 'core/images/cta2.jpg' %}" alt=""
+                        class="col-span-4 h-full object-cover grayscale blur-[2px] -rotate-6 mt-10 shadow-lg rounded-xl ring-2 ring-offset-2 ring-primaryColor">
+                    <img src="{% static 'core/images/cta1.jpg' %}" alt=""
+                        class="col-span-4 h-full object-cover grayscale blur-[2px] rotate-3 shadow-lg rounded-xl ring-2 ring-offset-2 ring-secondaryColor">
+                    <img src="{% static 'core/images/cta3.jpg' %}" alt=""
+                        class="col-span-4 h-full object-cover grayscale blur-[2px] -rotate-3 mt-1 shadow-lg rounded-xl ring-2 ring-offset-2 ring-primaryColor">
+                </div>
+            </div>
+            {% endif %}
         </div>
 
         <div class="absolute -top-8 blur-2xl opacity-50 w-full max-w-screen-xl h-16 bg-gradient-to-r from-primaryColor to-secondaryColor rounded-[300%]"></div>
 
         <section class="relative -top-32 px-14 py-10 grid grid-cols-12 gap-2 m-auto max-w-screen-xl">
             {% for level in levels %}
-            <a href="" class="col-span-4 flex flex-col items-start gap-2 text-left shadow hover:shadow-lg rounded-2xl p-4 border outline outline-0 outline-transparent hover:outline hover:outline-1 hover:outline-darkColor border-darkColor bg-whiteColor hover:bg-white transition-all duration-200 ease-linear">
-                <div class="leading-tight uppercase w-full">
-                    {% if level.group %}
-                    <h3 class="text-2xl font-bold">
-                        {{ level.get_level_display }}, Group {{ level.group}}
-                    </h3>
-                    {% else %}
-                    <h3 class="text-2xl font-bold">
-                        {{ level.get_level_display }}
-                    </h3>
-                    {% endif %}
-                    <div class="flex items-center justify-between text-gray-500">
-                        <div class="flex items-center gap-2">
-                            <small>{{ level.semester}} {{ level.year }}</small>
-                            <small class="capitalize text-xs text-gray-400 px-2 py-0.5 rounded-full bg-gray-200">
-                                {{ level.created_at }}
-                            </small>
-                        </div>
-                        <small> {{ level.department }} </small>
-                    </div>
-                </div>
-                <hr class="w-full border-gray-500">
-                {% if level.about %}
-                <p class="text-base text-gray-500">
-                    {{ level.about }}
-                </p>
-                {% else %}
-                <p class="text-base text-gray-500">
-                    Welcome to this {{ level.get_level_display }}! Explore and discover more about it. 
-                    Don't worry, it's a secret club. We only share the best memes here. 😄
-                </p>
-                {% endif %}
-
-                <div class="min-h-5 h-full"></div>
-
-                <div class="flex justify-between items-center w-full">
-                    <div class="flex flex-col">
-                        <div class="flex gap-2 text-secondaryColor">
-                            {% if level.main_hall == 'Online' or level.main_hall == 'online' %}
-                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none" class="w-5">
-                                    <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.5" />
-                                    <path d="M8 12C8 18 12 22 12 22C12 22 16 18 16 12C16 6 12 2 12 2C12 2 8 6 8 12Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" />
-                                    <path d="M21 15H3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
-                                    <path d="M21 9H3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
-                                </svg>
-                              {% else %}
-                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none" class="w-5">
-                                    <path d="M2 22H22" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
-                                    <path d="M18 9H14C11.518 9 11 9.518 11 12V22H21V12C21 9.518 20.482 9 18 9Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" />
-                                    <path d="M15 22H3V5C3 2.518 3.518 2 6 2H12C14.482 2 15 2.518 15 5V9" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" />
-                                    <path d="M3 6H6M3 10H6M3 14H6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
-                                    <path d="M15 13H17M15 16H17" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
-                                    <path d="M16 22L16 19" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
-                                </svg>
-                            {% endif %}
-                            <small>
-                                {{ level.main_hall }}
-                            </small>
-                        </div>
-                        {% if level.secondary_hall %}
-                        <div class="flex items-center gap-2">
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none" class="w-4">
-                                <path d="M16.9767 19.5C19.4017 17.8876 21 15.1305 21 12C21 7.02944 16.9706 3 12 3C11.3126 3 10.6432 3.07706 10 3.22302M16.9767 19.5V16M16.9767 19.5H20.5M7 4.51555C4.58803 6.13007 3 8.87958 3 12C3 16.9706 7.02944 21 12 21C12.6874 21 13.3568 20.9229 14 20.777M7 4.51555V8M7 4.51555H3.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
-                            </svg>
-                            <small class="text-xs">
-                                {{ level.secondary_hall }}
-                            </small>
-                        </div>
+                {% if level.is_visible %}
+                <a href="{% url 'core:dashboard' level_pk=level.id level_slug=level.slug %}" class="col-span-4 flex flex-col items-start gap-2 text-left shadow hover:shadow-lg rounded-2xl p-4 border outline outline-0 outline-transparent hover:outline hover:outline-1 hover:outline-darkColor border-darkColor bg-whiteColor hover:bg-[#ffecd5] transition-all duration-200 ease-linear">
+                    <div class="leading-tight uppercase w-full">
+                        {% if level.group %}
+                        <h3 class="text-2xl font-bold">
+                            {{ level.get_level_display }}, Group {{ level.group}}
+                        </h3>
+                        {% else %}
+                        <h3 class="text-2xl font-bold">
+                            {{ level.get_level_display }}
+                        </h3>
                         {% endif %}
+                        <div class="flex items-center justify-between text-gray-500">
+                            <div class="flex items-center gap-2">
+                                <small>{{ level.semester}} {{ level.year }}</small>
+                                <small class="capitalize text-xs text-gray-400 px-2 py-0.5 rounded-full bg-gray-200">
+                                    {{ level.created_at }}
+                                </small>
+                            </div>
+                            <small> {{ level.department }} </small>
+                        </div>
                     </div>
-
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none" class="text-secondaryColor">
-                        <path d="M9.00005 6C9.00005 6 15 10.4189 15 12C15 13.5812 9 18 9 18" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
-                    </svg>
-                </div>
-            </a>
+                    <hr class="w-full border-gray-500">
+                    {% if level.about %}
+                    <p class="text-base text-gray-500">
+                        {{ level.about }}
+                    </p>
+                    {% else %}
+                    <p class="text-base text-gray-500">
+                        Welcome to this {{ level.get_level_display }}! Explore and discover more about it. 
+                        Don't worry, it's a secret club. We only share the best memes here. 😄
+                    </p>
+                    {% endif %}
+    
+                    <div class="min-h-5 h-full"></div>
+    
+                    <div class="flex justify-between items-center w-full">
+                        <div class="flex flex-col">
+                            <div class="flex gap-2 text-secondaryColor">
+                                {% if level.main_hall == 'Online' or level.main_hall == 'online' %}
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none" class="w-5">
+                                        <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.5" />
+                                        <path d="M8 12C8 18 12 22 12 22C12 22 16 18 16 12C16 6 12 2 12 2C12 2 8 6 8 12Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" />
+                                        <path d="M21 15H3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                                        <path d="M21 9H3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                                    </svg>
+                                  {% else %}
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none" class="w-5">
+                                        <path d="M2 22H22" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+                                        <path d="M18 9H14C11.518 9 11 9.518 11 12V22H21V12C21 9.518 20.482 9 18 9Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" />
+                                        <path d="M15 22H3V5C3 2.518 3.518 2 6 2H12C14.482 2 15 2.518 15 5V9" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" />
+                                        <path d="M3 6H6M3 10H6M3 14H6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+                                        <path d="M15 13H17M15 16H17" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+                                        <path d="M16 22L16 19" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                                    </svg>
+                                {% endif %}
+                                <small>
+                                    {{ level.main_hall }}
+                                </small>
+                            </div>
+                            {% if level.secondary_hall %}
+                            <div class="flex items-center gap-2">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none" class="w-4">
+                                    <path d="M16.9767 19.5C19.4017 17.8876 21 15.1305 21 12C21 7.02944 16.9706 3 12 3C11.3126 3 10.6432 3.07706 10 3.22302M16.9767 19.5V16M16.9767 19.5H20.5M7 4.51555C4.58803 6.13007 3 8.87958 3 12C3 16.9706 7.02944 21 12 21C12.6874 21 13.3568 20.9229 14 20.777M7 4.51555V8M7 4.51555H3.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                                </svg>
+                                <small class="text-xs">
+                                    {{ level.secondary_hall }}
+                                </small>
+                            </div>
+                            {% endif %}
+                        </div>
+    
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none" class="text-secondaryColor">
+                            <path d="M9.00005 6C9.00005 6 15 10.4189 15 12C15 13.5812 9 18 9 18" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                        </svg>
+                    </div>
+                </a>
+                {% endif %}                
             {% endfor %}
         </section>
     </div>
 </main>
-{% endblock %}
 
+{% include "components/message.html" %}
+{% endblock body %}
 
 {% block javascript %}
 {% endblock javascript %}

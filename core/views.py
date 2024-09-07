@@ -3,65 +3,82 @@ from datetime import timedelta
 
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.shortcuts import get_object_or_404
 from django.urls import reverse_lazy
 from django.utils.html import format_html
 from django.views.generic import TemplateView, ListView, DetailView, CreateView, UpdateView
 
 from .forms import CourseForm, LecturerForm, StudentForm, TeachingRecordForm
-from .mixins import CommonContextMixin
-from .models import Course, Student, Lecturer, TeachingRecord, StudentDelegate, Enrollment, CourseAttendance, ClassLevel
+from .mixins import CommonContextMixin, ClassLevelAccessMixin
+from .models import Course, Student, Lecturer, TeachingRecord, CourseDelegate, CourseAttendance, \
+    ClassLevel, Attendance
+from .utils import group_model_items_by_week
 
 
 # Create your views here.
-class HomeView(CommonContextMixin, TemplateView):
+class HomeView(TemplateView):
     template_name = 'core/index.html'
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['levels_count'] = ClassLevel.objects.all().count()
+        context['course_attendance_count'] = Attendance.objects.all().count()
+        context['courses_count'] = Course.objects.all().count()
+        context['lecturers_count'] = Lecturer.objects.all().count()
+        context['students_count'] = Student.objects.all().count()
+        return context
 
-class LevelView(TemplateView):
+
+class LevelView(LoginRequiredMixin, TemplateView):
     template_name = 'core/levels/levels.html'
-    
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["levels"] = ClassLevel.objects.all()
         return context
-    
+
 
 # Dashboard views
-class DashboardView(LoginRequiredMixin, CommonContextMixin, TemplateView):
-    template_name = 'core/dashboard.html'
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        grouped_attendances = group_items_by_week(CourseAttendance)
-        for week, attendances in grouped_attendances.items():
-            for attendance in attendances:
-                attendance.course_title = attendance.course.title
-                attendance.course_lecturer_name = attendance.course.lecturer.name
-                attendance.course_delegate = StudentDelegate.objects.filter(course=attendance.course,
-                                                                            role='delegate').first()
-                attendance.course_assistant = StudentDelegate.objects.filter(course=attendance.course,
-                                                                             role='assistant').first()
-                attendance.enrollment_count = Enrollment.objects.filter(attendance=attendance).count()
-        context['grouped_attendances'] = dict(grouped_attendances)
-        return context
-
-
-def group_items_by_week(model):
-    items = model.objects.all().order_by('created_at')
-    grouped_items = defaultdict(list)
-
-    for item in items:
+def group_items_by_week(attendances):
+    grouped_attendances = defaultdict(list)
+    for attendance in attendances.order_by('created_at'):
         # Calculate the start of the week (Monday) for each item
-        week_start = item.created_at - timedelta(days=item.created_at.weekday())
+        week_start = attendance.created_at - timedelta(days=attendance.created_at.weekday())
         week_end = week_start + timedelta(days=6)
 
         # Format the week range as "Mon 19 Aug - Sun 25 Aug"
         week_range = f"{week_start.strftime('%a %d %b')} - {week_end.strftime('%a %d %b %Y')}"
 
         # Group items by this week range
-        grouped_items[week_range].append(item)
+        grouped_attendances[week_range].append(attendance)
+    return grouped_attendances
 
-    return grouped_items
+
+# core/views.py
+class DashboardView(LoginRequiredMixin, CommonContextMixin, ClassLevelAccessMixin, DetailView):
+    model = ClassLevel
+    template_name = 'core/dashboard.html'
+    context_object_name = 'level'
+
+    def get_object(self, queryset=None):
+        return get_object_or_404(self.model, id=self.kwargs['level_pk'], slug=self.kwargs['level_slug'])
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        grouped_attendances = group_items_by_week(Attendance.objects.filter(class_level=self.kwargs['level_pk']))
+        print('grouped_attendances', grouped_attendances)
+        for week, attendances in grouped_attendances.items():
+            for attendance in attendances:
+                attendance.course_title = attendance.course.title
+                attendance.course_lecturer_name = attendance.course.lecturer.name
+                attendance.course_delegate = CourseDelegate.objects.filter(course=attendance.course,
+                                                                           role='delegate').first()
+                attendance.course_assistant = CourseDelegate.objects.filter(course=attendance.course,
+                                                                            role='assistant').first()
+                attendance.enrollment_count = CourseAttendance.objects.filter(
+                    attendance__course=attendance.course).count()
+        context['grouped_attendances'] = dict(grouped_attendances)
+        return context
 
 
 class CourseView(LoginRequiredMixin, CommonContextMixin, ListView):
@@ -69,6 +86,9 @@ class CourseView(LoginRequiredMixin, CommonContextMixin, ListView):
     template_name = 'core/courses/courses.html'
     paginate_by = 25
     context_object_name = 'courses'
+
+    def get_queryset(self):
+        return Course.objects.filter(class_level=self.kwargs['level_pk']).order_by('title')
 
     def post(self, request, *args, **kwargs):
         if 'delete_course' in request.POST:
@@ -90,16 +110,12 @@ class CourseDetailView(LoginRequiredMixin, CommonContextMixin, DetailView):
     context_object_name = 'course'
 
     def get_object(self, queryset=None):
-        queryset = self.get_queryset()
-        return queryset.get(id=self.kwargs['pk'], slug=self.kwargs['slug'])
-
-    def get_queryset(self):
-        return Course.objects.all()
+        return get_object_or_404(self.model, id=self.kwargs['pk'], slug=self.kwargs['slug'])
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         course = self.get_object()
-        context['delegates'] = StudentDelegate.objects.filter(course=course)
+        context['delegates'] = CourseDelegate.objects.filter(course=course)
         return context
 
 
@@ -108,13 +124,33 @@ class CourseAddView(LoginRequiredMixin, CommonContextMixin, CreateView):
     template_name = 'core/courses/course_add.html'
     context_object_name = 'form'
     form_class = CourseForm
-    success_url = reverse_lazy('core:courses')
+
+    def get_success_url(self):
+        return reverse_lazy('core:courses', kwargs={'level_pk': self.kwargs['level_pk']})
+
+    def get_form(self, form_class=None):
+        form = super().get_form(form_class)
+        # Get the class level based on the URL parameter
+        level_pk = self.kwargs.get('level_pk')
+        class_level = ClassLevel.objects.get(pk=level_pk)
+
+        # Set the class_level in the form
+        form.fields['class_level'].initial = class_level
+        return form
 
     def form_valid(self, form):
+        # Get the class level from the URL
+        level_pk = self.kwargs.get('level_pk')
+        class_level = ClassLevel.objects.get(pk=level_pk)
+
+        # Set the class_level for the student instance
+        form.instance.class_level = class_level
+
         form.save()
         message = format_html(
             'Course added successfully.<br><a href="{}" class="font-bold underline">View</a>',
-            reverse_lazy('core:course_detail', kwargs={'pk': form.instance.pk, 'slug': form.instance.slug})
+            reverse_lazy('core:course_detail', kwargs={'level_pk': self.kwargs.get('level_pk'), 'pk': form.instance.pk,
+                                                       'slug': form.instance.slug})
         )
         messages.success(
             self.request,
@@ -141,14 +177,13 @@ class CourseUpdateView(LoginRequiredMixin, CommonContextMixin, UpdateView):
     template_name = 'core/courses/course_update.html'
     context_object_name = 'form'
     form_class = CourseForm
-    success_url = reverse_lazy('core:courses')
 
     def get_object(self, queryset=None):
         queryset = self.get_queryset()
         return queryset.get(id=self.kwargs['pk'], slug=self.kwargs['slug'])
 
-    def get_queryset(self):
-        return Course.objects.all()
+    def get_success_url(self):
+        return reverse_lazy('core:courses', kwargs={'level_pk': self.kwargs['level_pk']})
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -159,7 +194,8 @@ class CourseUpdateView(LoginRequiredMixin, CommonContextMixin, UpdateView):
         form.save()
         message = format_html(
             'Course updated successfully.<br><a href="{}" class="font-bold underline">View</a>',
-            reverse_lazy('core:course_detail', kwargs={'pk': form.instance.pk, 'slug': form.instance.slug})
+            reverse_lazy('core:course_detail', kwargs={'level_pk': self.kwargs.get('level_pk'), 'pk': form.instance.pk,
+                                                       'slug': form.instance.slug})
         )
         messages.success(
             self.request,
@@ -182,6 +218,9 @@ class StudentView(LoginRequiredMixin, CommonContextMixin, ListView):
     template_name = 'core/students/students.html'
     paginate_by = 25
     context_object_name = 'students'
+
+    def get_queryset(self):
+        return self.model.objects.filter(class_level=self.kwargs['level_pk']).order_by('name')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -207,15 +246,7 @@ class StudentDetailView(LoginRequiredMixin, CommonContextMixin, DetailView):
     context_object_name = 'student'
 
     def get_object(self, queryset=None):
-        queryset = self.get_queryset()
-        return queryset.get(id=self.kwargs['pk'], slug=self.kwargs['slug'])
-
-    def get_queryset(self):
-        return Student.objects.all()
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        return context
+        return get_object_or_404(self.model, id=self.kwargs['pk'], slug=self.kwargs['slug'])
 
 
 class StudentAddView(LoginRequiredMixin, CommonContextMixin, CreateView):
@@ -223,13 +254,33 @@ class StudentAddView(LoginRequiredMixin, CommonContextMixin, CreateView):
     template_name = 'core/students/student_add.html'
     context_object_name = 'form'
     form_class = StudentForm
-    success_url = reverse_lazy('core:students')
+
+    def get_success_url(self):
+        return reverse_lazy('core:students', kwargs={'level_pk': self.kwargs['level_pk']})
+
+    def get_form(self, form_class=None):
+        form = super().get_form(form_class)
+        # Get the class level based on the URL parameter
+        level_pk = self.kwargs.get('level_pk')
+        class_level = ClassLevel.objects.get(pk=level_pk)
+
+        # Set the class_level in the form
+        form.fields['class_level'].initial = class_level
+        return form
 
     def form_valid(self, form):
+        # Get the class level from the URL
+        level_pk = self.kwargs.get('level_pk')
+        class_level = ClassLevel.objects.get(pk=level_pk)
+
+        # Set the class_level for the student instance
+        form.instance.class_level = class_level
+
         form.save()
         message = format_html(
             'Student added successfully.<br><a href="{}" class="font-bold underline">View</a>',
-            reverse_lazy('core:student_detail', kwargs={'pk': form.instance.pk, 'slug': form.instance.slug})
+            reverse_lazy('core:student_detail',
+                         kwargs={'level_pk': level_pk, 'pk': form.instance.pk, 'slug': form.instance.slug})
         )
         messages.success(
             self.request,
@@ -252,14 +303,13 @@ class StudentUpdateView(LoginRequiredMixin, CommonContextMixin, UpdateView):
     template_name = 'core/students/student_update.html'
     context_object_name = 'form'
     form_class = StudentForm
-    success_url = reverse_lazy('core:students')
 
     def get_object(self, queryset=None):
         queryset = self.get_queryset()
         return queryset.get(id=self.kwargs['pk'], slug=self.kwargs['slug'])
 
-    def get_queryset(self):
-        return Student.objects.all()
+    def get_success_url(self):
+        return reverse_lazy('core:students', kwargs={'level_pk': self.kwargs['level_pk']})
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -270,7 +320,8 @@ class StudentUpdateView(LoginRequiredMixin, CommonContextMixin, UpdateView):
         form.save()
         message = format_html(
             'Student updated successfully.<br><a href="{}" class="font-bold underline">View</a>',
-            reverse_lazy('core:student_detail', kwargs={'pk': form.instance.pk, 'slug': form.instance.slug})
+            reverse_lazy('core:student_detail', kwargs={'level_pk': self.kwargs.get('level_pk'), 'pk': form.instance.pk,
+                                                        'slug': form.instance.slug})
         )
         messages.success(
             self.request,
@@ -294,6 +345,9 @@ class LecturerView(LoginRequiredMixin, CommonContextMixin, ListView):
     paginate_by = 25
     context_object_name = 'lecturers'
 
+    def get_queryset(self):
+        return self.model.objects.filter(course_lecturer__class_level=self.kwargs['level_pk']).order_by('name')
+
     def post(self, request, *args, **kwargs):
         if 'delete_lecturer' in request.POST:
             lecturer_id = request.POST.get('lecturer_id')
@@ -313,15 +367,7 @@ class LecturerDetailView(LoginRequiredMixin, CommonContextMixin, DetailView):
     context_object_name = 'lecturer'
 
     def get_object(self, queryset=None):
-        queryset = self.get_queryset()
-        return queryset.get(id=self.kwargs['pk'], slug=self.kwargs['slug'])
-
-    def get_queryset(self):
-        return Lecturer.objects.all()
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        return context
+        return get_object_or_404(self.model, id=self.kwargs['pk'], slug=self.kwargs['slug'])
 
 
 class LecturerAddView(LoginRequiredMixin, CommonContextMixin, CreateView):
@@ -329,13 +375,17 @@ class LecturerAddView(LoginRequiredMixin, CommonContextMixin, CreateView):
     template_name = 'core/lecturers/lecturer_add.html'
     context_object_name = 'form'
     form_class = LecturerForm
-    success_url = reverse_lazy('core:lecturers')
+
+    def get_success_url(self):
+        return reverse_lazy('core:lecturers', kwargs={'level_pk': self.kwargs['level_pk']})
 
     def form_valid(self, form):
         form.save()
         message = format_html(
             'Lecturer added successfully.<br><a href="{}" class="font-bold underline">View</a>',
-            reverse_lazy('core:lecturer_detail', kwargs={'pk': form.instance.pk, 'slug': form.instance.slug})
+            reverse_lazy('core:lecturer_detail',
+                         kwargs={'level_pk': self.kwargs.get('level_pk'), 'pk': form.instance.pk,
+                                 'slug': form.instance.slug})
         )
         messages.success(
             self.request,
@@ -358,11 +408,13 @@ class LecturerUpdateView(LoginRequiredMixin, CommonContextMixin, UpdateView):
     template_name = 'core/lecturers/lecturer_update.html'
     context_object_name = 'form'
     form_class = LecturerForm
-    success_url = reverse_lazy('core:lecturers')
 
     def get_object(self, queryset=None):
         queryset = self.get_queryset()
         return queryset.get(id=self.kwargs['pk'], slug=self.kwargs['slug'])
+
+    def get_success_url(self):
+        return reverse_lazy('core:lecturers', kwargs={'level_pk': self.kwargs['level_pk']})
 
     def get_queryset(self):
         return Lecturer.objects.all()
@@ -376,7 +428,9 @@ class LecturerUpdateView(LoginRequiredMixin, CommonContextMixin, UpdateView):
         form.save()
         message = format_html(
             'Lecturer updated successfully.<br><a href="{}" class="font-bold underline">View</a>',
-            reverse_lazy('core:lecturer_detail', kwargs={'pk': form.instance.pk, 'slug': form.instance.slug})
+            reverse_lazy('core:lecturer_detail',
+                         kwargs={'level_pk': self.kwargs.get('level_pk'), 'pk': form.instance.pk,
+                                 'slug': form.instance.slug})
         )
         messages.success(
             self.request,
@@ -402,14 +456,17 @@ class TeachingRecordView(LoginRequiredMixin, CommonContextMixin, ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        grouped_records = group_items_by_week(TeachingRecord)
+        class_level_id = self.kwargs['level_pk']
+        records_queryset = TeachingRecord.objects.filter(
+            teaching_record_attendance__course__class_level_id=class_level_id)
+        grouped_records = group_model_items_by_week(records_queryset)
         for week, records in grouped_records.items():
             for record in records:
                 record.course_title = record.teaching_record_attendance.course.title
                 record.course_lecturer_name = record.teaching_record_attendance.course.lecturer.name
-                record.course_delegate = StudentDelegate.objects.filter(course=record.teaching_record_attendance.course,
-                                                                        role='delegate').first()
-                record.course_assistant = StudentDelegate.objects.filter(
+                record.course_delegate = CourseDelegate.objects.filter(course=record.teaching_record_attendance.course,
+                                                                       role='delegate').first()
+                record.course_assistant = CourseDelegate.objects.filter(
                     course=record.teaching_record_attendance.course, role='assistant').first()
         context['grouped_records'] = dict(grouped_records)
         return context
@@ -421,21 +478,28 @@ class TeachingRecordDetailView(LoginRequiredMixin, CommonContextMixin, DetailVie
     context_object_name = 'record'
 
     def get_object(self, queryset=None):
-        queryset = self.get_queryset()
-        return queryset.get(id=self.kwargs['pk'], teaching_record_attendance__course__slug=self.kwargs['slug'])
-
-    def get_queryset(self):
-        return TeachingRecord.objects.all()
+        return get_object_or_404(
+            self.model,
+            teaching_record_attendance__course__class_level_id=self.kwargs['level_pk'],
+            id=self.kwargs['pk'],
+            teaching_record_attendance__course__slug=self.kwargs['slug']
+        )
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['course_delegates'] = StudentDelegate.objects.filter(
+        class_level_id = self.kwargs['level_pk']
+        context['course_delegates'] = CourseDelegate.objects.filter(
             course=self.object.teaching_record_attendance.course,
-            student__is_delegate=True)
-        context['enrollments'] = Enrollment.objects.filter(
-            attendance__course=self.object.teaching_record_attendance.course).count()
+            student__is_delegate=True,
+            course__class_level_id=class_level_id
+        )
+        context['enrollments'] = CourseAttendance.objects.filter(
+            attendance__course=self.object.teaching_record_attendance.course,
+            attendance__course__class_level_id=class_level_id
+        ).count()
         return context
-    
+
+
 class TeachingRecordUpdateView(LoginRequiredMixin, CommonContextMixin, UpdateView):
     model = TeachingRecord
     template_name = 'core/records/record_update.html'
@@ -446,16 +510,15 @@ class TeachingRecordUpdateView(LoginRequiredMixin, CommonContextMixin, UpdateVie
         queryset = self.get_queryset()
         return queryset.get(id=self.kwargs['pk'], teaching_record_attendance__course__slug=self.kwargs['slug'])
 
-    def get_queryset(self):
-        return TeachingRecord.objects.all()
-
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['record'] = self.get_object()
         return context
-    
+
     def get_success_url(self):
-        return reverse_lazy('core:record_detail', kwargs={'pk': self.object.pk, 'slug': self.object.teaching_record_attendance.course.slug})
+        return reverse_lazy('core:record_detail',
+                            kwargs={'level_pk': self.kwargs.get('level_pk'), 'pk': self.object.pk,
+                                    'slug': self.object.teaching_record_attendance.course.slug})
 
     def form_valid(self, form):
         form.save()

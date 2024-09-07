@@ -3,7 +3,7 @@
 {% load tailwind_tags number_formatting %}
 
 {# Title of the page #}
-{% block title %}Home{% endblock %}
+{% block title %}Dashboard{% endblock %}
 
 {# Extra styles #}
 {% block extra_styles %}
@@ -30,8 +30,9 @@
         <div class="p-4 sm:ml-64">
             <div class="rounded-lg mt-14">
                 <div class="grid grid-cols-12 gap-4">
-                    <div class="flex col-span-12">
-                        <h2 class="text-2xl">Overall Stats</h2>
+                    <div class="flex flex-col col-span-12">
+                        <small class="text-gray-500 block">You are currently logged in the class</small>
+                        <h2 class="text-2xl">{{ level.get_level_display }} - Group {{ level.group }} ({{ level.semester }} {{ level.year }}, {{ level.department }} ) </h2>
                     </div>
 
                     <div class="col-span-12 flex items-center justify-evenly backdrop-blur-xl px-6 py-2.5 rounded-2xl outline outline-1 outline-secondaryColor shadow-lg">
@@ -262,7 +263,7 @@
                                             <div class="flex items-center gap-2">
 
                                                 {% if attendance.teaching_record %}
-                                                    <a href="{% url 'core:record_detail' pk=attendance.course.id slug=attendance.course.slug %}"
+                                                    <a href="{% url 'core:record_detail' level_pk=level.id pk=attendance.teaching_record.id slug=attendance.course.slug %}"
                                                        class="text-nowrap px-4 py-2 rounded-xl bg-secondaryColor text-white text-sm">
                                                         View associated record
                                                     </a>
@@ -284,7 +285,20 @@
                                 {% endfor %}
                             </ul>
                         {% empty %}
-                            <p>No attendances available.</p>
+                            <div class="grid grid-cols-12 items-center justify-center w-full my-4 mt-8">
+                                <div class="col-span-4 flex flex-col text-center gap-1">
+                                   <span  class="px-6 py-2 rounded-full border border-dashed border-gray-500 text-gray-500 text-base w-max m-auto">
+                                    Nothing to show here for now...
+                                   </span>
+                                    <span class="text-xs">
+                                        Come back in the mean time or contact the support
+                                    </span>
+                                </div>
+                                <img src="{% static 'core/images/process-attendance.svg' %}" alt="Manage attendances"
+                                    class="col-span-4 h-full bg-white object-cover relative z-0 scale-90 -top-5 -right-2 md:-right-5 rotate-3 shadow-lg rounded-xl ring-2 ring-offset-2 ring-secondaryColor">
+                                <img src="{% static 'core/images/process-monitor.svg' %}" alt="Interactive dashboard"
+                                    class="col-span-4 h-full bg-white object-cover relative z-10 scale-90 -top-5 -left-2 md:-left-5 -rotate-3 shadow-lg rounded-xl ring-2 ring-offset-2 ring-primaryColor">
+                            </div>
                         {% endfor %}
                     </div>
                 </div>

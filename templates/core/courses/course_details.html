@@ -24,7 +24,7 @@
     <div class="flex flex-col gap-4 items-start justify-center w-full mt-14">
         <div class="flex flex-col gap-2">
             <small>
-                <a href="{% url 'core:courses' %}" class="text-secondaryColor">Courses</a> /
+                <a href="{% url 'core:courses' level_pk=level.id %}" class="text-secondaryColor">Courses</a> /
             </small>
             <h2 class="text-3xl">
                 {{ course.code }} {{ course.title }}
@@ -85,7 +85,7 @@
                                 <li class="">
                                     <div class="flex items-center justify-between">
                                         <p class="text-gray-500">Semester:</p>
-                                        <p class="text-darkColor">{{ course.semester }} {{ course.year}}</p>
+                                        <p class="text-darkColor">{{ level.semester }} {{ level.year}}</p>
                                     </div>
                                 </li>
                             </ul>

@@ -1,10 +1,8 @@
-import datetime
-
-from django import forms
 from allauth.account.forms import LoginForm
-from .models import Course, Lecturer, Student, DepartmentChoices, TeachingRecord, SemesterChoices
-from django_summernote.fields import SummernoteTextField
-from django_summernote.widgets import SummernoteWidget, SummernoteInplaceWidget
+from django import forms
+from django_summernote.widgets import SummernoteWidget
+
+from .models import Course, Lecturer, Student, DepartmentChoices, TeachingRecord, ClassLevel
 
 
 # Create your forms here
@@ -47,6 +45,25 @@ class CourseForm(forms.ModelForm):
     class Meta:
         model = Course
         fields = '__all__'
+
+    class_level = forms.ModelChoiceField(
+        queryset=ClassLevel.objects.all(),
+        widget=forms.Select(
+            attrs={
+                'id': 'class_level_course',
+                'name': 'class_level_course',
+                'placeholder': 'Select class level',
+                'class': 'rounded-2xl block w-full ps-10 p-2.5 bg-gray-200 border-darkColor placeholder-darkColor/50 '
+                         'focus:ring-primaryColor focus:border-primaryColor transition-all duration-300 ease-in-out '
+                         'disabled:text-gray-500 disabled:cursor-not-allowed',
+            }
+        ),
+        label='Class Level',
+        help_text='The class level of the course',
+        error_messages={'required': 'Please select the class level of the course'},
+        required=False,
+        disabled=True
+    )
 
     code = forms.CharField(
         widget=forms.TextInput(
@@ -100,43 +117,6 @@ class CourseForm(forms.ModelForm):
         error_messages={'required': 'Please select the lecturer teaching the course'},
         required=True,
     )
-
-    semester = forms.ChoiceField(
-        widget=forms.Select(
-            attrs={
-                'id': 'semester',
-                'name': 'semester',
-                'placeholder': 'Select semester',
-                'class': 'rounded-2xl block w-full ps-10 p-2.5 bg-whiteColor border-darkColor placeholder-darkColor/50 '
-                         'focus:ring-primaryColor focus:border-primaryColor transition-all duration-300 ease-in-out',
-            }
-        ),
-        label='Semester',
-        help_text='Select the semester of the course.',
-        choices=SemesterChoices.choices,
-        required=True,
-    )
-
-    year = forms.IntegerField(
-        widget=forms.NumberInput(
-            attrs={
-                'id': 'year',
-                'name': 'year',
-                'placeholder': '2022',
-                'class': 'rounded-2xl block w-full ps-10 p-2.5 bg-whiteColor border-darkColor placeholder-darkColor/50 '
-                         'focus:ring-primaryColor focus:border-primaryColor transition-all duration-300 ease-in-out',
-            }
-        ),
-        label='Year',
-        help_text='Enter the year of the course.',
-        error_messages={'required': 'Please enter the year of the course'},
-        required=True,
-        initial=datetime.date.today().year,
-    )
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.fields['semester'].default = Course.SemesterChoices.FALL
 
 
 class LecturerForm(forms.ModelForm):
@@ -202,6 +182,25 @@ class StudentForm(forms.ModelForm):
         model = Student
         fields = '__all__'
 
+    class_level = forms.ModelChoiceField(
+        queryset=ClassLevel.objects.all(),
+        widget=forms.Select(
+            attrs={
+                'id': 'class_level_student',
+                'name': 'class_level_student',
+                'placeholder': 'Select class level',
+                'class': 'rounded-2xl block w-full ps-10 p-2.5 bg-gray-200 border-darkColor placeholder-darkColor/50 '
+                         'focus:ring-primaryColor focus:border-primaryColor transition-all duration-300 ease-in-out '
+                         'disabled:text-gray-500 disabled:cursor-not-allowed',
+            }
+        ),
+        label='Class Level',
+        help_text='The class level of the student.',
+        error_messages={'required': 'Please select the class level of the student'},
+        required=True,
+        disabled=True
+    )
+
     name = forms.CharField(
         widget=forms.TextInput(
             attrs={
@@ -218,21 +217,21 @@ class StudentForm(forms.ModelForm):
         required=True,
     )
 
-    matricule = forms.CharField(
+    student_number = forms.CharField(
         widget=forms.TextInput(
             attrs={
-                'id': 'matricule',
-                'name': 'matricule',
+                'id': 'student_number',
+                'name': 'student_number',
                 'placeholder': 'ICTU20XXxxxx',
                 'class': 'rounded-2xl block w-full ps-10 p-2.5 bg-whiteColor border-darkColor placeholder-darkColor/50 '
                          'focus:ring-primaryColor focus:border-primaryColor transition-all duration-300 ease-in-out',
             }
         ),
-        label='Matricule',
-        help_text='Enter the matricule of the student.',
+        label='Student Number',
+        help_text='Enter the student number of the student.',
         error_messages={
-            'required': 'Please enter the matricule of the student',
-            'unique': 'A student with that matricule already exists.',
+            'required': 'Please enter the student number of the student',
+            'unique': 'A student with that student number already exists.',
         },
         required=True,
     )
@@ -325,16 +324,17 @@ class StudentForm(forms.ModelForm):
         self.fields['department'].default = DepartmentChoices.ICT
         self.fields['is_delegate'].default = False
 
+
 class TeachingRecordForm(forms.ModelForm):
     class Meta:
         model = TeachingRecord
         fields = [
             'description',
             'lecturer_arrival_time',
-            'lecturer_departure_time',   
+            'lecturer_departure_time',
             'quality_assurance',
         ]
-        
+
     description = forms.CharField(
         widget=SummernoteWidget(),
         label='Description',
@@ -342,7 +342,7 @@ class TeachingRecordForm(forms.ModelForm):
         error_messages={'required': 'Please enter a description of the teaching record'},
         required=True,
     )
-    
+
     lecturer_arrival_time = forms.TimeField(
         widget=forms.TimeInput(
             attrs={
@@ -359,7 +359,7 @@ class TeachingRecordForm(forms.ModelForm):
         error_messages={'required': 'Please enter the time the lecturer arrived'},
         required=True,
     )
-    
+
     lecturer_departure_time = forms.TimeField(
         widget=forms.TimeInput(
             attrs={
@@ -376,7 +376,7 @@ class TeachingRecordForm(forms.ModelForm):
         error_messages={'required': 'Please enter the time the lecturer left'},
         required=True,
     )
-    
+
     quality_assurance = forms.ChoiceField(
         widget=forms.Select(
             attrs={
@@ -392,7 +392,7 @@ class TeachingRecordForm(forms.ModelForm):
         choices=TeachingRecord.QualityChoices.choices,
         required=True,
     )
-    
+
     def clean(self):
         cleaned_data = super().clean()
         arrival_time = cleaned_data.get('lecturer_arrival_time')

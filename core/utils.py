@@ -1,3 +1,4 @@
+from collections import defaultdict
 from datetime import datetime, timedelta
 
 
@@ -44,3 +45,20 @@ def is_valid_time(start_time, end_time):
     start_datetime = datetime.combine(today, start_time)
     end_datetime = datetime.combine(today, end_time)
     return end_datetime > start_datetime
+
+
+def group_model_items_by_week(queryset):
+    grouped_items = defaultdict(list)
+
+    for item in queryset.order_by('created_at'):
+        # Calculate the start of the week (Monday) for each item
+        week_start = item.created_at - timedelta(days=item.created_at.weekday())
+        week_end = week_start + timedelta(days=6)
+
+        # Format the week range as "Mon 19 Aug - Sun 25 Aug"
+        week_range = f"{week_start.strftime('%a %d %b')} - {week_end.strftime('%a %d %b %Y')}"
+
+        # Group items by this week range
+        grouped_items[week_range].append(item)
+
+    return grouped_items

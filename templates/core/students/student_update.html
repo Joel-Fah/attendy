@@ -57,7 +57,7 @@
                     <div class="flex flex-col gap-2">
                         {# Matricule field #}
                         <div class="">
-                            <label for="{{ form.matricule.label }}" class="ps-4 text-xs text-gray-500"> {{ form.matricule.label }} </label>
+                            <label for="{{ form.student_number.label }}" class="ps-4 text-xs text-gray-500"> {{ form.student_number.label }} </label>
                             <div class="relative">
                                 <div class="absolute inset-y-0 start-0 flex items-center ps-2.5 pointer-events-none">
                                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none">
@@ -67,12 +67,12 @@
                                         <path d="M15 14H19" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
                                     </svg>
                                 </div>
-                                {{ form.matricule }}
+                                {{ form.student_number }}
                             </div>
         
-                            {% if form.matricule.errors %}
+                            {% if form.student_number.errors %}
                             <small class="text-sm text-danger">
-                                {% for error in form.matricule.errors %}
+                                {% for error in form.student_number.errors %}
                                     {{ error }}
                                 {% endfor %}
                             </small>

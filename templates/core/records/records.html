@@ -42,7 +42,7 @@
                 <ul class="border-l border-secondaryColor/20">
                     {% for record in records %}
                     <li>
-                        <a href="{% url 'core:record_detail' pk=record.id slug=record.teaching_record_attendance.course.slug %}"
+                        <a href="{% url 'core:record_detail' level_pk=level.id pk=record.id slug=record.teaching_record_attendance.course.slug %}"
                             class="flex items-center justify-between w-full px-4 py-2 hover:bg-secondaryColor/5 transition-all duration-300 ease-linear">
                             <div class="flex items-center gap-4">
                                 <span> {{ forloop.counter }}. </span>

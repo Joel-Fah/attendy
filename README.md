@@ -6,7 +6,9 @@ Welcome to **Attendy**, a web application designed to make student attendance ma
 
 **GitHub Repository**: [Attendy on GitHub](https://github.com/Joel-Fah/attendy)
 
-![Login screen](./static/docs/image.png)
+![Login screen](./static/docs/attendy-login.jpeg)
+
+![Classes screen](./static/docs/attendy-levels.jpeg)
 
 ## **Project Overview**
 
@@ -27,6 +29,8 @@ Attendy is built with the goal of providing a user-friendly platform for educati
 - **Teaching Records Management**: Log and track teaching sessions and attendance data.
   
 ![Admin/Delegate Dashboard screen](./static/core/images/attendy-dashboard.png)
+
+![Teaching Records screen](./static/docs/attendy-records.jpeg)
 
 ## **Project Setup**
 

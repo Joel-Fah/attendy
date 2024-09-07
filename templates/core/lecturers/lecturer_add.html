@@ -36,7 +36,7 @@
                     </p>
                 </div>
         
-                <form action="{% url 'core:lecturer_add' %}" method="post" class="max-w-sm w-full">
+                <form action="{% url 'core:lecturer_add' level_pk=level.id %}" method="post" class="max-w-sm w-full">
                     {% csrf_token %}
         
                     <!-- Display non fields errors -->
@@ -64,7 +64,7 @@
                             </div>
         
                             {% if form.name.errors %}
-                            <small class="text-sm text-danger">
+                            <small class="ps-4 text-sm text-danger">
                                 {% for error in form.name.errors %}
                                     {{ error }}
                                 {% endfor %}
@@ -86,7 +86,7 @@
                             </div>
         
                             {% if form.department.errors %}
-                            <small class="text-sm text-danger">
+                            <small class="ps-4 text-sm text-danger">
                                 {% for error in form.department.errors %}
                                     {{ error }}
                                 {% endfor %}
@@ -107,7 +107,7 @@
                             </div>
         
                             {% if form.phone.errors %}
-                            <small class="text-sm text-danger">
+                            <small class="ps-4 text-sm text-danger">
                                 {% for error in form.phone.errors %}
                                     {{ error }}
                                 {% endfor %}

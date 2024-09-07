@@ -223,7 +223,7 @@
                 <img src="{% static 'core/images/numbers.svg' %}" alt="Attendy community" class="relative z-0 w-full md:w-10/12 m-auto select-none pointer-events-none">
                 
                 <div id="numbers_img" class="relative z-10 py-2.5 flex flex-wrap md:flex-nowrap items-center justify-center md:justify-evenly w-full md:h-40 rounded-3xl shadow-lg text-whiteColor">
-                    {# courses count #}
+                    {# Attendance count #}
                     <div class="w-1/2 md:w-auto flex flex-col gap-2.5 items-center md:items-start">
                         <div class="relative">
                             <h3 class="font-bold inline text-5xl md:text-6xl"> {{ course_attendance_count }}+ </h3>
@@ -245,11 +245,30 @@
                         </div>
                     </div>
 
+                    {# Levels count #}
+                    <div class="w-1/2 md:w-auto flex flex-col gap-2.5 items-center md:items-start mt-4 md:mt-0">
+                        <div class="relative">
+                            <h3 class="font-bold inline text-5xl md:text-6xl"> {{ levels_count }}+ </h3>
+                            <span class="text-outline absolute left-1 top-1 text-5xl md:text-6xl"> {{ levels_count }}+ </span>
+                        </div>
+                        <div class="flex gap-2 items-center">
+                            <div class="flex items-center h-max p-1.5 bg-white bg-opacity-10 border-[1.5px] border-whiteColor backdrop-blur-sm rounded-xl">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none" class="w-6 h-6">
+                                    <path d="M17.5798 9.71016C17.0765 9.57314 16.5468 9.5 16 9.5C13.4668 9.5 11.3002 11.0699 10.4202 13.2898M17.5798 9.71016C20.1271 10.4036 22 12.7331 22 15.5C22 18.8137 19.3137 21.5 16 21.5C14.4633 21.5 13.0615 20.9223 12 19.9722M17.5798 9.71016C17.851 9.02618 18 8.2805 18 7.5C18 4.18629 15.3137 1.5 12 1.5C8.68629 1.5 6 4.18629 6 7.5C6 8.2805 6.14903 9.02618 6.42018 9.71016M10.4202 13.2898C10.149 13.9738 10 14.7195 10 15.5C10 17.277 10.7725 18.8736 12 19.9722M10.4202 13.2898C8.59146 12.792 7.11029 11.451 6.42018 9.71016M6.42018 9.71016C3.87294 10.4036 2 12.7331 2 15.5C2 18.8137 4.68629 21.5 8 21.5C9.53671 21.5 10.9385 20.9223 12 19.9722" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+                                </svg>
+                            </div>
+                            <div class="leading-tight -space-y-1">
+                                <span class="block text-sm md:text-base">Classes</span>
+                                <span class="block text-xs md:text-sm text-whiteColor/50">joined</span>
+                            </div>
+                        </div>
+                    </div>
+
                     {# courses count #}
                     <div class="w-1/2 md:w-auto flex flex-col gap-2.5 items-center md:items-start">
                         <div class="relative">
-                            <h3 class="font-bold inline text-5xl md:text-6xl"> {{ courses.count }}+ </h3>
-                            <span class="text-outline absolute left-1 top-1 text-5xl md:text-6xl"> {{ courses.count }}+ </span>
+                            <h3 class="font-bold inline text-5xl md:text-6xl"> {{ courses_count }}+ </h3>
+                            <span class="text-outline absolute left-1 top-1 text-5xl md:text-6xl"> {{ courses_count }}+ </span>
                         </div>
                         <div class="flex gap-2 items-center">
                             <div class="flex items-center h-max p-1.5 bg-white bg-opacity-10 border-[1.5px] border-whiteColor backdrop-blur-sm rounded-xl">
@@ -270,8 +289,8 @@
                     {# students count #}
                     <div class="w-1/2 md:w-auto flex flex-col gap-2.5 items-center md:items-start mt-4 md:mt-0">
                         <div class="relative">
-                            <h3 class="font-bold inline text-5xl md:text-6xl"> {{ students.count }}+ </h3>
-                            <span class="text-outline absolute left-1 top-1 text-5xl md:text-6xl"> {{ students.count }}+ </span>
+                            <h3 class="font-bold inline text-5xl md:text-6xl"> {{ students_count }}+ </h3>
+                            <span class="text-outline absolute left-1 top-1 text-5xl md:text-6xl"> {{ students_count }}+ </span>
                         </div>
                         <div class="flex gap-2 items-center">
                             <div class="flex items-center h-max p-1.5 bg-white bg-opacity-10 border-[1.5px] border-whiteColor backdrop-blur-sm rounded-xl">
@@ -292,7 +311,7 @@
                             </div>
                             <div class="leading-tight -space-y-1">
                                 <span class="block text-sm md:text-base">Students</span>
-                                <span class="block text-xs md:text-sm text-whiteColor/50">consented</span>
+                                <span class="block text-xs md:text-sm text-whiteColor/50">managed</span>
                             </div>
                         </div>
                     </div>
@@ -300,8 +319,8 @@
                     {# lecturers count #}
                     <div class="w-1/2 md:w-auto flex flex-col gap-2.5 items-center md:items-start mt-4 md:mt-0">
                         <div class="relative">
-                            <h3 class="font-bold inline text-5xl md:text-6xl"> {{ lecturers.count}}+ </h3>
-                            <span class="text-outline absolute left-1 top-1 text-5xl md:text-6xl"> {{ lecturers.count}}+ </span>
+                            <h3 class="font-bold inline text-5xl md:text-6xl"> {{ lecturers_count}}+ </h3>
+                            <span class="text-outline absolute left-1 top-1 text-5xl md:text-6xl"> {{ lecturers_count}}+ </span>
                         </div>
                         <div class="flex gap-2 items-center">
                             <div class="flex items-center h-max p-1.5 bg-white bg-opacity-10 border-[1.5px] border-whiteColor backdrop-blur-sm rounded-xl">
@@ -319,7 +338,7 @@
                             </div>
                             <div class="leading-tight -space-y-1">
                                 <span class="block text-sm md:text-base">Lecturers</span>
-                                <span class="block text-xs md:text-sm text-whiteColor/50">approved</span>
+                                <span class="block text-xs md:text-sm text-whiteColor/50">already</span>
                             </div>
                         </div>
                     </div>
@@ -502,7 +521,7 @@
                     attendance and make sure you're on top of your studies.
                 </p>
 
-                <a href="{% url 'core:dashboard' %}"
+                <a href="{% url 'core:levels' %}"
                     class="flex gap-2 hover:gap-8 items-center text-whiteColor w-max m-auto px-6 py-2 rounded-xl hover:rounded-3xl bg-primaryColor hover:shadow-xl transition-all duration-300 ease-linear">
                     let's get started
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none">
@@ -527,7 +546,7 @@
 </main>
 {% endblock body %}
 
-{# Header of the page #}
+{# Footer of the page #}
 {% block footer %}
 {% include "components/footer.html" %}
 {% endblock footer %}
