@@ -2,7 +2,7 @@ from django.urls import path
 from .views import HomeView, DashboardView, CourseView, StudentView, LecturerView, TeachingRecordView, \
     TeachingRecordDetailView, CourseDetailView, StudentDetailView, LecturerDetailView, LecturerAddView, \
     StudentAddView, CourseAddView, CourseUpdateView, StudentUpdateView, LecturerUpdateView, \
-    TeachingRecordUpdateView, LevelView
+    TeachingRecordUpdateView, LevelView, DashboardDetailView
 
 # Create your urls here
 app_name = 'core'
@@ -42,4 +42,5 @@ urlpatterns = [
 
     # Dashboard URLs
     path('app/<int:level_pk>/<slug:level_slug>/', DashboardView.as_view(), name='dashboard'),
+    path('app/<int:level_pk>/<slug:level_slug>/overview/', DashboardDetailView.as_view(), name='dashboard_detail'),
 ]

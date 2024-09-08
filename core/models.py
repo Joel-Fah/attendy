@@ -232,13 +232,15 @@ class ClassLevel(models.Model):
 
 
 class ClassLevelUser(models.Model):
+    class Meta:
+        verbose_name = 'Class Level User'
+        verbose_name_plural = 'Class Level Users'
+        unique_together = ('user', 'class_level')
+
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='class_level_users')
     class_level = models.ForeignKey('ClassLevel', on_delete=models.CASCADE, related_name='class_level_users')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-
-    class Meta:
-        unique_together = ('user', 'class_level')
 
     def __str__(self):
         return f'{self.user.username} - {self.class_level}'
@@ -287,3 +289,14 @@ class Attendance(models.Model):
 
     def __str__(self):
         return f"Attendance for {self.course.code} {self.course.title} on {self.course_date}"
+
+
+class Profile(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
+    phone_number = models.CharField(max_length=15, blank=True, null=True)
+
+    created_at = models.DateTimeField(auto_now_add=True, help_text="Date and time this profile was added")
+    updated_at = models.DateTimeField(auto_now=True, help_text="Date and time this profile was last updated")
+
+    def __str__(self):
+        return f'{self.user.username} profile'

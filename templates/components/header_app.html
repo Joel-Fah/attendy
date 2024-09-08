@@ -49,23 +49,21 @@
                         </div>
                         <ul class="py-1" role="none">
                             <li>
-                                <a href=""
+                                <a href="{% url 'core:dashboard_detail' level_pk=level.id level_slug=level.slug %}"
                                     class="block px-4 py-2 text-sm hover:bg-secondaryColor/10" role="menuitem">
-                                    Edit class info
+                                    Class overview
                                 </a>
                             </li>
                             <li>
-                                <form action="" method="post" class="">
-                                    <button type="submit"
-                                        class="w-full text-left px-4 py-2 text-sm text-danger hover:bg-secondaryColor/10"
-                                        role="menuitem">
-                                        Delete this class
-                                    </button>
-                                </form>
+                                <a href="{% url 'core:levels' %}"
+                                    class="block px-4 py-2 text-sm hover:bg-secondaryColor/10" role="menuitem">
+                                    My classes
+                                </a>
                             </li>
                         </ul>
                     </div>
                 </div>
+                
                 <div class="flex items-center ms-3">
                     <div>
                         <button type="button"

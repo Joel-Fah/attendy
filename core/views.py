@@ -11,7 +11,7 @@ from django.views.generic import TemplateView, ListView, DetailView, CreateView,
 from .forms import CourseForm, LecturerForm, StudentForm, TeachingRecordForm
 from .mixins import CommonContextMixin, ClassLevelAccessMixin
 from .models import Course, Student, Lecturer, TeachingRecord, CourseDelegate, CourseAttendance, \
-    ClassLevel, Attendance
+    ClassLevel, Attendance, ClassLevelUser
 from .utils import group_model_items_by_week
 
 
@@ -29,13 +29,16 @@ class HomeView(TemplateView):
         return context
 
 
-class LevelView(LoginRequiredMixin, TemplateView):
-    template_name = 'core/levels/levels.html'
+class LevelView(LoginRequiredMixin, ListView):
+    model = ClassLevel
+    template_name = 'core/dashboard/levels.html'
+    context_object_name = 'levels'
+    paginate_by = 25
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["levels"] = ClassLevel.objects.all()
-        return context
+    def get_queryset(self):
+        if self.request.user.is_superuser:
+            return ClassLevel.objects.all()
+        return ClassLevel.objects.filter(class_level_users__user=self.request.user)
 
 
 # Dashboard views
@@ -57,7 +60,7 @@ def group_items_by_week(attendances):
 # core/views.py
 class DashboardView(LoginRequiredMixin, CommonContextMixin, ClassLevelAccessMixin, DetailView):
     model = ClassLevel
-    template_name = 'core/dashboard.html'
+    template_name = 'core/dashboard/dashboard.html'
     context_object_name = 'level'
 
     def get_object(self, queryset=None):
@@ -66,7 +69,6 @@ class DashboardView(LoginRequiredMixin, CommonContextMixin, ClassLevelAccessMixi
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         grouped_attendances = group_items_by_week(Attendance.objects.filter(class_level=self.kwargs['level_pk']))
-        print('grouped_attendances', grouped_attendances)
         for week, attendances in grouped_attendances.items():
             for attendance in attendances:
                 attendance.course_title = attendance.course.title
@@ -78,6 +80,19 @@ class DashboardView(LoginRequiredMixin, CommonContextMixin, ClassLevelAccessMixi
                 attendance.enrollment_count = CourseAttendance.objects.filter(
                     attendance__course=attendance.course).count()
         context['grouped_attendances'] = dict(grouped_attendances)
+        return context
+
+class DashboardDetailView(LoginRequiredMixin, CommonContextMixin, DetailView):
+    model = ClassLevel
+    template_name = 'core/dashboard/dashboard_details.html'
+    context_object_name = 'level'
+
+    def get_object(self, queryset=None):
+        return get_object_or_404(self.model, id=self.kwargs['level_pk'], slug=self.kwargs['level_slug'])
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['users'] = ClassLevelUser.objects.filter(class_level=self.kwargs['level_pk'])
         return context
 
 

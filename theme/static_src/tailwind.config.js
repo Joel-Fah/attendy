@@ -55,6 +55,7 @@ module.exports = {
                 // Neutrals
                 darkColor: '#0C0C0C',
                 whiteColor: '#FFF5EA',
+                whiteHover: '#ffecd5',
                 disabledColor: '#A0A0A0',
 
                 // States colors

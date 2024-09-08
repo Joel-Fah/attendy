@@ -1,5 +1,3 @@
-# core/templatetags/number_formatting.py
-
 from django import template
 
 register = template.Library()

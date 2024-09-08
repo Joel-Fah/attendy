@@ -51,7 +51,7 @@
                             <th scope="col" class="px-6 py-3">
                                 Semester
                             </th>
-                            <th scope="col" class="px-6 py-3 bg-orange-100">
+                            <th scope="col" class="px-6 py-3 bg-whiteHover">
                                 Actions
                             </th>
                         </tr>
@@ -74,7 +74,7 @@
                                 <td class="px-6 py-4">
                                     {{ course.semester }}
                                 </td>
-                                <td class="px-6 py-4 bg-orange-100">
+                                <td class="px-6 py-4 bg-whiteHover">
                                     <div class="flex gap-2">
                                         <a href="{% url 'core:course_detail' level_pk=level.id pk=course.id slug=course.slug %}" class="select-none cursor-pointer font-medium text-primaryColor hover:underline">
                                             View

@@ -2,7 +2,7 @@ from django.contrib import admin
 from django_summernote.admin import SummernoteModelAdmin
 from django import forms
 from .models import Student, CourseDelegate, Lecturer, TeachingRecord, Course, CourseAttendance, \
-    ClassLevel, ClassLevelUser, Attendance
+    ClassLevel, ClassLevelUser, Attendance, Profile
 
 
 # Register your models here.
@@ -144,6 +144,12 @@ class AttendanceAdmin(admin.ModelAdmin):
     def class_level_name(obj):
         return f'{obj.class_level.get_level_display()} - Group {obj.class_level.group}'
 
+class ProfileAdmin(admin.ModelAdmin):
+    model = Profile
+    list_display = ['user', 'phone_number',]
+    search_fields = ['user', 'phone_number']
+
+    readonly_fields = ['updated_at', 'created_at']
 
 # Register on dashboard admin
 admin.site.register(Student, StudentAdmin)
@@ -155,3 +161,4 @@ admin.site.register(CourseAttendance, CourseAttendanceAdmin)
 admin.site.register(Attendance, AttendanceAdmin)
 admin.site.register(ClassLevel, ClassLevelAdmin)
 admin.site.register(ClassLevelUser, ClassLevelUserAdmin)
+admin.site.register(Profile, ProfileAdmin)

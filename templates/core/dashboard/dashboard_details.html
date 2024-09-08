@@ -1,0 +1,286 @@
+{% extends 'core/base_app.html' %}
+{% load static %}
+{% load tailwind_tags %}
+{% load custom_date_formatter duration_formatter email_mask %}
+
+{# Title of the page #}
+{% block title %} {{ level.get_level_display }} - Group {{ level.group }} - {{ level.semester }} {{ level.year }} - {{ level.department }} overview {% endblock %}
+
+{% block extra_styles %}
+    <style>
+        #lect_img {
+            background: linear-gradient(170deg, rgba(0, 0, 0, 0.9) 25%, rgba(0, 0, 0, 0.1) 75%), url("{% static 'core/images/classes.jpg' %}");
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+    </style>
+{% endblock extra_styles %}
+
+{# Header of the page #}
+{% block header %}
+    {% include "components/header_app.html" %}
+{% endblock header %}
+
+{# Body of the page #}
+{% block body %}
+    <div class="relative p-4 md:ml-64">
+        <div class="flex flex-col gap-4 items-start justify-center w-full mt-14">
+            <div class="grid grid-cols-12 items-center justify-center gap-2 w-full">
+                <div class="col-span-9 flex flex-col gap-4">
+                    <div class="flex flex-col gap-2">
+                        <small>
+                            <a href="{% url 'core:levels' %}" class="text-secondaryColor">My classes</a> /
+                        </small>
+                        <h2 class="text-3xl text-primaryColor">
+                            {{ level.get_level_display }} - Group {{ level.group }}
+                        </h2>
+                    </div>
+
+                    <div class="flex flex-col gap-4">
+                        {% if level.about %}
+                        <p class="text-base text-gray-600">
+                            {{ level.about }}
+                        </p>
+                          {% else %}
+                          <p class="text-base text-gray-600">
+                            Welcome to this {{ level.get_level_display }}! Explore and discover more about it. 
+                            Don't worry, it's a secret club. We only share the best memes here. 😄
+                          </p>
+                        {% endif %}
+
+                        <div class="flex flex-col gap-2">
+                            <h3 class="flex items-center justify-center gap-2 w-full whitespace-nowrap text-xl">
+                                Class overview
+                                <hr class="w-full border-gray-400">
+                            </h3>
+
+                            <div class="grid grid-cols-12 gap-2 items-center w-full px-1">
+                                <div class="col-span-3 flex flex-col text-center bg-secondaryColor rounded-2xl p-4 h-full">
+                                    <small class="text-sm text-whiteColor">
+                                        Stats about courses, students, and more from other menus.
+                                    </small>
+                                </div>
+
+                                <div class="col-span-5 flex flex-col text-center bg-whiteHover rounded-2xl p-4">
+                                    <small class="text-sm text-secondaryColor">Semester:</small>
+                                    {{ level.semester }} {{ level.year }}
+                                </div>
+    
+                                <div class="col-span-4 flex flex-col text-center bg-whiteHover rounded-2xl p-4">
+                                    <small class="text-sm text-secondaryColor">Department:</small>
+                                    {{ level.department }}
+                                </div>
+    
+                                <div class="col-span-5 flex flex-col text-center bg-whiteHover rounded-2xl p-4">
+                                    <small class="text-sm text-secondaryColor">Registered:</small>
+                                    {{ level.created_at|format_date }}
+                                </div>
+    
+                                <div class="col-span-7 flex flex-col text-center bg-whiteHover rounded-2xl p-4">
+                                    <small class="text-sm text-secondaryColor">Main hall:</small>
+                                    {{ level.main_hall }}
+                                </div>
+
+                                {% if level.secondary_hall %}
+                                <div class="col-span-6 flex flex-col text-center bg-whiteHover rounded-2xl p-4">
+                                    <small class="text-sm text-secondaryColor">Secondary hall:</small>
+                                    {{ level.secondary_hall }}
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="flex flex-col gap-2">
+                            <h3 class="flex items-center justify-center gap-2 w-full whitespace-nowrap text-xl">
+                                Who has access?
+                                {% if users.count > 1 %}
+                                  ({{ users.count }} people)
+                                {% elif users.count == 0 %}
+                                    (No one yet)
+                                {% else %}
+                                  ({{ users.count }} person)
+                                {% endif %}
+                                <hr class="w-full border-gray-400">
+                            </h3>
+
+                            {% if users.count > 1 %}
+                              <p class="text-base text-gray-600">
+                                The people listed below have access to this class and therefore can view and interact with the class materials just as you do.
+                              </p>
+                            {% endif %}
+
+                            {% if users.count == 0 %}
+                            <div class="grid grid-cols-12 items-center justify-center w-full my-4">
+                                <div class="col-span-12 flex flex-col text-center gap-1 mb-5">
+                                   <span  class="text-sm px-6 py-2 rounded-full border border-dashed border-gray-500 text-gray-500 w-max m-auto">
+                                    Nothing to show here for now...
+                                   </span>
+                                    <span class="text-xs">
+                                        Come back in the mean time or contact the support
+                                    </span>
+                                </div>
+                                <img src="{% static 'core/images/process-attendance.svg' %}" alt="Manage attendances"
+                                     class="col-span-5 col-start-2 h-full bg-white object-cover relative z-0 scale-90 -top-5 -right-2 md:-right-5 rotate-3 shadow-lg rounded-xl ring-2 ring-offset-2 ring-secondaryColor">
+                                <img src="{% static 'core/images/process-monitor.svg' %}" alt="Interactive dashboard"
+                                     class="col-span-5 h-full bg-white object-cover relative z-10 scale-90 -top-5 -left-2 md:-left-5 -rotate-3 shadow-lg rounded-xl ring-2 ring-offset-2 ring-primaryColor">
+                            </div>
+                            {% else %}
+                            <div class="relative overflow-x-auto">
+                                <table class="w-full text-sm text-left">
+                                    <thead class="text-primaryColor uppercase">
+                                    <tr class="border-b border-darkColor/10">
+                                        <th scope="col" class="p-4">
+                                            S/N
+                                        </th>
+                                        <th scope="col" class="px-6 py-3">
+                                            Username
+                                        </th>
+                                        <th scope="col" class="px-6 py-3">
+                                            Full Name
+                                        </th>
+                                        <th scope="col" class="px-6 py-3">
+                                            Email
+                                        </th>
+                                        <th scope="col" class="px-6 py-3">
+                                            Phone
+                                        </th>
+                                        {% if request.user.is_staff %}
+                                        <th scope="col" class="px-6 py-3 bg-whiteHover">
+                                            Actions
+                                        </th>
+                                        {% endif %}
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    {% for staff in users %}
+                                        <tr class="border-b border-darkColor/10">
+                                            <td class="w-4 p-4">
+                                                {{ forloop.counter }}
+                                            </td>
+                                            <th scope="row" class="flex items-center gap-1 px-6 py-4 font-medium whitespace-nowrap">
+                                                {{ staff.user.username }}
+                                                {% if staff.user == request.user %}
+                                                  <span class="ms-2 text-secondaryColor text-xs">(you)</span>
+                                                {% endif %}
+                                            </th>
+                                            <td class="px-6 py-4 capitalize">
+                                                {{ staff.user.get_full_name }}
+                                            </td>
+                                            <td class="px-6 py-4">
+                                                {{ staff.user.email|mask_email }}
+                                            </td>
+                                            <td class="px-6 py-4">
+                                                {{ staff.user.profile.phone_number }}
+                                            </td>
+                                            {% if request.user.is_staff %}
+                                            <td class="px-6 py-4 bg-whiteHover">
+                                                <div class="flex gap-2">
+                                                    <a href="" class="select-none cursor-pointer font-medium text-primaryColor hover:underline">
+                                                        View
+                                                    </a>
+            
+                                                    <span>|</span>
+            
+                                                    <a type="button" class="select-none cursor-pointer font-medium text-danger hover:underline" data-ripple-light="true"
+                                                        data-dialog-target="animated-dialog-{{ forloop.counter }}">
+                                                        Remove
+                                                    </a>
+            
+                                                    <div data-dialog-backdrop="animated-dialog-{{ forloop.counter }}" data-dialog-backdrop-close="true"
+                                                        class="pointer-events-none fixed inset-0 z-[999] grid h-screen w-screen place-items-center bg-black bg-opacity-60 opacity-0 backdrop-blur-sm transition-opacity duration-300">
+                                                        <div data-dialog="animated-dialog-{{ forloop.counter }}" data-dialog-mount="opacity-100 translate-y-0 scale-100"
+                                                            data-dialog-unmount="opacity-0 -translate-y-28 scale-90 pointer-events-none"
+                                                            data-dialog-transition="transition-all duration-300"
+                                                            class="relative m-4 w-2/5 min-w-[40%] max-w-[40%] rounded-2xl bg-whiteColor antialiased shadow-2xl">
+                                                            <div
+                                                                class="flex flex-col items-center p-5 text-2xl antialiased shrink-0">
+                                                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" color="#000000" fill="none">
+                                                                    <path d="M19.5 5.5L18.8803 15.5251C18.7219 18.0864 18.6428 19.3671 18.0008 20.2879C17.6833 20.7431 17.2747 21.1273 16.8007 21.416C15.8421 22 14.559 22 11.9927 22C9.42312 22 8.1383 22 7.17905 21.4149C6.7048 21.1257 6.296 20.7408 5.97868 20.2848C5.33688 19.3626 5.25945 18.0801 5.10461 15.5152L4.5 5.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+                                                                    <path d="M9 11.7349H15" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+                                                                    <path d="M10.5 15.6543H13.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+                                                                    <path d="M3 5.5H21M16.0555 5.5L15.3729 4.09173C14.9194 3.15626 14.6926 2.68852 14.3015 2.39681C14.2148 2.3321 14.1229 2.27454 14.0268 2.2247C13.5937 2 13.0739 2 12.0343 2C10.9686 2 10.4358 2 9.99549 2.23412C9.89791 2.28601 9.80479 2.3459 9.7171 2.41317C9.32145 2.7167 9.10044 3.20155 8.65842 4.17126L8.05273 5.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+                                                                </svg>
+                                                                You're about to delete
+                                                                <span class="text-danger capitalize">{{ user.get_full_name }}</span>
+                                                            </div>
+                                                            <div
+                                                                class="relative py-2 px-5 text-base antialiased leading-relaxed">
+                                                                By deleting this course, you will lose all the data associated with it.
+                                                                After deletion, this action cannot be undone.
+                                                                Are you sure you want to delete this course?
+                                                            </div>
+                                                            <div class="flex flex-wrap items-center justify-end p-4 shrink-0 text-blue-gray-500">
+                                                                <button data-ripple-dark="true" data-dialog-close="true"
+                                                                    class="px-6 py-3 mr-1 font-sans text-sm font-bold uppercase transition-all rounded-xl middle none center hover:bg-info/10">
+                                                                    Cancel
+                                                                </button>
+                                                                <form action="" method="">
+                                                                    {% csrf_token %}
+                                                                    <input type="hidden" name="user_id" value="{{ user.id }}">
+                                                                    <button name="delete_user" 
+                                                                        data-ripple-light="true" data-dialog-close="true"
+                                                                        class="middle none center rounded-xl bg-danger py-3 px-6 text-sm font-bold uppercase text-whiteColor shadow-md shadow-red-500/20 transition-all hover:shadow-lg hover:shadow-red-500/40">
+                                                                        Remove user
+                                                                    </button>
+                                                                </form>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            {% endif %}
+                                        </tr>
+                                    {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="flex items-center gap-1 text-gray-600 text-xs">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none" class="w-3">
+                                <path d="M22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22C17.5228 22 22 17.5228 22 12Z" stroke="currentColor" stroke-width="1.5" />
+                                <path d="M12.2422 17V12C12.2422 11.5286 12.2422 11.2929 12.0957 11.1464C11.9493 11 11.7136 11 11.2422 11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                                <path d="M11.992 8H12.001" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                            </svg>
+                            <p>
+                                You are viewing this class info as it was last updated on
+                                <span class="text-secondaryColor">
+                                    {{ level.updated_at|format_date }}
+                                </span>
+                            </p>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div id="lect_img" class="relative col-span-3 h-screen">
+                    <blockquote
+                            class="flex flex-col gap-2 text-[16px] leading-tight text-whiteColor p-4 text-left max-w-64">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none"
+                             class="text-secondaryColor">
+                            <path d="M5.07579 17C4.08939 4.54502 12.9123 1.0121 19.9734 2.22417C20.2585 6.35185 18.2389 7.89748 14.3926 8.61125C15.1353 9.38731 16.4477 10.3639 16.3061 11.5847C16.2054 12.4534 15.6154 12.8797 14.4355 13.7322C11.8497 15.6004 8.85421 16.7785 5.07579 17Z"
+                                  stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
+                                  stroke-linejoin="round"/>
+                            <path d="M4 22C4 15.5 7.84848 12.1818 10.5 10" stroke="currentColor" stroke-width="1.5"
+                                  stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        University is about the people we meet—the wild nights, deep talks, and friendships that seem small but shape us in ways
+                        we never expected. One day, we'll leave all this behind when our paths diverge, but the memories will stay with us
+                        forever.
+                        <cite class="block font-semibold mt-2 text-secondaryColor">ChatGPT</cite>
+                    </blockquote>
+                    <img src="{% static 'core/images/logo-shapes.svg' %}" alt="Attendy shapes"
+                         class="w-20 absolute bottom-3 right-3">
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+{% endblock body %}
+
+{# Additional javascript #}
+{% block javascript %}
+{% endblock javascript %}
