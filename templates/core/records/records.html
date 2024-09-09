@@ -42,18 +42,18 @@
                 <ul class="border-l border-secondaryColor/20">
                     {% for record in records %}
                     <li>
-                        <a href="{% url 'core:record_detail' level_pk=level.id pk=record.id slug=record.teaching_record_attendance.course.slug %}"
+                        <a href="{% url 'core:record_detail' level_pk=level.id pk=record.id slug=record.attendance.course.slug %}"
                             class="flex items-center justify-between w-full px-4 py-2 hover:bg-secondaryColor/5 transition-all duration-300 ease-linear">
                             <div class="flex items-center gap-4">
                                 <span> {{ forloop.counter }}. </span>
                                 <div class="">
-                                    <small class="text-xs text-gray-500"> {{ record.created_at }} | {{ record.teaching_record_attendance.course.semester }} {{ record.teaching_record_attendance.course.year }} </small>
-                                    <h3 class="text-xl font-medium"> {{ record.teaching_record_attendance.course.code }} {{ record.teaching_record_attendance.course.title }}
+                                    <small class="text-xs text-gray-500"> {{ record.created_at }} | {{ record.attendance.course.semester }} {{ record.attendance.course.year }} </small>
+                                    <h3 class="text-xl font-medium"> {{ record.attendance.course.code }} {{ record.attendance.course.title }}
                                     </h3>
                                     <small class="flex items-center gap-4">
                                         <div class="">
                                             <span class="text-gray-500"> Lecturer: </span>
-                                            {{ record.teaching_record_attendance.course.lecturer.name }}
+                                            {{ record.attendance.course.lecturer.name }}
                                         </div>
 
                                         {% if record.course_delegate %}

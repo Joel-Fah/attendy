@@ -71,16 +71,14 @@ class DashboardView(LoginRequiredMixin, CommonContextMixin, ClassLevelAccessMixi
         grouped_attendances = group_items_by_week(Attendance.objects.filter(class_level=self.kwargs['level_pk']))
         for week, attendances in grouped_attendances.items():
             for attendance in attendances:
-                attendance.course_title = attendance.course.title
-                attendance.course_lecturer_name = attendance.course.lecturer.name
                 attendance.course_delegate = CourseDelegate.objects.filter(course=attendance.course,
                                                                            role='delegate').first()
                 attendance.course_assistant = CourseDelegate.objects.filter(course=attendance.course,
                                                                             role='assistant').first()
-                attendance.enrollment_count = CourseAttendance.objects.filter(
-                    attendance__course=attendance.course).count()
+                attendance.enrollment_count = CourseAttendance.objects.filter(attendance=attendance).count()
         context['grouped_attendances'] = dict(grouped_attendances)
         return context
+
 
 class DashboardDetailView(LoginRequiredMixin, CommonContextMixin, DetailView):
     model = ClassLevel
@@ -93,6 +91,31 @@ class DashboardDetailView(LoginRequiredMixin, CommonContextMixin, DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['users'] = ClassLevelUser.objects.filter(class_level=self.kwargs['level_pk'])
+        return context
+
+
+class AttendanceDetailView(LoginRequiredMixin, CommonContextMixin, DetailView):
+    model = Attendance
+    template_name = 'core/attendance/attendance_details.html'
+    context_object_name = 'attendance'
+
+    def get_object(self, queryset=None):
+        return get_object_or_404(
+            self.model,
+            class_level=self.kwargs['level_pk'],
+            class_level__slug=self.kwargs['level_slug'],
+            id=self.kwargs['pk']
+        )
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['course_delegates'] = CourseDelegate.objects.filter(
+            course=self.object.course,
+            student__is_delegate=True
+        )
+        context['enrollments'] = CourseAttendance.objects.filter(attendance=self.object,
+                                                                 attendance__class_level=self.kwargs[
+                                                                     'level_pk']).order_by('created_at')
         return context
 
 
@@ -471,18 +494,18 @@ class TeachingRecordView(LoginRequiredMixin, CommonContextMixin, ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        class_level_id = self.kwargs['level_pk']
         records_queryset = TeachingRecord.objects.filter(
-            teaching_record_attendance__course__class_level_id=class_level_id)
+            attendance__class_level=self.kwargs['level_pk']
+        )
         grouped_records = group_model_items_by_week(records_queryset)
         for week, records in grouped_records.items():
             for record in records:
-                record.course_title = record.teaching_record_attendance.course.title
-                record.course_lecturer_name = record.teaching_record_attendance.course.lecturer.name
-                record.course_delegate = CourseDelegate.objects.filter(course=record.teaching_record_attendance.course,
+                record.course_title = record.attendance.course.title
+                record.course_lecturer_name = record.attendance.course.lecturer.name
+                record.course_delegate = CourseDelegate.objects.filter(course=record.attendance.course,
                                                                        role='delegate').first()
                 record.course_assistant = CourseDelegate.objects.filter(
-                    course=record.teaching_record_attendance.course, role='assistant').first()
+                    course=record.attendance.course, role='assistant').first()
         context['grouped_records'] = dict(grouped_records)
         return context
 
@@ -495,21 +518,21 @@ class TeachingRecordDetailView(LoginRequiredMixin, CommonContextMixin, DetailVie
     def get_object(self, queryset=None):
         return get_object_or_404(
             self.model,
-            teaching_record_attendance__course__class_level_id=self.kwargs['level_pk'],
+            attendance__course__class_level_id=self.kwargs['level_pk'],
             id=self.kwargs['pk'],
-            teaching_record_attendance__course__slug=self.kwargs['slug']
+            attendance__course__slug=self.kwargs['slug']
         )
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         class_level_id = self.kwargs['level_pk']
         context['course_delegates'] = CourseDelegate.objects.filter(
-            course=self.object.teaching_record_attendance.course,
+            course=self.object.attendance.course,
             student__is_delegate=True,
             course__class_level_id=class_level_id
         )
         context['enrollments'] = CourseAttendance.objects.filter(
-            attendance__course=self.object.teaching_record_attendance.course,
+            attendance__course=self.object.attendance.course,
             attendance__course__class_level_id=class_level_id
         ).count()
         return context

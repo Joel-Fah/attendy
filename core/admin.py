@@ -73,45 +73,43 @@ class LecturerAdmin(admin.ModelAdmin):
 
 class TeachingRecordAdmin(SummernoteModelAdmin):
     model = TeachingRecord
-    list_display = ['course_title', 'lecturer_name', 'lecturer_duration', 'quality_assurance']
+    list_display = ['attendance__id', 'course_title', 'lecturer_name', 'lecturer_duration', 'quality_assurance']
     list_filter = ['quality_assurance']
-    search_fields = ['course_title', 'lecturer_name']
+    search_fields = ['attendance__course__title', 'attendance__course__lecturer__name']
 
     summernote_fields = ['description']
 
     readonly_fields = ['lecturer_duration', 'updated_at', 'created_at']
 
-    # get course title
     @staticmethod
     def course_title(obj):
-        return obj.teaching_record_attendance.course.title
+        return obj.attendance.course
 
-    # get lecturer name
     @staticmethod
     def lecturer_name(obj):
-        return obj.teaching_record_attendance.course.lecturer.name
+        return obj.attendance.course.lecturer
 
 
 class CourseAttendanceAdmin(admin.ModelAdmin):
     model = CourseAttendance
-    list_display = ['student__name', 'attendance__course__title']
+    list_display = ['student__name', 'course_title', 'class_level']
     search_fields = ['student__name', 'student__student_number', 'attendance']
     list_per_page = 25
 
     readonly_fields = ['updated_at', 'created_at']
 
     @staticmethod
-    def student_name(obj):
-        return obj.student.name
-
-    @staticmethod
     def course_title(obj):
         return obj.attendance.course.title
+
+    @staticmethod
+    def class_level(obj):
+        return obj.attendance.class_level
 
 
 class ClassLevelAdmin(admin.ModelAdmin):
     model = ClassLevel
-    list_display = ['level', 'group', 'department', 'semester_year']
+    list_display = ['level', 'group', 'department', 'semester_year', 'main_hall']
     list_filter = ['level', 'group', 'department']
     search_fields = ['level', 'group']
     list_per_page = 25
@@ -135,21 +133,29 @@ class ClassLevelUserAdmin(admin.ModelAdmin):
 
 class AttendanceAdmin(admin.ModelAdmin):
     model = Attendance
-    list_display = ['course__title', 'course__lecturer__name', 'class_level_name']
+    list_display = ['id', 'course__title', 'course__lecturer__name', 'course_date', 'class_level_name', 'record_id']
     list_filter = ['course_date', 'is_catchup', 'class_level']
     search_fields = ['course_title']
     list_per_page = 25
+
+    readonly_fields = ['course_duration', 'updated_at', 'created_at']
+
+    @staticmethod
+    def record_id(obj):
+        return obj.teaching_record.id
 
     @staticmethod
     def class_level_name(obj):
         return f'{obj.class_level.get_level_display()} - Group {obj.class_level.group}'
 
+
 class ProfileAdmin(admin.ModelAdmin):
     model = Profile
-    list_display = ['user', 'phone_number',]
+    list_display = ['user', 'phone_number', ]
     search_fields = ['user', 'phone_number']
 
     readonly_fields = ['updated_at', 'created_at']
+
 
 # Register on dashboard admin
 admin.site.register(Student, StudentAdmin)

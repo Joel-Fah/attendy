@@ -13,8 +13,7 @@ class CommonContextMixin(ContextMixin):
         context['courses'] = Course.objects.filter(class_level=self.kwargs['level_pk']).order_by('title')
         context['students'] = Student.objects.filter(class_level=self.kwargs['level_pk']).order_by('name')
         context['lecturers'] = Lecturer.objects.all().order_by('name')
-        context['teaching_records'] = TeachingRecord.objects.filter(
-            teaching_record_attendance__class_level=self.kwargs['level_pk'])
+        context['teaching_records'] = TeachingRecord.objects.filter(attendance__class_level=self.kwargs['level_pk'])
         return context
 
 

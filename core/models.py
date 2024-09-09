@@ -1,5 +1,6 @@
 from datetime import datetime
 
+from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models import UniqueConstraint
 from django.contrib.auth.models import User, Group
@@ -108,6 +109,11 @@ class CourseDelegate(models.Model):
     created_at = models.DateTimeField(auto_now_add=True, help_text="Date and time this student delegate was added")
     updated_at = models.DateTimeField(auto_now=True, help_text="Date and time this student delegate was last updated")
 
+    def save(self, *args, **kwargs):
+        if self.student.class_level != self.course.class_level:
+            raise ValueError("The class level of the student does not match the class level of the course.")
+        super().save(*args, **kwargs)
+
     def __str__(self):
         return f'{self.student.name} - {self.get_role_display()} for {self.course.title}'
 
@@ -144,6 +150,7 @@ class TeachingRecord(models.Model):
         APPROVED = 'Approved', 'Approved'
         REJECTED = 'Rejected', 'Rejected'
 
+    attendance = models.OneToOneField('Attendance', on_delete=models.CASCADE, related_name='teaching_record')
     description = models.TextField(
         null=False, blank=False, help_text="What was taught in the course")
     quality_assurance = models.CharField(
@@ -169,8 +176,7 @@ class TeachingRecord(models.Model):
         super().save(*args, **kwargs)
 
     def __str__(self):
-        return (f"Record for {self.teaching_record_attendance.course.title} "
-                f"by {self.teaching_record_attendance.course.lecturer.name}")
+        return f"Teaching Record for {self.attendance.course}"
 
 
 class CourseAttendance(models.Model):
@@ -184,6 +190,11 @@ class CourseAttendance(models.Model):
 
     created_at = models.DateTimeField(auto_now_add=True, help_text="Date and time this enrollment was added")
     updated_at = models.DateTimeField(auto_now=True, help_text="Date and time this enrollment was last updated")
+
+    def save(self, *args, **kwargs):
+        if self.student.class_level != self.attendance.course.class_level:
+            raise ValueError("The class level of the student does not match the class level of the course.")
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return f"{self.student.name} enrolled in {self.attendance.course.title}"
@@ -228,14 +239,13 @@ class ClassLevel(models.Model):
         super().save(*args, **kwargs)
 
     def __str__(self):
-        return f'{self.get_level_display()} - Group {self.group}: {self.semester} {self.year} - {self.department}'
+        return f'{self.get_level_display()} - Group {self.group} - {self.semester} {self.year} - {self.department}'
 
 
 class ClassLevelUser(models.Model):
     class Meta:
         verbose_name = 'Class Level User'
         verbose_name_plural = 'Class Level Users'
-        unique_together = ('user', 'class_level')
 
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='class_level_users')
     class_level = models.ForeignKey('ClassLevel', on_delete=models.CASCADE, related_name='class_level_users')
@@ -250,14 +260,9 @@ class Attendance(models.Model):
     class Meta:
         verbose_name = "Attendance"
         verbose_name_plural = "Attendances"
-        constraints = [
-            UniqueConstraint(fields=['course', 'teaching_record'], name='unique_course_record')
-        ]
 
     class_level = models.ForeignKey(ClassLevel, on_delete=models.CASCADE, related_name='class_level_attendance')
-    course = models.OneToOneField(Course, on_delete=models.CASCADE, related_name='course_attendance')
-    teaching_record = models.OneToOneField(TeachingRecord, on_delete=models.CASCADE, null=True, blank=True,
-                                           related_name='teaching_record_attendance')
+    course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='course_attendance')
     course_date = models.DateField(null=False, blank=False, help_text="Date the course is taught")
     course_start_time = models.TimeField(null=False, blank=False, help_text="Time the course started")
     course_end_time = models.TimeField(null=False, blank=False, help_text="Time the course ended")
@@ -269,15 +274,24 @@ class Attendance(models.Model):
     updated_at = models.DateTimeField(auto_now=True, help_text="Date and time this course attendance was last updated")
 
     def has_teaching_record(self):
-        return TeachingRecord.objects.filter(course=self).exists()
+        return TeachingRecord.objects.filter(attendance=self).exists()
+
+    def clean(self):
+        # Ensure course_start_time is before course_end_time
+        if self.course_start_time >= self.course_end_time:
+            raise ValidationError("Course start time must be before end time.")
+
+        # Ensure there's no conflict with other attendance on the same course
+        overlapping_attendance = Attendance.objects.filter(
+            course=self.course,
+            course_date=self.course_date,
+            course_start_time=self.course_start_time
+        ).exclude(pk=self.pk)  # Exclude current record when editing
+
+        if overlapping_attendance.exists():
+            raise ValidationError("Attendance for this course at the same time already exists.")
 
     def save(self, *args, **kwargs):
-        # Automatically create a teaching record for the course
-        if not self.teaching_record:
-            self.teaching_record = TeachingRecord.objects.create(
-                description=f"Teaching record for {self.course.title} by {self.course.lecturer.name}",
-            )
-
         # Validate times
         if not is_valid_time(self.course_start_time, self.course_end_time):
             raise ValueError("Invalid time range")
@@ -285,10 +299,11 @@ class Attendance(models.Model):
         # Calculate course duration
         if self.course_start_time and self.course_end_time:
             self.course_duration = calculate_duration(self.course_start_time, self.course_end_time)
+        self.full_clean()
         super().save(*args, **kwargs)
 
     def __str__(self):
-        return f"Attendance for {self.course.code} {self.course.title} on {self.course_date}"
+        return f"Attendance for {self.course.code} {self.course.title} on {self.course_date} at {self.course_start_time}"
 
 
 class Profile(models.Model):
