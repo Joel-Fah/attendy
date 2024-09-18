@@ -335,3 +335,32 @@ class Profile(models.Model):
 
     def __str__(self):
         return f'{self.user.username} profile'
+
+class Feedback(models.Model):
+    class Meta:
+        verbose_name = "Feedback"
+        verbose_name_plural = "Feedbacks"
+
+    class FeedbackTypeChoices(models.TextChoices):
+        COMPLAINT = 'Complaint', 'Complaint'
+        SUGGESTION = 'Suggestion', 'Suggestion'
+        COMPLIMENT = 'Compliment', 'Compliment'
+
+    class FeedbackStatusChoices(models.TextChoices):
+        PENDING = 'Pending', 'Pending'
+        RESOLVED = 'Resolved', 'Resolved'
+
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_feedbacks')
+    feedback_type = models.CharField(
+        max_length=255, choices=FeedbackTypeChoices.choices, null=False, blank=False,
+        help_text="Type of feedback: Complaint, Suggestion, Compliment")
+    feedback = models.TextField(null=False, blank=False, help_text="Feedback message")
+    status = models.CharField(
+        max_length=255, choices=FeedbackStatusChoices.choices, null=False, blank=False, default=FeedbackStatusChoices.PENDING,
+        help_text="Status of the feedback: Pending, Resolved")
+
+    created_at = models.DateTimeField(auto_now_add=True, help_text="Date and time this feedback was added")
+    updated_at = models.DateTimeField(auto_now=True, help_text="Date and time this feedback was last updated")
+
+    def __str__(self):
+        return f"{self.get_feedback_type_display()} by {self.user.username}"

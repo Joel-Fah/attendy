@@ -316,7 +316,7 @@
             .then(data => {
                 if (data.success) {
                     // Ask for user confirmation
-                    const confirmation = confirm(`Do you want to add Student: ${data.student_name}, Class Level: ${data.class_level} to the course?`);
+                    const confirmation = confirm('Do you want to add \n\tStudent: ${data.student_name}\n\tClass: ${data.class_level} \nto the current attendance?');
                     if (confirmation) {
                         // Send the data to add the student to the course
                         fetch("{% url 'core:add_student_to_course_attendance' level_pk=level.id level_slug=level.slug pk=attendance.id %}", {
@@ -330,7 +330,7 @@
                         .then(response => response.json())
                         .then(addData => {
                             if (addData.success) {
-                                alert(`Student: ${addData.student_name} has been successfully added to the course.`);
+                                alert('Student: ${addData.student_name} has been successfully added to the course.');
                                 // Stop the camera and reload the window after successful addition
                                 html5QrcodeScanner.clear().then(() => {
                                     window.location.href = "{% url 'core:attendance_detail' level_pk=level.id level_slug=level.slug pk=attendance.id %}";
@@ -339,7 +339,7 @@
                                     window.location.href = "{% url 'core:attendance_detail' level_pk=level.id level_slug=level.slug pk=attendance.id %}";
                                 });
                             } else {
-                                alert(`Failed to add student to the course: ${addData.error}`);
+                                alert(`Failed to add student to the attendance: ${addData.error}`);
                             }
                         })
                         .catch(error => console.error('Error:', error));

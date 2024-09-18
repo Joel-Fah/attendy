@@ -3,7 +3,7 @@ from .views import HomeView, DashboardView, CourseView, StudentView, LecturerVie
     TeachingRecordDetailView, CourseDetailView, StudentDetailView, LecturerDetailView, LecturerAddView, \
     StudentAddView, CourseAddView, CourseUpdateView, StudentUpdateView, LecturerUpdateView, \
     TeachingRecordUpdateView, LevelView, DashboardDetailView, AttendanceDetailView, AttendanceAddView, \
-    CourseAttendanceAddView, AttendanceUpdateView, decode_qr, add_student_to_course_attendance
+    CourseAttendanceAddView, AttendanceUpdateView, decode_qr, add_student_to_course_attendance, FeedbackView
 
 # Create your urls here
 app_name = 'core'
@@ -56,5 +56,9 @@ urlpatterns = [
     path('app/<int:level_pk>/<slug:level_slug>/attendance/<int:pk>/admit/', CourseAttendanceAddView.as_view(),
          name='enroll_add'),
     path('app/<int:level_pk>/<slug:level_slug>/attendance/<int:pk>/scan/', decode_qr, name='decode_qr'),
-    path('app/<int:level_pk>/<slug:level_slug>/attendance/<int:pk>/scan/admit/', add_student_to_course_attendance, name='add_student_to_course_attendance'),
+    path('app/<int:level_pk>/<slug:level_slug>/attendance/<int:pk>/scan/admit/', add_student_to_course_attendance,
+         name='add_student_to_course_attendance'),
+
+    # Feedback URLs
+    path('app/feedback/', FeedbackView.as_view(), name='feedback'),
 ]

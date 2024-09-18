@@ -1,4 +1,5 @@
 import json
+import random
 from collections import defaultdict
 from datetime import timedelta, datetime
 
@@ -11,11 +12,12 @@ from django.utils.html import format_html
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import TemplateView, ListView, DetailView, CreateView, UpdateView
 
-from .forms import CourseForm, LecturerForm, StudentForm, TeachingRecordForm, AttendanceForm, CourseAttendanceForm
+from .forms import CourseForm, LecturerForm, StudentForm, TeachingRecordForm, AttendanceForm, CourseAttendanceForm, \
+    FeedbackForm
 from .mixins import CommonContextMixin, ClassLevelAccessMixin
 from .models import Course, Student, Lecturer, TeachingRecord, CourseDelegate, CourseAttendance, \
-    ClassLevel, Attendance, ClassLevelUser
-from .utils import group_model_items_by_week, get_faqs
+    ClassLevel, Attendance, ClassLevelUser, Feedback
+from .utils import group_model_items_by_week, get_faqs, get_quotes
 
 
 # Create your views here.
@@ -265,7 +267,7 @@ class CourseAttendanceAddView(LoginRequiredMixin, CommonContextMixin, CreateView
 
 
 @csrf_exempt
-def decode_qr(request):
+def decode_qr(request, *args, **kwargs):
     if request.method == 'POST':
         data = json.loads(request.body)
         qr_data = data.get('qr_data')
@@ -277,13 +279,12 @@ def decode_qr(request):
             class_level_id = qr_json.get('class_level')
 
             # Fetch the student and class level from the database
-            student = Student.objects.get(id=student_id)
-            class_level = ClassLevel.objects.get(id=class_level_id)
+            student = Student.objects.get(id=student_id, class_level_id=class_level_id)
 
             return JsonResponse({
                 'success': True,
                 'student_name': student.name,
-                'class_level': class_level.level
+                'class_level': f'{student.class_level.get_level_display()} - Group {student.class_level.group}',
             })
         except (Student.DoesNotExist, ClassLevel.DoesNotExist, ValueError, json.JSONDecodeError) as e:
             return JsonResponse({'success': False, 'error': str(e)})
@@ -306,7 +307,7 @@ def add_student_to_course_attendance(request, *args, **kwargs):
             student = Student.objects.get(id=student_id, class_level_id=class_level_id)
 
             # Add the student to the CourseAttendance
-            course_attendance = CourseAttendance.objects.create(
+            CourseAttendance.objects.create(
                 student=student,
                 attendance=Attendance.objects.get(pk=kwargs['pk'])
             )
@@ -784,3 +785,40 @@ class TeachingRecordUpdateView(LoginRequiredMixin, CommonContextMixin, UpdateVie
             )
         )
         return super().form_invalid(form)
+
+
+class FeedbackView(LoginRequiredMixin, CreateView):
+    model = Feedback
+    template_name = 'core/feedback.html'
+    context_object_name = 'form'
+    form_class = FeedbackForm
+
+    def get_success_url(self):
+        return reverse_lazy('core:feedback')
+
+    def get_form(self, form_class=None):
+        form = super().get_form(form_class)
+        form.fields['user'].initial = self.request.user
+        return form
+
+    def form_valid(self, form):
+        form.save()
+        messages.success(
+            self.request,
+            'Feedback submitted successfully.'
+        )
+        return super().form_valid(form)
+
+    def form_invalid(self, form):
+        messages.error(
+            self.request,
+            'An error occurred while submitting your feedback.<br>Please try again.'
+        )
+        return super().form_invalid(form)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        # Get a random quote from get_quotes
+        random_quote = random.choice(get_quotes())
+        context['quote'] = random_quote
+        return context

@@ -1,9 +1,10 @@
 from allauth.account.forms import LoginForm
 from django import forms
+from django.contrib.auth.models import User
 from django_summernote.widgets import SummernoteWidget
 
 from .models import Course, Lecturer, Student, DepartmentChoices, TeachingRecord, ClassLevel, Attendance, \
-    CourseAttendance
+    CourseAttendance, Feedback
 
 
 # Create your forms here
@@ -554,4 +555,64 @@ class CourseAttendanceForm(forms.ModelForm):
         error_messages={'required': 'Please select the attendance concerned'},
         required=True,
         disabled=True,
+    )
+
+class FeedbackForm(forms.ModelForm):
+    class Meta:
+        model = Feedback
+        fields = [
+            'user',
+            'feedback_type',
+            'feedback',
+        ]
+
+    user = forms.ModelChoiceField(
+        queryset=User.objects.all(),
+        widget=forms.Select(
+            attrs={
+                'id': 'user',
+                'name': 'user',
+                'placeholder': 'Select user',
+                'class': 'rounded-2xl block w-full ps-10 p-2.5 bg-gray-200 border-darkColor placeholder-darkColor/50 '
+                         'focus:ring-primaryColor focus:border-primaryColor transition-all duration-300 ease-in-out '
+                         'disabled:text-gray-500 disabled:cursor-not-allowed text-wrap',
+            }
+        ),
+        label='User',
+        help_text='Who is giving the feedback?',
+        error_messages={'required': 'Please select the user who is giving the feedback'},
+        required=True,
+        disabled=True,
+    )
+
+    feedback_type = forms.ChoiceField(
+        widget=forms.Select(
+            attrs={
+                'id': 'feedback',
+                'name': 'feedback',
+                'placeholder': 'Write down your feedback here... don\'t miss on any detail!',
+                'class': 'rounded-2xl block w-full ps-10 p-2.5 bg-whiteColor border-darkColor placeholder-darkColor/50 '
+                         'focus:ring-primaryColor focus:border-primaryColor transition-all duration-300 ease-in-out',
+            }
+        ),
+        label='Feedback type',
+        help_text='What type of feedback is it?',
+        choices=Feedback.FeedbackTypeChoices.choices,
+        required=True,
+    )
+
+    feedback = forms.CharField(
+        widget=forms.Textarea(
+            attrs={
+                'id': 'feedback_type',
+                'name': 'feedback_type',
+                'placeholder': 'Be sure to go as detail as possible about this message you\'re about to write...',
+                'class': 'rounded-2xl block w-full ps-10 p-2.5 bg-whiteColor border-darkColor placeholder-darkColor/50 '
+                         'focus:ring-primaryColor focus:border-primaryColor transition-all duration-300 ease-in-out min-h-24 max-h-60',
+            }
+        ),
+        label='Feedback',
+        help_text='What is your feedback all about?',
+        error_messages={'required': 'Please write down what your feedback is all about.'},
+        required=True,
     )

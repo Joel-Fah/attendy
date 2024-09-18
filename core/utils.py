@@ -116,3 +116,31 @@ def get_faqs():
                       "one time. It’s the law of the universe… or at least, our app."
         }
     ]
+
+
+def get_quotes():
+    return [
+        "Through the sleepless nights, the tears, the exhaustion, I nearly gave up so many times. But with every "
+        "moment of doubt, I found strength by the grace of God. Now, as the project finally reaches its end, "
+        "the relief and peace that fill my heart remind me—it was all worth it, every single struggle.",
+        "I braced for it—the feedback, the judgment after all the sweat, tears, and sleepless nights. But hearing the "
+        "voices of those who used it, who saw the work and felt its impact—it hit different. All the pain, doubt, "
+        "and pushing through felt worth it in that moment. To know it mattered... that’s the reward no one tells you "
+        "about.",
+        "After countless sleepless nights, stress, and nearly giving up, seeing that long project finally come to an "
+        "end brings a peace and joy like no other. Through pain and struggle, by God's grace, we kept pushing—and "
+        "now, it’s all worth it.",
+        "Don’t hold back—your feedback, even if tough to hear, is what drives real growth. It might sting, "
+        "but it’s the key to making things better. Honest input, no matter how harsh, is a gift that leads to real "
+        "progress.",
+        "As the project nears its end, the finish line is in sight, but feedback reminds me there’s still work to be "
+        "done. It’s not easy, but I know it’s the last push that makes the difference between good and great.",
+        "I know the effort, the long hours, and the passion poured into this work. Giving feedback isn't about "
+        "criticism; it’s about helping you reach the potential I see in what you’ve done. With empathy, "
+        "we shape something stronger together.",
+        "As the project was wrapping up, I figured I was done—ready to call it finished. But then came all the "
+        "comments and suggestions. At first, I brushed them off, thinking it was good enough. But slowly, I realized "
+        "that maybe those last changes were exactly what it needed to be something great.",
+        "Giving feedback isn’t always easy—I know how much effort went into this. But offering honest critique, "
+        "with empathy and understanding, is how we help each other grow and reach our best."
+    ]

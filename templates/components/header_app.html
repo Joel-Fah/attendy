@@ -112,6 +112,12 @@
                                     Back to home
                                 </a>
                             </li>
+                            <li></li>
+                                <a href="{% url 'core:feedback' %}"
+                                    class="block px-4 py-2 text-sm hover:bg-secondaryColor/10" role="menuitem">
+                                    Feedback
+                                </a>
+                            </li>
                             <li>
                                 <form action="{% url 'account_logout' %}" method="post" class="">
                                     {% csrf_token %}

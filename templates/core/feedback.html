@@ -1,0 +1,180 @@
+{% load static tailwind_tags %}
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth bg-whiteColor">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Send a feedback</title>
+
+    {# Favicon #}
+    <link rel="shortcut icon" href="{% static 'core/images/attendy.svg' %}" type="image/x-icon">
+
+    {# CSS: Tailwind, Custom #}
+    {% tailwind_css %}
+
+    <style>
+        #hero {
+            background: linear-gradient(to bottom, rgb(0, 0, 0, .9) 20%, rgb(0, 0, 0, .1) 50%), url("{% static 'core/images/stars_bg.svg' %}"), url("{% static 'core/images/feedback.jpg' %}");
+            background-position: bottom center;
+            -webkit-background-size: cover;
+            -moz-background-size: cover;
+            -o-background-size: cover;
+            background-size: cover;
+            background-repeat: no-repeat;
+        }
+    </style>
+</head>
+<body>
+    <div class="grid grid-cols-12 items-center justify-center gap-4 h-dvh w-full bg-whiteColor">
+        <div id="hero" class="col-span-4 relative flex bg-primaryColor h-dvh p-6 text-base text-whiteColor">
+            <blockquote class="flex flex-col gap-2 text-base leading-tight text-whiteColor p-4">
+                <div class="flex items-center gap-1">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none" class="text-secondaryColor">
+                        <path d="M5.07579 17C4.08939 4.54502 12.9123 1.0121 19.9734 2.22417C20.2585 6.35185 18.2389 7.89748 14.3926 8.61125C15.1353 9.38731 16.4477 10.3639 16.3061 11.5847C16.2054 12.4534 15.6154 12.8797 14.4355 13.7322C11.8497 15.6004 8.85421 16.7785 5.07579 17Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                        <path d="M4 22C4 15.5 7.84848 12.1818 10.5 10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
+                    <img src="{% static 'core/images/attendy-text-white.svg' %}" alt="Attendy logo" class="w-1/4">
+                </div>
+
+                {{ quote }}
+                
+                <cite class="block text-xs mt-2 text-secondaryColor">into my mind</cite>
+            </blockquote>
+            <img src="{% static 'core/images/logo-shapes.svg' %}" alt="Attendy shapes" class="w-20 absolute bottom-3 left-3">
+        </div>
+
+        <main class="col-start-6 col-span-6 flex flex-col items-center gap-2">
+            <div class="space-y-4">
+                <h1 class="flex items-center gap-2 text-3xl text-primaryColor font-bold">
+                    <a href="#" id="back-link" class="" title="Go back">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none" class="text-darkColor">
+                            <path d="M3.99982 11.9998L19.9998 11.9998" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                            <path d="M8.99963 17C8.99963 17 3.99968 13.3176 3.99966 12C3.99965 10.6824 8.99966 7 8.99966 7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                        </svg>
+                    </a>
+                    let's get your feedback
+                </h1>
+                <p class="text-base">
+                    Humans are always prone to errors, and it's both sad and unfortunate. Thankfully, we can learn from them and improve.
+                    Now it's your turn—help us make this project better. Share your ideas on how we can improve the attendance process.
+                    <small class="block text-gray-500">Or just leave us a smiiile 😊</small>
+                </p>
+            </div>
+
+            <form action="{% url 'core:feedback' %}" method="post" class="w-full">
+                {% csrf_token %}
+
+                <!-- Display non fields errors -->
+                {% if form.non_field_errors %}
+                <small class="text-sm text-danger bg-danger/10 rounded-xl px-2 py-1">
+                    {% for error in form.non_field_errors %}
+                    {{ error }}
+                    {% endfor %}
+                </small>
+                {% endif %}
+
+                <div class="flex flex-col gap-2">
+                    <div class="flex items-center gap-2">
+                        {# User field #}
+                        <div class="w-full">
+                            <label for="{{ form.user.label }}" class="ps-4 text-xs text-gray-500"> {{ form.user.label }} </label>
+                            <div class="relative">
+                                <div class="absolute inset-y-0 start-0 flex items-center ps-2.5 pointer-events-none">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none">
+                                        <path d="M12.5212 3H11.5192C10.9563 3.00836 10.3958 3.03083 9.84518 3.06737C5.65374 3.34548 2.31504 6.72539 2.04032 10.9686C1.98656 11.7989 1.98656 12.6588 2.04032 13.4892C2.14038 15.0346 2.82509 16.4655 3.63119 17.6738C4.09923 18.5196 3.79035 19.5754 3.30283 20.4975C2.95132 21.1624 2.77557 21.4949 2.91669 21.735C3.0578 21.9752 3.37302 21.9829 4.00346 21.9982C5.25021 22.0285 6.09091 21.6757 6.75825 21.1845C7.13674 20.9059 7.32598 20.7666 7.45641 20.7506C7.58684 20.7346 7.84352 20.8401 8.3568 21.0511C8.81812 21.2408 9.35376 21.3578 9.84518 21.3904C11.2722 21.4851 12.7652 21.4853 14.1951 21.3904C18.217 21.1236 21.5019 18.0009 22 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                                        <path d="M15.59 8.64819C14.9612 9.01675 13.3126 9.7693 14.3167 10.711C14.8072 11.171 15.3536 11.5 16.0404 11.5H19.9596C20.6464 11.5 21.1928 11.171 21.6833 10.711C22.6874 9.7693 21.0388 9.01675 20.41 8.64819C18.9355 7.78394 17.0645 7.78394 15.59 8.64819Z" stroke="currentColor" stroke-width="1.5" />
+                                        <path d="M20 4C20 5.10457 19.1046 6 18 6C16.8954 6 16 5.10457 16 4C16 2.89543 16.8954 2 18 2C19.1046 2 20 2.89543 20 4Z" stroke="currentColor" stroke-width="1.5" />
+                                        <path d="M8.5 15H15.5M8.5 10H10.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                                    </svg>
+                                </div>
+                                {{ form.user }}
+                            </div>
+                            <small class="ps-4 text-xs text-gray-500"> {{ form.user.help_text }} </small>
+        
+                            {% if form.user.errors %}
+                            <small class="ps-4 text-sm text-danger">
+                                {% for error in form.user.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </small>
+                            {% endif %}
+                        </div>
+
+                        {# Feedback type field #}
+                        <div class="w-full">
+                            <label for="{{ form.feedback_type.label }}" class="ps-4 text-xs text-gray-500"> {{ form.feedback_type.label }} </label>
+                            <div class="relative">
+                                <div class="absolute inset-y-0 start-0 flex items-center ps-2.5 pointer-events-none">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none">
+                                        <path d="M18.058 8.53645L17.058 7.92286C16.0553 7.30762 15.554 7 15 7C14.446 7 13.9447 7.30762 12.942 7.92286L11.942 8.53645C10.9935 9.11848 10.5192 9.40949 10.2596 9.87838C10 10.3473 10 10.9129 10 12.0442V17.9094C10 19.8377 10 20.8019 10.5858 21.4009C11.1716 22 12.1144 22 14 22H16C17.8856 22 18.8284 22 19.4142 21.4009C20 20.8019 20 19.8377 20 17.9094V12.0442C20 10.9129 20 10.3473 19.7404 9.87838C19.4808 9.40949 19.0065 9.11848 18.058 8.53645Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                                        <path d="M14 7.10809C13.3612 6.4951 12.9791 6.17285 12.4974 6.05178C11.9374 5.91102 11.3491 6.06888 10.1725 6.3846L8.99908 6.69947C7.88602 6.99814 7.32949 7.14748 6.94287 7.5163C6.55624 7.88513 6.40642 8.40961 6.10679 9.45857L4.55327 14.8971C4.0425 16.6852 3.78712 17.5792 4.22063 18.2836C4.59336 18.8892 6.0835 19.6339 7.5 20" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                                        <path d="M14.4947 10C15.336 9.44058 16.0828 8.54291 16.5468 7.42653C17.5048 5.12162 16.8944 2.75724 15.1836 2.14554C13.4727 1.53383 11.3091 2.90644 10.3512 5.21135C10.191 5.59667 10.0747 5.98366 10 6.36383" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+                                    </svg>
+                                </div>
+                                {{ form.feedback_type }}
+                            </div>
+                            <small class="ps-4 text-xs text-gray-500"> {{ form.feedback_type.help_text }} </small>
+        
+                            {% if form.feedback_type.errors %}
+                            <small class="ps-4 text-sm text-danger">
+                                {% for error in form.feedback_type.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </small>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    {# Feedback field #}
+                    <div class="">
+                        <label for="{{ form.feedback.label }}" class="ps-4 text-xs text-gray-500"> {{ form.feedback.label }} </label>
+                        <div class="relative">
+                            <div class="absolute top-3 start-0 flex items-center ps-2.5 pointer-events-none">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none">
+                                    <path d="M8.5 14.5H15.5M8.5 9.5H12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                                    <path d="M14.1706 20.8905C18.3536 20.6125 21.6856 17.2332 21.9598 12.9909C22.0134 12.1607 22.0134 11.3009 21.9598 10.4707C21.6856 6.22838 18.3536 2.84913 14.1706 2.57107C12.7435 2.47621 11.2536 2.47641 9.8294 2.57107C5.64639 2.84913 2.31441 6.22838 2.04024 10.4707C1.98659 11.3009 1.98659 12.1607 2.04024 12.9909C2.1401 14.536 2.82343 15.9666 3.62791 17.1746C4.09501 18.0203 3.78674 19.0758 3.30021 19.9978C2.94941 20.6626 2.77401 20.995 2.91484 21.2351C3.05568 21.4752 3.37026 21.4829 3.99943 21.4982C5.24367 21.5285 6.08268 21.1757 6.74868 20.6846C7.1264 20.4061 7.31527 20.2668 7.44544 20.2508C7.5756 20.2348 7.83177 20.3403 8.34401 20.5513C8.8044 20.7409 9.33896 20.8579 9.8294 20.8905C11.2536 20.9852 12.7435 20.9854 14.1706 20.8905Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" />
+                                </svg>
+                            </div>
+                            {{ form.feedback }}
+                        </div>
+                        <small class="ps-4 text-xs text-gray-500"> {{ form.feedback.help_text }} </small>
+    
+                        {% if form.feedback.errors %}
+                        <small class="ps-4 text-sm text-danger">
+                            {% for error in form.feedback.errors %}
+                                {{ error }}
+                            {% endfor %}
+                        </small>
+                        {% endif %}
+                    </div>
+
+                    {# Submit button #}
+                    <div class="text-whiteColor">
+                        <button type="submit"
+                            class="flex items-center justify-center gap-2 focus:outline-none rounded-xl w-1/3 ms-auto px-5 py-2 bg-primaryColor hover:bg-blue-950 focus:ring-2 focus:ring-secondaryColor focus:ring-offset-1 transition-all duration-300 ease-in-out">
+                            Submit feedback
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none" class="w-5">
+                                <path d="M21.0477 3.05293C18.8697 0.707363 2.48648 6.4532 2.50001 8.551C2.51535 10.9299 8.89809 11.6617 10.6672 12.1581C11.7311 12.4565 12.016 12.7625 12.2613 13.8781C13.3723 18.9305 13.9301 21.4435 15.2014 21.4996C17.2278 21.5892 23.1733 5.342 21.0477 3.05293Z" stroke="currentColor" stroke-width="1.5" />
+                                <path d="M11.5 12.5L15 9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </main>
+    </div>
+
+    {% include "components/message.html" %}
+
+    <script>
+        var element = document.getElementById('back-link');
+            element.setAttribute('href', document.referrer);
+            element.onclick = function () {
+                history.back();
+                return false;
+            }
+    </script>
+</body>
+</html>
