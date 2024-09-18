@@ -1,0 +1,226 @@
+{% extends 'core/base_app.html' %}
+{% load static %}
+{% load tailwind_tags %}
+{% load custom_date_formatter duration_formatter %}
+
+{# Title of the page #}
+{% block title %} Update for {{ attendance }} {% endblock %}
+
+{% block extra_styles %}
+    <style>
+        #lect_img {
+            background: linear-gradient(170deg, rgba(0, 0, 0, 0.9) 25%, rgba(0, 0, 0, 0.1) 75%), url("{% static 'core/images/attendance.jpg' %}");
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+    </style>
+{% endblock extra_styles %}
+
+{# Header of the page #}
+{% block header %}
+    {% include "components/header_app.html" %}
+{% endblock header %}
+
+{# Body of the page #}
+{% block body %}
+    <div class="relative p-4 md:ml-64">
+        <div class="flex flex-col gap-4 items-start justify-center w-full mt-14">
+            <div class="grid grid-cols-12 items-center justify-center gap-2">
+                <div class="col-start-2 col-span-4 flex flex-col gap-4">
+                    <div class="flex flex-col gap-2">
+                        <h2 class="text-2xl">
+                            You're updating
+                            <span class="block text-primaryColor">{{ attendance }}</span>
+                        </h2>
+                        <small class="w-max px-2.5 rounded-xl bg-darkColor/5">
+                            <span class="text-gray-500">Last update:</span>
+                            {{ attendance.updated_at|format_date }}
+                        </small>
+                        <p class="text-sm">
+                            Keep track of your class activity by creating and managing course attendances.
+                        </p>
+                    </div>
+
+                    <form method="post" class="max-w-sm w-full">
+                        {% csrf_token %}
+
+                        <!-- Display non fields errors -->
+                        {% if form.non_field_errors %}
+                            <small class="text-sm text-danger bg-danger/10 rounded-xl px-2 py-1">
+                                {% for error in form.non_field_errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </small>
+                        {% endif %}
+
+                        <div class="flex flex-col gap-2">
+                            {# Attendance's class field #}
+                            <div class="">
+                                <label for="{{ form.class_level.label }}" class="ps-4 text-xs text-gray-500"> {{ form.class_level.label }} </label>
+                                <div class="relative">
+                                    <div class="absolute inset-y-0 start-0 flex items-center ps-2.5 pointer-events-none">
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none">
+                                            <path d="M17.5798 9.71016C17.0765 9.57314 16.5468 9.5 16 9.5C13.4668 9.5 11.3002 11.0699 10.4202 13.2898M17.5798 9.71016C20.1271 10.4036 22 12.7331 22 15.5C22 18.8137 19.3137 21.5 16 21.5C14.4633 21.5 13.0615 20.9223 12 19.9722M17.5798 9.71016C17.851 9.02618 18 8.2805 18 7.5C18 4.18629 15.3137 1.5 12 1.5C8.68629 1.5 6 4.18629 6 7.5C6 8.2805 6.14903 9.02618 6.42018 9.71016M10.4202 13.2898C10.149 13.9738 10 14.7195 10 15.5C10 17.277 10.7725 18.8736 12 19.9722M10.4202 13.2898C8.59146 12.792 7.11029 11.451 6.42018 9.71016M6.42018 9.71016C3.87294 10.4036 2 12.7331 2 15.5C2 18.8137 4.68629 21.5 8 21.5C9.53671 21.5 10.9385 20.9223 12 19.9722" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+                                        </svg>
+                                    </div>
+                                    {{ form.class_level }}
+                                </div>
+            
+                                {% if form.class_level.errors %}
+                                <small class="ps-4 text-sm text-danger">
+                                    {% for error in form.class_level.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </small>
+                                {% endif %}
+                            </div>
+
+                            {# Course field #}
+                            <div class="">
+                                <label for="{{ form.course.label }}"
+                                       class="ps-4 text-xs text-gray-500"> {{ form.course.label }} </label>
+                                <div class="relative">
+                                    <div class="absolute inset-y-0 start-0 flex items-center ps-2.5 pointer-events-none">
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none">
+                                            <path
+                                                d="M14.5 5L12.5 5C9.67157 5 8.25736 5 7.37868 5.87868C6.5 6.75736 6.5 8.17157 6.5 11L6.5 16C6.5 18.8284 6.5 20.2426 7.37868 21.1213C8.25736 22 9.67157 22 12.5 22H13.8431C14.6606 22 15.0694 22 15.4369 21.8478C15.8045 21.6955 16.0935 21.4065 16.6716 20.8284L19.3284 18.1716C19.9065 17.5935 20.1955 17.3045 20.3478 16.9369C20.5 16.5694 20.5 16.1606 20.5 15.3431V11C20.5 8.17157 20.5 6.75736 19.6213 5.87868C18.7426 5 17.3284 5 14.5 5Z"
+                                                stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                                            <path d="M15 21.5L15 20.5C15 18.6144 15 17.6716 15.5858 17.0858C16.1716 16.5 17.1144 16.5 19 16.5L20 16.5"
+                                                stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                                            <path
+                                                d="M6.5 19C4.84315 19 3.5 17.6569 3.5 16L3.5 8C3.5 5.17157 3.5 3.75736 4.37868 2.87868C5.25736 2 6.67157 2 9.5 2L14.5004 2C16.1572 2.00001 17.5004 3.34319 17.5004 5.00003"
+                                                stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                                            <path d="M10.0011 13L14.0011 13M10.0011 9L17.0011 9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
+                                                stroke-linejoin="round" />
+                                        </svg>
+                                    </div>
+                                    {{ form.course }}
+                                </div>
+
+                                {% if form.course.errors %}
+                                    <small class="ps-4 text-sm text-danger">
+                                        {% for error in form.course.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </small>
+                                {% endif %}
+                            </div>
+
+                            {# Course date field #}
+                            <div class="">
+                                <label for="{{ form.course_date.label }}"
+                                       class="ps-4 text-xs text-gray-500"> {{ form.course_date.label }} </label>
+                                <div class="relative">
+                                    <div class="absolute inset-y-0 start-0 flex items-center ps-2.5 pointer-events-none">
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none">
+                                            <path d="M18 2V4M6 2V4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                                            <path d="M10 17L9.99999 13.3472C9.99999 13.1555 9.86325 13 9.69458 13H9M13.6297 17L14.9842 13.3492C15.0475 13.1785 14.9128 13 14.7207 13H13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+                                            <path d="M2.5 12.2432C2.5 7.88594 2.5 5.70728 3.75212 4.35364C5.00424 3 7.01949 3 11.05 3H12.95C16.9805 3 18.9958 3 20.2479 4.35364C21.5 5.70728 21.5 7.88594 21.5 12.2432V12.7568C21.5 17.1141 21.5 19.2927 20.2479 20.6464C18.9958 22 16.9805 22 12.95 22H11.05C7.01949 22 5.00424 22 3.75212 20.6464C2.5 19.2927 2.5 17.1141 2.5 12.7568V12.2432Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                                            <path d="M6 8H18" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                                        </svg>
+                                    </div>
+                                    {{ form.course_date }}
+                                </div>
+
+                                {% if form.course_date.errors %}
+                                    <small class="ps-4 text-sm text-danger">
+                                        {% for error in form.course_date.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </small>
+                                {% endif %}
+                            </div>
+
+                            <div class="flex gap-2 items-center">
+                                {# Course start time field #}
+                                <div class="w-full">
+                                    <label for="{{ form.course_start_time.label }}"
+                                           class="ps-4 text-xs text-gray-500"> {{ form.course_start_time.label }} </label>
+                                    <div class="relative">
+                                        <div class="absolute inset-y-0 start-0 flex items-center ps-2.5 pointer-events-none">
+                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none">
+                                                <path d="M2 15C2.14277 15.4274 2.31023 15.8431 2.50062 16.2452M4.12547 18.7463C4.44158 19.1137 4.781 19.4596 5.14137 19.7814M9 22C8.55224 21.8557 8.11701 21.6824 7.69641 21.4822" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                                                <path d="M12 13.5C12.8284 13.5 13.5 12.8284 13.5 12C13.5 11.1716 12.8284 10.5 12 10.5C11.1716 10.5 10.5 11.1716 10.5 12M12 13.5C11.1716 13.5 10.5 12.8284 10.5 12M12 13.5V16M10.5 12H6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+                                                <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+                                            </svg>
+                                        </div>
+                                        {{ form.course_start_time }}
+                                    </div>
+                                    {% if form.course_start_time.errors %}
+                                        <small class="ps-4 text-sm text-danger">
+                                            {% for error in form.course_start_time.errors %}
+                                                {{ error }}
+                                            {% endfor %}
+                                        </small>
+                                    {% endif %}
+                                </div>
+
+                                {# Course end time field #}
+                                <div class="w-full">
+                                    <label for="{{ form.course_end_time.label }}"
+                                        class="ps-4 text-xs text-gray-500"> {{ form.course_end_time.label }} </label>
+                                    <div class="relative">
+                                        <div class="absolute inset-y-0 start-0 flex items-center ps-2.5 pointer-events-none">
+                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none">
+                                                <path d="M2 15C2.14277 15.4274 2.31023 15.8431 2.50062 16.2452M4.12547 18.7463C4.44158 19.1137 4.781 19.4596 5.14137 19.7814M9 22C8.55224 21.8557 8.11701 21.6824 7.69641 21.4822" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                                                <path d="M12 13.5C12.8284 13.5 13.5 12.8284 13.5 12C13.5 11.1716 12.8284 10.5 12 10.5C11.1716 10.5 10.5 11.1716 10.5 12M12 13.5C11.1716 13.5 10.5 12.8284 10.5 12M12 13.5V16M10.5 12H6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+                                                <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+                                            </svg>
+                                        </div>
+                                        {{ form.course_end_time }}
+                                    </div>
+
+                                    {% if form.course_end_time.errors %}
+                                        <small class="ps-4 text-sm text-danger">
+                                            {% for error in form.course_end_time.errors %}
+                                                {{ error }}
+                                            {% endfor %}
+                                        </small>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+
+                            {# Submit button #}
+                            <div class="text-whiteColor">
+                                <button type="submit"
+                                        class="block mb-2 focus:outline-none rounded-2xl w-full px-5 py-2 text-center bg-primaryColor hover:bg-blue-950 focus:ring-2 focus:ring-secondaryColor focus:ring-offset-1 transition-all duration-300 ease-in-out">
+                                    Update attendance
+                                </button>
+                                <small class="text-gray-500 text-xs">
+                                    This attendance will account for <strong>{{ level.semester }} {{ level.year }}</strong>
+                                </small>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+
+                <div id="lect_img" class="relative col-start-8 col-span-4 h-screen">
+                    <blockquote
+                            class="flex flex-col gap-2 text-[16px] leading-tight text-whiteColor p-4 text-left max-w-64">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none"
+                             class="text-secondaryColor">
+                            <path d="M5.07579 17C4.08939 4.54502 12.9123 1.0121 19.9734 2.22417C20.2585 6.35185 18.2389 7.89748 14.3926 8.61125C15.1353 9.38731 16.4477 10.3639 16.3061 11.5847C16.2054 12.4534 15.6154 12.8797 14.4355 13.7322C11.8497 15.6004 8.85421 16.7785 5.07579 17Z"
+                                  stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
+                                  stroke-linejoin="round"/>
+                            <path d="M4 22C4 15.5 7.84848 12.1818 10.5 10" stroke="currentColor" stroke-width="1.5"
+                                  stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        Lectures are like Netflix series—except you can't skip to the good parts, and the plot twists
+                        are just more homework.
+                        <cite class="block font-semibold mt-2 text-secondaryColor">ChatGPT</cite>
+                    </blockquote>
+                    <img src="{% static 'core/images/logo-shapes.svg' %}" alt="Attendy shapes"
+                         class="w-20 absolute bottom-3 right-3">
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+{% endblock body %}
+
+{# Additional javascript #}
+{% block javascript %}
+{% endblock javascript %}

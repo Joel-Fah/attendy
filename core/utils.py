@@ -48,6 +48,26 @@ def is_valid_time(start_time, end_time):
 
 
 def group_model_items_by_week(queryset):
+    """
+    Group model items by week based on their creation date.
+
+    This function takes a queryset of model items and groups them by the week in which they were created. The items are
+    grouped based on the start of the week (Monday) for each item's creation date.
+
+    Parameters:
+    queryset (QuerySet): A queryset of model items to be grouped.
+
+    Returns:
+    dict: A dictionary where the keys are the week ranges (e.g., "Mon 19 Aug - Sun 25 Aug") and the values are lists
+          of items created during that week.
+
+    Example:
+    {
+        'Mon 19 Aug - Sun 25 Aug': [<Item1>, <Item2>, ...],
+        'Mon 26 Aug - Sun 01 Sep': [<Item3>, <Item4>, ...],
+        ...
+    }
+    """
     grouped_items = defaultdict(list)
 
     for item in queryset.order_by('created_at'):
@@ -62,3 +82,37 @@ def group_model_items_by_week(queryset):
         grouped_items[week_range].append(item)
 
     return grouped_items
+
+
+# Function that returns a list of FAQs (questions and answers) for display on the FAQ page.
+def get_faqs():
+    """
+    Get a list of frequently asked questions (FAQs) for display on the FAQ page.
+
+    Returns:
+    list: A list of dictionaries, where each dictionary represents an FAQ item with 'question' and 'answer' keys.
+
+    Example:
+    [
+        {'question': 'What is Lorem Ipsum?', 'answer': 'Lorem Ipsum is simply dummy text of the printing...'},
+        {'question': 'Why do we use it?', 'answer': 'It is a long-established fact that a reader will be...'},
+        ...
+    ]
+    """
+    return [
+        {
+            'question': "Can I attend the same class twice in one day? Asking for a friend...",
+            'answer': "Well, if you really love that class! As long as the start times are different, you're free to "
+                      "double-dip on knowledge."
+        },
+        {
+            'question': "What happens if I forget to take attendance? Does the world end?",
+            'answer': "Good news—no apocalypse! But you might need to bribe your classmates for the notes. Don’t make "
+                      "it a habit, though!"
+        },
+        {
+            'question': "Why can’t I create two attendances for the same time and class? Magic?",
+            'answer': "Almost! Time travel is tricky, and our system likes to keep things in order. One class, "
+                      "one time. It’s the law of the universe… or at least, our app."
+        }
+    ]

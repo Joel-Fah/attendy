@@ -2,7 +2,8 @@ from allauth.account.forms import LoginForm
 from django import forms
 from django_summernote.widgets import SummernoteWidget
 
-from .models import Course, Lecturer, Student, DepartmentChoices, TeachingRecord, ClassLevel
+from .models import Course, Lecturer, Student, DepartmentChoices, TeachingRecord, ClassLevel, Attendance, \
+    CourseAttendance
 
 
 # Create your forms here
@@ -402,3 +403,155 @@ class TeachingRecordForm(forms.ModelForm):
             raise forms.ValidationError("Lecturer departure time must come after arrival time.")
 
         return cleaned_data
+
+
+class AttendanceForm(forms.ModelForm):
+    class Meta:
+        model = Attendance
+        fields = '__all__'
+
+    class_level = forms.ModelChoiceField(
+        queryset=ClassLevel.objects.all(),
+        widget=forms.Select(
+            attrs={
+                'id': 'class_level_attendance',
+                'name': 'class_level_attendance',
+                'placeholder': 'Select class level',
+                'class': 'rounded-2xl block w-full ps-10 p-2.5 bg-gray-200 border-darkColor placeholder-darkColor/50 '
+                         'focus:ring-primaryColor focus:border-primaryColor transition-all duration-300 ease-in-out '
+                         'disabled:text-gray-500 disabled:cursor-not-allowed',
+            }
+        ),
+        label='Class Level',
+        help_text='The class level for the attendance',
+        error_messages={'required': 'Please select the class level for the attendance'},
+        required=True,
+        disabled=True
+    )
+
+    course = forms.ModelChoiceField(
+        queryset=Course.objects.all(),
+        widget=forms.Select(
+            attrs={
+                'id': 'course',
+                'name': 'course',
+                'placeholder': 'Select course',
+                'class': 'rounded-2xl block w-full ps-10 p-2.5 bg-gray-200 border-darkColor placeholder-darkColor/50 '
+                         'focus:ring-primaryColor focus:border-primaryColor transition-all duration-300 ease-in-out '
+                         'disabled:text-gray-500 disabled:cursor-not-allowed',
+            }
+        ),
+        label='Course',
+        help_text='Select the course for which attendance is being taken.',
+        error_messages={'required': 'Please select the course for which attendance is being taken'},
+        required=True,
+    )
+
+    course_date = forms.DateField(
+        widget=forms.DateInput(
+            attrs={
+                'id': 'course_date',
+                'name': 'course_date',
+                'type': 'date',
+                'placeholder': 'DD-MM-YYYY',
+                'class': 'rounded-2xl block w-full ps-10 p-2.5 bg-whiteColor border-darkColor placeholder-darkColor/50 '
+                         'focus:ring-primaryColor focus:border-primaryColor transition-all duration-300 ease-in-out',
+            }
+        ),
+        label='Course date',
+        help_text='Enter the date the course was taken.',
+        error_messages={'required': 'Please enter the date the course was taken'},
+        required=True,
+    )
+
+    course_start_time = forms.TimeField(
+        widget=forms.TimeInput(
+            attrs={
+                'id': 'course_start_time',
+                'name': 'course_start_time',
+                'type': 'time',
+                'placeholder': 'HH:MM:SS',
+                'class': 'rounded-2xl block w-full ps-10 p-2.5 bg-whiteColor border-darkColor placeholder-darkColor/50 '
+                         'focus:ring-primaryColor focus:border-primaryColor transition-all duration-300 ease-in-out',
+            }
+        ),
+        label='Course start time',
+        help_text='Enter the time the course started',
+        error_messages={'required': 'Please enter the time the course started'},
+        required=True,
+    )
+
+    course_end_time = forms.TimeField(
+        widget=forms.TimeInput(
+            attrs={
+                'id': 'course_start_time',
+                'name': 'course_start_time',
+                'type': 'time',
+                'placeholder': 'HH:MM:SS',
+                'class': 'rounded-2xl block w-full ps-10 p-2.5 bg-whiteColor border-darkColor placeholder-darkColor/50 '
+                         'focus:ring-primaryColor focus:border-primaryColor transition-all duration-300 ease-in-out',
+            }
+        ),
+        label='Course end time',
+        help_text='Enter the time the course should end',
+        error_messages={'required': 'Please enter the time the course should end'},
+        required=True,
+    )
+
+    is_catchup = forms.BooleanField(
+        widget=forms.CheckboxInput(
+            attrs={
+                'id': 'is_catchup',
+                'name': 'is_catchup',
+                'class': 'w-4 h-4 border rounded-md focus:ring-3 bg-slate-700 border-slate-600 '
+                         'focus:ring-primaryColor ring-offset-slate-800 focus:ring-offset-slate-800',
+            }
+
+        ),
+        label='Catchup class?',
+        help_text='Is the attendance for a catchup class?',
+        required=False,
+    )
+
+
+class CourseAttendanceForm(forms.ModelForm):
+    class Meta:
+        model = CourseAttendance
+        fields = '__all__'
+
+    student = forms.ModelChoiceField(
+        queryset=Student.objects.all(),
+        widget=forms.Select(
+            attrs={
+                'id': 'student_attendance',
+                'name': 'student_attendance',
+                'placeholder': 'Select attendance',
+                'class': 'rounded-2xl block w-full ps-10 p-2.5 bg-gray-200 border-darkColor placeholder-darkColor/50 '
+                         'focus:ring-primaryColor focus:border-primaryColor transition-all duration-300 ease-in-out '
+                         'disabled:text-gray-500 disabled:cursor-not-allowed',
+            }
+        ),
+        label='Student',
+        help_text='Select the student to admit into attendance',
+        error_messages={'required': 'Please select the student to admit into attendance'},
+        required=True,
+    )
+
+    attendance = forms.ModelChoiceField(
+        queryset=Attendance.objects.all(),
+        widget=forms.Select(
+            attrs={
+                'id': 'attendance',
+                'name': 'attendance',
+                'placeholder': 'Select attendance',
+                'class': 'rounded-2xl block w-full ps-10 p-2.5 bg-gray-200 border-darkColor placeholder-darkColor/50 '
+                         'focus:ring-primaryColor focus:border-primaryColor transition-all duration-300 ease-in-out '
+                         'disabled:text-gray-500 disabled:cursor-not-allowed text-wrap',
+            }
+        ),
+        label='Attendance',
+        help_text='Select the attendance concerned',
+        error_messages={'required': 'Please select the attendance concerned'},
+        required=True,
+        disabled=True,
+    )

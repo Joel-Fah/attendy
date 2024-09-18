@@ -1,8 +1,8 @@
 {% load static %}
 {% load tailwind_tags%}
 
-<footer class="w-full p-8 bg-whiteColor max-w-screen-lg m-auto my-5 px-4 py-6">
-  <div class="separator flex gap-2 items-center justify-center max-w-screen-lg m-auto mb-4">
+<footer class="w-full p-8 bg-whiteColor {% if max_screen == 'xl' %} max-w-screen-xl {% else %} max-w-screen-lg {% endif %} m-auto my-5 px-4 py-6">
+  <div class="separator flex gap-2 items-center justify-center {% if max_screen == 'xl' %} max-w-screen-xl {% else %} max-w-screen-lg {% endif %} m-auto mb-4">
     <hr class="w-full border-primaryColor border-dashed">
     <img src="{% static 'core/images/logo-shapes-primary.svg' %}" alt="" class="w-20">
     <hr class="w-full border-primaryColor border-dashed">
@@ -12,7 +12,7 @@
     class="flex flex-row flex-wrap items-center justify-center text-center bg-whiteColor gap-y-6 gap-x-12 md:justify-between">
     <img src="{% static 'core/images/attendy-text.svg' %}" alt="Attendy" class="" />
     <small class="block font-sans text-base antialiased font-normal leading-relaxed text-center text-blue-gray-900">
-      © 2024 attendy. All rights reserved.
+      © {{ current_year }} attendy. All rights reserved.
     </small>
     <div class="flex items-center gap-4 md:gap-2">
       <a href="https://linkedin.com/in/joelfah">

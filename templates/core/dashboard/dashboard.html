@@ -228,72 +228,69 @@
                         </div>
                     </div>
 
-                    <div class="col-span-12 flex flex-col">
+                    <div class="col-span-12 flex flex-col gap-2.5">
                         {% for week, attendances in grouped_attendances.items %}
-                            <small class="block text-sm text-secondaryColor">{{ week }}</small>
-                            <ul class="border-l border-secondaryColor/20">
-                                {% for attendance in attendances %}
-                                    <li>
-                                        <div class="flex items-center justify-between w-full px-4 py-2 hover:bg-secondaryColor/5 transition-all duration-300 ease-linear">
-                                            <a href="{% url 'core:attendance_detail' level_pk=level.id level_slug=level.slug pk=attendance.id %}" class="flex items-center gap-4">
-                                                <span> {{ forloop.counter }}. </span>
-                                                <div class="">
-                                                    <small class="text-xs text-gray-500"> {{ attendance.created_at }}
-                                                        | {{ attendance.course.semester }} {{ attendance.course.year }} </small>
-                                                    <h3 class="text-xl font-medium"> {{ attendance.course.code }} {{ attendance.course.title }}
-                                                    </h3>
-                                                    <small class="flex items-center gap-4">
-                                                        <div class="">
-                                                            <span class="text-gray-500"> Lecturer: </span>
-                                                            {{ attendance.course.lecturer.name }}
-                                                        </div>
-
-                                                        {% if attendance.course_delegate %}
+                            <div class="">
+                                <small class="block text-sm text-secondaryColor">{{ week }}</small>
+                                <ul class="border-l border-secondaryColor/20">
+                                    {% for attendance in attendances %}
+                                        <li>
+                                            <div class="flex items-center justify-between w-full px-4 py-2 hover:bg-secondaryColor/5 transition-all duration-300 ease-linear">
+                                                <a href="{% url 'core:attendance_detail' level_pk=level.id level_slug=level.slug pk=attendance.id %}" class="flex items-center gap-4">
+                                                    <span> {{ forloop.counter }}. </span>
+                                                    <div class="">
+                                                        <small class="text-xs text-gray-500"> {{ attendance.created_at }}
+                                                            | {{ attendance.course.semester }} {{ attendance.course.year }} </small>
+                                                        <h3 class="text-xl font-medium"> {{ attendance.course.code }} {{ attendance.course.title }}
+                                                        </h3>
+                                                        <small class="flex items-center gap-4">
                                                             <div class="">
-                                                                <span class="text-gray-500">Delegate: </span>
-                                                                {{ attendance.course_delegate.student.name }}
+                                                                <span class="text-gray-500"> Lecturer: </span>
+                                                                {{ attendance.course.lecturer.name }}
                                                             </div>
-                                                        {% else %}
-                                                            <span class="text-danger">No course delegate</span>
-                                                        {% endif %}
-
-                                                        {% if attendance.enrollment_count > 0 %}
-                                                            <div class="">
-                                                                <span class="text-gray-500">No. Students: </span>
-                                                                {{ attendance.enrollment_count }}
-                                                            </div>
-                                                        {% else %}
-                                                            <span class="text-danger">No students yet</span>
-                                                        {% endif %}
-
-                                                    </small>
+                                                            {% if attendance.course_delegate %}
+                                                                <div class="">
+                                                                    <span class="text-gray-500">Delegate: </span>
+                                                                    {{ attendance.course_delegate.student.name }}
+                                                                </div>
+                                                            {% else %}
+                                                                <span class="text-danger">No course delegate</span>
+                                                            {% endif %}
+                                                            {% if attendance.enrollment_count > 0 %}
+                                                                <div class="">
+                                                                    <span class="text-gray-500">No. Students: </span>
+                                                                    {{ attendance.enrollment_count }}
+                                                                </div>
+                                                            {% else %}
+                                                                <span class="text-danger">No students yet</span>
+                                                            {% endif %}
+                                                        </small>
+                                                    </div>
+                                                </a>
+                                                <div class="flex items-center gap-2">
+                                                    {% if attendance.teaching_record %}
+                                                        <a href="{% url 'core:record_detail' level_pk=level.id pk=attendance.teaching_record.id slug=attendance.course.slug %}"
+                                                           class="text-nowrap px-4 py-2 rounded-xl bg-secondaryColor text-white text-sm">
+                                                            View associated record
+                                                        </a>
+                                                    {% else %}
+                                                        <a href=""
+                                                           class="text-nowrap px-4 py-2 rounded-xl outline outline-1 outline-secondaryColor text-secondaryColor text-sm">
+                                                            Add a teaching record
+                                                        </a>
+                                                    {% endif %}
+                                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24"
+                                                         height="24" fill="none" class="text-secondaryColor">
+                                                        <path d="M9.00005 6C9.00005 6 15 10.4189 15 12C15 13.5812 9 18 9 18"
+                                                              stroke="currentColor" stroke-width="1.5"
+                                                              stroke-linecap="round" stroke-linejoin="round"/>
+                                                    </svg>
                                                 </div>
-                                            </a>
-
-                                            <div class="flex items-center gap-2">
-
-                                                {% if attendance.teaching_record %}
-                                                    <a href="{% url 'core:record_detail' level_pk=level.id pk=attendance.teaching_record.id slug=attendance.course.slug %}"
-                                                       class="text-nowrap px-4 py-2 rounded-xl bg-secondaryColor text-white text-sm">
-                                                        View associated record
-                                                    </a>
-                                                {% else %}
-                                                    <a href=""
-                                                       class="text-nowrap px-4 py-2 rounded-xl outline outline-1 outline-secondaryColor text-secondaryColor text-sm">
-                                                        Add a teaching record
-                                                    </a>
-                                                {% endif %}
-                                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24"
-                                                     height="24" fill="none" class="text-secondaryColor">
-                                                    <path d="M9.00005 6C9.00005 6 15 10.4189 15 12C15 13.5812 9 18 9 18"
-                                                          stroke="currentColor" stroke-width="1.5"
-                                                          stroke-linecap="round" stroke-linejoin="round"/>
-                                                </svg>
                                             </div>
-                                        </div>
-                                    </li>
-                                {% endfor %}
-                            </ul>
+                                        </li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
                         {% empty %}
                             <div class="grid grid-cols-12 items-center justify-center w-full my-4 mt-8">
                                 <div class="col-span-4 flex flex-col text-center gap-1">
@@ -313,6 +310,14 @@
                     </div>
                 </div>
             </div>
+
+            <a href="{% url 'core:attendance_add' level_pk=level.id level_slug=level.slug %}" title="New attendance"
+                class="fixed z-40 p-3 bottom-2 right-2 flex items-center justify-center bg-primaryColor rounded-2xl shadow-md text-whiteColor hover:scale-110 hover:bg-blue-950 transition-all duration-100 ease-linear">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none">
+                    <path d="M12 4V20M20 12H4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
+                        stroke-linejoin="round" />
+                </svg>
+            </a>
         </div>
     </main>
 {% endblock body %}

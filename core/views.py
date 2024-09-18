@@ -1,18 +1,21 @@
+import json
 from collections import defaultdict
-from datetime import timedelta
+from datetime import timedelta, datetime
 
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
 from django.urls import reverse_lazy
 from django.utils.html import format_html
+from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import TemplateView, ListView, DetailView, CreateView, UpdateView
 
-from .forms import CourseForm, LecturerForm, StudentForm, TeachingRecordForm
+from .forms import CourseForm, LecturerForm, StudentForm, TeachingRecordForm, AttendanceForm, CourseAttendanceForm
 from .mixins import CommonContextMixin, ClassLevelAccessMixin
 from .models import Course, Student, Lecturer, TeachingRecord, CourseDelegate, CourseAttendance, \
     ClassLevel, Attendance, ClassLevelUser
-from .utils import group_model_items_by_week
+from .utils import group_model_items_by_week, get_faqs
 
 
 # Create your views here.
@@ -26,6 +29,8 @@ class HomeView(TemplateView):
         context['courses_count'] = Course.objects.all().count()
         context['lecturers_count'] = Lecturer.objects.all().count()
         context['students_count'] = Student.objects.all().count()
+        context['faqs'] = get_faqs
+        context['current_year'] = datetime.now().year
         return context
 
 
@@ -117,6 +122,203 @@ class AttendanceDetailView(LoginRequiredMixin, CommonContextMixin, DetailView):
                                                                  attendance__class_level=self.kwargs[
                                                                      'level_pk']).order_by('created_at')
         return context
+
+    def post(self, request, *args, **kwargs):
+        if 'delete_enrollment' in request.POST:
+            enrollment_id = request.POST.get('enrollment_id')
+            enrollment = CourseAttendance.objects.get(id=enrollment_id)
+            enrollment.delete()
+            message = format_html(
+                '<strong>{}</strong> was removed successfully.',
+                enrollment.student.name
+            )
+            messages.success(request, message)
+        return self.get(request, *args, **kwargs)
+
+
+class AttendanceAddView(LoginRequiredMixin, CommonContextMixin, CreateView):
+    model = Attendance
+    template_name = 'core/attendance/attendance_add.html'
+    context_object_name = 'form'
+    form_class = AttendanceForm
+
+    def get_success_url(self):
+        return reverse_lazy('core:dashboard',
+                            kwargs={'level_pk': self.kwargs['level_pk'], 'level_slug': self.kwargs['level_slug']})
+
+    def get_form(self, form_class=None):
+        form = super().get_form(form_class)
+        class_level_id = self.kwargs['level_pk']
+        form.fields['class_level'].initial = ClassLevel.objects.get(pk=class_level_id)
+        form.fields['course'].queryset = Course.objects.filter(class_level=class_level_id)
+        return form
+
+    def form_valid(self, form):
+        form.save()
+        message = format_html(
+            'Attendance added successfully.<br><a href="{}" class="font-bold underline">View</a>',
+            reverse_lazy('core:attendance_detail',
+                         kwargs={'level_pk': self.kwargs['level_pk'], 'level_slug': self.kwargs['level_slug'],
+                                 'pk': form.instance.pk})
+        )
+        messages.success(
+            self.request,
+            message
+        )
+        messages.info(
+            self.request,
+            "A teaching record has been created for this attendance. Remind to check and fill out accordingly."
+        )
+        return super().form_valid(form)
+
+    def form_invalid(self, form):
+        messages.error(
+            self.request,
+            format_html(
+                'An error occurred while adding the attendance.<br>Please try again.'
+            )
+        )
+        return super().form_invalid(form)
+
+
+class AttendanceUpdateView(LoginRequiredMixin, CommonContextMixin, UpdateView):
+    model = Attendance
+    template_name = 'core/attendance/attendance_update.html'
+    context_object_name = 'attendance'
+    form_class = AttendanceForm
+
+    def get_object(self, queryset=None):
+        queryset = self.get_queryset()
+        return queryset.get(id=self.kwargs['pk'], class_level=self.kwargs['level_pk'])
+
+    def get_success_url(self):
+        return reverse_lazy('core:attendance_detail',
+                            kwargs={'level_pk': self.kwargs['level_pk'], 'level_slug': self.kwargs['level_slug'],
+                                    'pk': self.kwargs['pk']})
+
+    def get_form(self, form_class=None):
+        form = super().get_form(form_class)
+        form.fields['course'].queryset = Course.objects.filter(class_level=self.kwargs['level_pk'])
+        return form
+
+    def form_valid(self, form):
+        form.save()
+        messages.success(
+            self.request,
+            'Attendance updated successfully.'
+        )
+        return super().form_valid(form)
+
+    def form_invalid(self, form):
+        messages.error(
+            self.request,
+            format_html(
+                'An error occurred while updating the attendance.<br>Please try again.'
+            )
+        )
+        return super().form_invalid(form)
+
+
+class CourseAttendanceAddView(LoginRequiredMixin, CommonContextMixin, CreateView):
+    model = CourseAttendance
+    template_name = 'core/enrollment/course_attendance_add.html'
+    context_object_name = 'form'
+    form_class = CourseAttendanceForm
+
+    def get_success_url(self):
+        return reverse_lazy('core:attendance_detail',
+                            kwargs={'level_pk': self.kwargs['level_pk'], 'level_slug': self.kwargs['level_slug'],
+                                    'pk': self.kwargs['pk']})
+
+    def get_form(self, form_class=None):
+        form = super().get_form(form_class)
+        form.fields['student'].queryset = Student.objects.filter(class_level=self.kwargs['level_pk'])
+        form.fields['attendance'].initial = Attendance.objects.get(pk=self.kwargs['pk'])
+        return form
+
+    def form_valid(self, form):
+        form.save()
+        student_name = form.instance.student.name
+        message = format_html(
+            'Student <strong>{}</strong> admitted into attendance successfully.',
+            student_name,
+        )
+        messages.success(
+            self.request,
+            message
+        )
+        return super().form_valid(form)
+
+    def form_invalid(self, form):
+        messages.error(
+            self.request,
+            format_html(
+                'An error occurred while admitting the student into attendance.<br>Please try again.'
+            )
+        )
+        return super().form_invalid(form)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['attendance'] = Attendance.objects.get(pk=self.kwargs['pk'])
+        return context
+
+
+@csrf_exempt
+def decode_qr(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        qr_data = data.get('qr_data')
+
+        try:
+            # Parse the JSON data from the QR code
+            qr_json = json.loads(qr_data)
+            student_id = qr_json.get('id')
+            class_level_id = qr_json.get('class_level')
+
+            # Fetch the student and class level from the database
+            student = Student.objects.get(id=student_id)
+            class_level = ClassLevel.objects.get(id=class_level_id)
+
+            return JsonResponse({
+                'success': True,
+                'student_name': student.name,
+                'class_level': class_level.level
+            })
+        except (Student.DoesNotExist, ClassLevel.DoesNotExist, ValueError, json.JSONDecodeError) as e:
+            return JsonResponse({'success': False, 'error': str(e)})
+    return JsonResponse({'success': False, 'error': 'Invalid request method'})
+
+
+@csrf_exempt
+def add_student_to_course_attendance(request, *args, **kwargs):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        qr_data = data.get('qr_data')
+
+        try:
+            # Parse the JSON data from the QR code
+            qr_json = json.loads(qr_data)
+            student_id = qr_json.get('id')
+            class_level_id = qr_json.get('class_level')
+
+            # Fetch the student and class level from the database
+            student = Student.objects.get(id=student_id, class_level_id=class_level_id)
+
+            # Add the student to the CourseAttendance
+            course_attendance = CourseAttendance.objects.create(
+                student=student,
+                attendance=Attendance.objects.get(pk=kwargs['pk'])
+            )
+
+            return JsonResponse({
+                'success': True,
+                'student_name': student.name,
+                'class_level': f'{student.class_level.get_level_display()} - Group {student.class_level.group}'
+            })
+        except (Student.DoesNotExist, ClassLevel.DoesNotExist, ValueError, json.JSONDecodeError) as e:
+            return JsonResponse({'success': False, 'error': str(e)})
+    return JsonResponse({'success': False, 'error': 'Invalid request method'})
 
 
 class CourseView(LoginRequiredMixin, CommonContextMixin, ListView):
@@ -285,6 +487,11 @@ class StudentDetailView(LoginRequiredMixin, CommonContextMixin, DetailView):
 
     def get_object(self, queryset=None):
         return get_object_or_404(self.model, id=self.kwargs['pk'], slug=self.kwargs['slug'])
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['qr_code_url'] = self.object.generate_qr_code_url()
+        return context
 
 
 class StudentAddView(LoginRequiredMixin, CommonContextMixin, CreateView):

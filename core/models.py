@@ -1,9 +1,12 @@
+import json
+import os
 from datetime import datetime
 
+import qrcode
+from django.conf import settings
+from django.contrib.auth.models import User, Group
 from django.core.exceptions import ValidationError
 from django.db import models
-from django.db.models import UniqueConstraint
-from django.contrib.auth.models import User, Group
 from slugify import slugify
 
 from .utils import calculate_duration, is_valid_time
@@ -59,6 +62,26 @@ class Student(models.Model):
     def save(self, *args, **kwargs):
         self.slug = slugify(self.name)
         super().save(*args, **kwargs)
+
+    def generate_qr_code_url(self):
+        data = {
+            'id': self.id,
+            'class_level': self.class_level.id
+        }
+        json_data = json.dumps(data)
+        qr = qrcode.QRCode(
+            version=1,
+            error_correction=qrcode.constants.ERROR_CORRECT_L,
+            box_size=10,
+            border=4,
+        )
+        qr.add_data(json_data)
+        qr.make(fit=True)
+        img = qr.make_image(fill_color="black", back_color="white")
+        qr_code_path = f'media/qr_codes/{self.slug}_{self.student_number}.png'
+        os.makedirs(os.path.dirname(qr_code_path), exist_ok=True)
+        img.save(qr_code_path)
+        return settings.SITE_URL + qr_code_path
 
     def __str__(self):
         return self.name
@@ -277,10 +300,6 @@ class Attendance(models.Model):
         return TeachingRecord.objects.filter(attendance=self).exists()
 
     def clean(self):
-        # Ensure course_start_time is before course_end_time
-        if self.course_start_time >= self.course_end_time:
-            raise ValidationError("Course start time must be before end time.")
-
         # Ensure there's no conflict with other attendance on the same course
         overlapping_attendance = Attendance.objects.filter(
             course=self.course,
@@ -303,7 +322,8 @@ class Attendance(models.Model):
         super().save(*args, **kwargs)
 
     def __str__(self):
-        return f"Attendance for {self.course.code} {self.course.title} on {self.course_date} at {self.course_start_time}"
+        return (f"Attendance for {self.course.code} {self.course.title} "
+                f"on {self.course_date} at {self.course_start_time}")
 
 
 class Profile(models.Model):

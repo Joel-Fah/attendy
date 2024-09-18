@@ -200,3 +200,5 @@ ACCOUNT_EMAIL_VERIFICATION = 'none'
 ACCOUNT_FORMS = {
     'login': 'core.forms.UserLoginForm',
 }
+
+SITE_URL = 'http://127.0.0.1:8000/'

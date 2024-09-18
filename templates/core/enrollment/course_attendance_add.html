@@ -1,0 +1,140 @@
+{% extends 'core/base_app.html' %}
+{% load static %}
+{% load tailwind_tags %}
+{% load custom_date_formatter duration_formatter %}
+
+{# Title of the page #}
+{% block title %} Admit student into attendance {% endblock %}
+
+{% block extra_styles %}
+    <style>
+        #lect_img {
+            background: linear-gradient(170deg, rgba(0, 0, 0, 0.9) 25%, rgba(0, 0, 0, 0.1) 75%), url("{% static 'core/images/attendance.jpg' %}");
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+    </style>
+{% endblock extra_styles %}
+
+{# Header of the page #}
+{% block header %}
+    {% include "components/header_app.html" %}
+{% endblock header %}
+
+{# Body of the page #}
+{% block body %}
+    <div class="relative p-4 md:ml-64">
+        <div class="flex flex-col gap-4 items-start justify-center w-full mt-14">
+            <div class="grid grid-cols-12 items-center justify-center gap-2 w-full">
+                <div class="col-start-2 col-span-4 flex flex-col gap-4">
+                    <div class="flex flex-col gap-2">
+                        <h2 class="text-2xl">Admit a student into attendance</h2>
+                        <p class="text-sm">
+                            Manually add a student into the current attendance list.
+                        </p>
+                    </div>
+
+                    <form action="{% url 'core:enroll_add' level_pk=level.id level_slug=level.slug pk=attendance.id %}" method="post" class="max-w-sm w-full">
+                        {% csrf_token %}
+
+                        <!-- Display non fields errors -->
+                        {% if form.non_field_errors %}
+                            <small class="text-sm text-danger bg-danger/10 rounded-xl px-2 py-1">
+                                {% for error in form.non_field_errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </small>
+                        {% endif %}
+
+                        <div class="flex flex-col gap-2">
+                            {# Student field #}
+                            <div class="">
+                                <label for="{{ form.student.label }}" class="ps-4 text-xs text-gray-500"> {{ form.student.label }} </label>
+                                <div class="relative">
+                                    <div class="absolute inset-y-0 start-0 flex items-center ps-2.5 pointer-events-none">
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none">
+                                            <path d="M6.57757 15.4816C5.1628 16.324 1.45336 18.0441 3.71266 20.1966C4.81631 21.248 6.04549 22 7.59087 22H16.4091C17.9545 22 19.1837 21.248 20.2873 20.1966C22.5466 18.0441 18.8372 16.324 17.4224 15.4816C14.1048 13.5061 9.89519 13.5061 6.57757 15.4816Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                                            <path d="M16.5 6.5C16.5 8.98528 14.4853 11 12 11C9.51472 11 7.5 8.98528 7.5 6.5C7.5 4.01472 9.51472 2 12 2C14.4853 2 16.5 4.01472 16.5 6.5Z" stroke="currentColor" stroke-width="1.5" />
+                                        </svg>
+                                    </div>
+                                    {{ form.student }}
+                                </div>
+            
+                                {% if form.student.errors %}
+                                <small class="ps-4 text-sm text-danger">
+                                    {% for error in form.student.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </small>
+                                {% endif %}
+                            </div>
+
+                            {# Attendance field #}
+                            <div class="">
+                                <label for="{{ form.attendance.label }}"
+                                       class="ps-4 text-xs text-gray-500"> {{ form.attendance.label }} </label>
+                                <div class="relative">
+                                    <div class="absolute inset-y-0 start-0 flex items-center ps-2.5 pointer-events-none">
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none">
+                                            <path d="M3.5 9V14C3.5 17.7712 3.5 19.6569 4.67157 20.8284C5.84315 22 7.72876 22 11.5 22H12.5C16.2712 22 18.1569 22 19.3284 20.8284C20.5 19.6569 20.5 17.7712 20.5 14V10C20.5 6.22876 20.5 4.34315 19.3284 3.17157C18.1569 2 16.2712 2 12.5 2H12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                                            <path d="M13.5 17H17.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                                            <path d="M13.5 7H17.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                                            <path d="M13.5 12H17.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                                            <path d="M6.5 16.5C6.5 16.5 7.46758 16.7672 8 18C8 18 9 15 11 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                                            <path d="M10 5H3.5M10 5C10 4.15973 7.67332 2.58984 7.08333 2M10 5C10 5.84027 7.67331 7.41016 7.08333 8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                                        </svg>
+                                    </div>
+                                    {{ form.attendance }}
+                                </div>
+
+                                {% if form.attendance.errors %}
+                                    <small class="ps-4 text-sm text-danger">
+                                        {% for error in form.attendance.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </small>
+                                {% endif %}
+                            </div>
+
+
+                            {# Submit button #}
+                            <div class="text-whiteColor">
+                                <button type="submit"
+                                        class="block mb-2 focus:outline-none rounded-2xl w-full px-5 py-2 text-center bg-primaryColor hover:bg-blue-950 focus:ring-2 focus:ring-secondaryColor focus:ring-offset-1 transition-all duration-300 ease-in-out">
+                                    Admit student
+                                </button>
+                                <small class="text-gray-500 text-xs">
+                                    This course attendance accounts for <strong>{{ level.semester }} {{ level.year }}</strong>
+                                </small>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+
+                <div id="lect_img" class="relative col-start-8 col-span-4 h-screen">
+                    <blockquote
+                            class="flex flex-col gap-2 text-[16px] leading-tight text-whiteColor p-4 text-left max-w-64">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none"
+                             class="text-secondaryColor">
+                            <path d="M5.07579 17C4.08939 4.54502 12.9123 1.0121 19.9734 2.22417C20.2585 6.35185 18.2389 7.89748 14.3926 8.61125C15.1353 9.38731 16.4477 10.3639 16.3061 11.5847C16.2054 12.4534 15.6154 12.8797 14.4355 13.7322C11.8497 15.6004 8.85421 16.7785 5.07579 17Z"
+                                  stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
+                                  stroke-linejoin="round"/>
+                            <path d="M4 22C4 15.5 7.84848 12.1818 10.5 10" stroke="currentColor" stroke-width="1.5"
+                                  stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        There's this one thing about class attendance: you can show up every day, yet somehow the teacher will only notice the one day
+                        you decide to skip.
+                        <cite class="block font-semibold mt-2 text-secondaryColor">ChatGPT</cite>
+                    </blockquote>
+                    <img src="{% static 'core/images/logo-shapes.svg' %}" alt="Attendy shapes"
+                         class="w-20 absolute bottom-3 right-3">
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock body %}
+
+{# Additional javascript #}
+{% block javascript %}
+{% endblock javascript %}
