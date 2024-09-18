@@ -153,7 +153,7 @@ Thank you for checking out Attendy!
 
 Thank you for helping us maintain a positive and inclusive community!
 
-<hr>
+---
 
 <small style="color:#BEBEBE;">
 I poured everything into this—my sleepless nights, my broken spirit, my tears when no one was watching. I wanted to quit, more times than I can count, but something deep inside, something by God’s grace and strength, kept me pushing through the pain, the screams, the endless frustration. Now, standing at the finish line, I feel the weight lift, the peace settle in, and I realize—every ounce of pain was the price for this moment of pure, overwhelming relief.

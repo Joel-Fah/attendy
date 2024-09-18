@@ -4,7 +4,7 @@
 {% load custom_date_formatter duration_formatter %}
 
 {# Title of the page #}
-{% block title %} Update for {{ teaching_record_attendance.course.code }} {{ teaching_record_attendance.course.title }} {% endblock %}
+{% block title %} Updating record for {{ record.attendance }} {% endblock %}
 
 {% block extra_styles %}
     <style>
@@ -31,7 +31,7 @@
                     <div class="flex flex-col gap-2">
                         <h2 class="text-2xl">
                             You're updating record for
-                            <span class="block text-primaryColor">{{ record.teaching_record_attendance.course.code }} {{ record.teaching_record_attendance.course.title }}</span>
+                            <span class="block text-primaryColor"> {{ record.attendance }} </span>
                         </h2>
                         <small class="w-max px-2.5 rounded-xl bg-darkColor/5">
                             <span class="text-gray-500">Last update:</span>

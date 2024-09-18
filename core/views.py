@@ -753,7 +753,7 @@ class TeachingRecordUpdateView(LoginRequiredMixin, CommonContextMixin, UpdateVie
 
     def get_object(self, queryset=None):
         queryset = self.get_queryset()
-        return queryset.get(id=self.kwargs['pk'], teaching_record_attendance__course__slug=self.kwargs['slug'])
+        return queryset.get(id=self.kwargs['pk'], attendance__course__slug=self.kwargs['slug'])
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -763,7 +763,7 @@ class TeachingRecordUpdateView(LoginRequiredMixin, CommonContextMixin, UpdateVie
     def get_success_url(self):
         return reverse_lazy('core:record_detail',
                             kwargs={'level_pk': self.kwargs.get('level_pk'), 'pk': self.object.pk,
-                                    'slug': self.object.teaching_record_attendance.course.slug})
+                                    'slug': self.object.attendance.course.slug})
 
     def form_valid(self, form):
         form.save()
