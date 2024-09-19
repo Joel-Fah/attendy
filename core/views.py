@@ -17,7 +17,7 @@ from .forms import CourseForm, LecturerForm, StudentForm, TeachingRecordForm, At
 from .mixins import CommonContextMixin, ClassLevelAccessMixin
 from .models import Course, Student, Lecturer, TeachingRecord, CourseDelegate, CourseAttendance, \
     ClassLevel, Attendance, ClassLevelUser, Feedback
-from .utils import group_model_items_by_week, get_faqs, get_quotes
+from .utils import group_model_items_by_week, get_faqs, get_quotes, decode_data
 
 
 # Create your views here.
@@ -270,13 +270,13 @@ class CourseAttendanceAddView(LoginRequiredMixin, CommonContextMixin, CreateView
 def decode_qr(request, *args, **kwargs):
     if request.method == 'POST':
         data = json.loads(request.body)
-        qr_data = data.get('qr_data')
+        encoded_qr_data = data.get('qr_data')
 
         try:
-            # Parse the JSON data from the QR code
-            qr_json = json.loads(qr_data)
-            student_id = qr_json.get('id')
-            class_level_id = qr_json.get('class_level')
+            # Decode the QR code data
+            qr_data = decode_data(encoded_qr_data)
+            student_id = qr_data.get('id')
+            class_level_id = qr_data.get('class_level')
 
             # Fetch the student and class level from the database
             student = Student.objects.get(id=student_id, class_level_id=class_level_id)
@@ -295,13 +295,13 @@ def decode_qr(request, *args, **kwargs):
 def add_student_to_course_attendance(request, *args, **kwargs):
     if request.method == 'POST':
         data = json.loads(request.body)
-        qr_data = data.get('qr_data')
+        encoded_qr_data = data.get('qr_data')
 
         try:
-            # Parse the JSON data from the QR code
-            qr_json = json.loads(qr_data)
-            student_id = qr_json.get('id')
-            class_level_id = qr_json.get('class_level')
+            # Decode the QR code data
+            qr_data = decode_data(encoded_qr_data)
+            student_id = qr_data.get('id')
+            class_level_id = qr_data.get('class_level')
 
             # Fetch the student and class level from the database
             student = Student.objects.get(id=student_id, class_level_id=class_level_id)

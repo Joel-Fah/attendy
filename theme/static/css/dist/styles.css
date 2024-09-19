@@ -950,26 +950,6 @@ select {
   top: 0.75rem;
 }
 
-.-bottom-0 {
-  bottom: -0px;
-}
-
-.-bottom-4 {
-  bottom: -1rem;
-}
-
-.-bottom-8 {
-  bottom: -2rem;
-}
-
-.-bottom-6 {
-  bottom: -1.5rem;
-}
-
-.-top-10 {
-  top: -2.5rem;
-}
-
 .z-0 {
   z-index: 0;
 }
@@ -1678,10 +1658,6 @@ select {
 
 .overflow-y-auto {
   overflow-y: auto;
-}
-
-.overflow-x-hidden {
-  overflow-x: hidden;
 }
 
 .scroll-smooth {
@@ -2462,16 +2438,8 @@ select {
   opacity: 0.5;
 }
 
-.opacity-65 {
-  opacity: 0.65;
-}
-
 .opacity-80 {
   opacity: 0.8;
-}
-
-.opacity-75 {
-  opacity: 0.75;
 }
 
 .shadow {
@@ -2575,11 +2543,6 @@ select {
 
 .blur-\[2px\] {
   --tw-blur: blur(2px);
-  filter: var(--tw-blur) var(--tw-brightness) var(--tw-contrast) var(--tw-grayscale) var(--tw-hue-rotate) var(--tw-invert) var(--tw-saturate) var(--tw-sepia) var(--tw-drop-shadow);
-}
-
-.blur-3xl {
-  --tw-blur: blur(64px);
   filter: var(--tw-blur) var(--tw-brightness) var(--tw-contrast) var(--tw-grayscale) var(--tw-hue-rotate) var(--tw-invert) var(--tw-saturate) var(--tw-sepia) var(--tw-drop-shadow);
 }
 

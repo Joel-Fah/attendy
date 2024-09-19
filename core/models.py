@@ -9,7 +9,7 @@ from django.core.exceptions import ValidationError
 from django.db import models
 from slugify import slugify
 
-from .utils import calculate_duration, is_valid_time
+from .utils import calculate_duration, is_valid_time, encode_data
 
 
 # Create your models here.
@@ -55,6 +55,7 @@ class Student(models.Model):
         help_text="Gender of the student: Male or Female")
     is_delegate = models.BooleanField(
         default=False, help_text="Is the student a course delegate?")
+    encoded_data = models.TextField(unique=True, editable=False, null=True, blank=True, help_text="Encoded data for the QR code")
 
     created_at = models.DateTimeField(auto_now_add=True, help_text="Date and time this student was added")
     updated_at = models.DateTimeField(auto_now=True, help_text="Date and time this student was last updated")
@@ -64,18 +65,21 @@ class Student(models.Model):
         super().save(*args, **kwargs)
 
     def generate_qr_code_url(self):
-        data = {
-            'id': self.id,
-            'class_level': self.class_level.id
-        }
-        json_data = json.dumps(data)
+        if not self.encoded_data:
+            data = {
+                'id': self.id,
+                'class_level': self.class_level.id
+            }
+            self.encoded_data = encode_data(data)
+            self.save()
+
         qr = qrcode.QRCode(
             version=1,
             error_correction=qrcode.constants.ERROR_CORRECT_L,
             box_size=10,
             border=4,
         )
-        qr.add_data(json_data)
+        qr.add_data(self.encoded_data)
         qr.make(fit=True)
         img = qr.make_image(fill_color="black", back_color="white")
         qr_code_path = f'media/qr_codes/{self.slug}_{self.student_number}.png'
@@ -336,6 +340,7 @@ class Profile(models.Model):
     def __str__(self):
         return f'{self.user.username} profile'
 
+
 class Feedback(models.Model):
     class Meta:
         verbose_name = "Feedback"
@@ -356,7 +361,8 @@ class Feedback(models.Model):
         help_text="Type of feedback: Complaint, Suggestion, Compliment")
     feedback = models.TextField(null=False, blank=False, help_text="Feedback message")
     status = models.CharField(
-        max_length=255, choices=FeedbackStatusChoices.choices, null=False, blank=False, default=FeedbackStatusChoices.PENDING,
+        max_length=255, choices=FeedbackStatusChoices.choices, null=False, blank=False,
+        default=FeedbackStatusChoices.PENDING,
         help_text="Status of the feedback: Pending, Resolved")
 
     created_at = models.DateTimeField(auto_now_add=True, help_text="Date and time this feedback was added")

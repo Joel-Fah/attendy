@@ -1,5 +1,7 @@
 from collections import defaultdict
 from datetime import datetime, timedelta
+import base64
+import json
 
 
 def calculate_duration(start_time, end_time):
@@ -144,3 +146,14 @@ def get_quotes():
         "Giving feedback isn’t always easy—I know how much effort went into this. But offering honest critique, "
         "with empathy and understanding, is how we help each other grow and reach our best."
     ]
+
+
+def encode_data(data):
+    json_data = json.dumps(data)
+    encoded_data = base64.urlsafe_b64encode(json_data.encode()).decode()
+    return encoded_data
+
+
+def decode_data(encoded_data):
+    decoded_data = base64.urlsafe_b64decode(encoded_data.encode()).decode()
+    return json.loads(decoded_data)

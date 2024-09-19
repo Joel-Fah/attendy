@@ -300,9 +300,6 @@
             "qr-reader", { fps: 10, qrbox: 230 });
 
         function onScanSuccess(decodedText, decodedResult) {
-            // Display the decoded text
-            // document.getElementById('qr-content').innerText = decodedText;
-
             // Send the decoded data to the server via AJAX
             fetch("{% url 'core:decode_qr' level_pk=level.id level_slug=level.slug pk=attendance.id %}", {
                 method: 'POST',
@@ -316,7 +313,8 @@
             .then(data => {
                 if (data.success) {
                     // Ask for user confirmation
-                    const confirmation = confirm('Do you want to add \n\tStudent: ${data.student_name}\n\tClass: ${data.class_level} \nto the current attendance?');
+                    
+                    const confirmation = confirm(`Do you want to add \n\tStudent: ${data.student_name}\n\tClass: ${data.class_level} \nto the current attendance?`);
                     if (confirmation) {
                         // Send the data to add the student to the course
                         fetch("{% url 'core:add_student_to_course_attendance' level_pk=level.id level_slug=level.slug pk=attendance.id %}", {
@@ -330,7 +328,7 @@
                         .then(response => response.json())
                         .then(addData => {
                             if (addData.success) {
-                                alert('Student: ${addData.student_name} has been successfully added to the course.');
+                                alert(`Student: ${addData.student_name} has been successfully added to the course.`);
                                 // Stop the camera and reload the window after successful addition
                                 html5QrcodeScanner.clear().then(() => {
                                     window.location.href = "{% url 'core:attendance_detail' level_pk=level.id level_slug=level.slug pk=attendance.id %}";

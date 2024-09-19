@@ -15,7 +15,7 @@ class StudentAdmin(admin.ModelAdmin):
     search_fields = ['name', 'student_number', 'email', 'phone']
     list_per_page = 25
 
-    readonly_fields = ['updated_at', 'created_at']
+    readonly_fields = ['encoded_data', 'updated_at', 'created_at']
 
 
 class CourseAdmin(admin.ModelAdmin):
@@ -156,6 +156,7 @@ class ProfileAdmin(admin.ModelAdmin):
 
     readonly_fields = ['updated_at', 'created_at']
 
+
 class FeedbackAdmin(admin.ModelAdmin):
     model = Feedback
     list_display = ['user', 'feedback_type', 'status']
@@ -163,6 +164,7 @@ class FeedbackAdmin(admin.ModelAdmin):
     search_fields = ['feedback']
 
     readonly_fields = ['updated_at', 'created_at']
+
 
 # Register on dashboard admin
 admin.site.register(Student, StudentAdmin)
