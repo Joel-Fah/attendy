@@ -1714,10 +1714,6 @@ select {
   white-space: nowrap;
 }
 
-.text-wrap {
-  text-wrap: wrap;
-}
-
 .text-nowrap {
   text-wrap: nowrap;
 }
@@ -1901,10 +1897,6 @@ select {
 
 .bg-danger\/10 {
   background-color: rgb(219 68 55 / 0.1);
-}
-
-.bg-danger\/20 {
-  background-color: rgb(219 68 55 / 0.2);
 }
 
 .bg-darkColor\/5 {
@@ -2267,10 +2259,6 @@ select {
 
 .font-serif {
   font-family: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
-}
-
-.font-body {
-  font-family: Urbanist, sans-serif;
 }
 
 .text-2xl {
@@ -2761,11 +2749,6 @@ select {
   background-color: rgb(5 0 65 / 0.05);
 }
 
-.hover\:bg-red-600:hover {
-  --tw-bg-opacity: 1;
-  background-color: rgb(220 38 38 / var(--tw-bg-opacity));
-}
-
 .hover\:bg-secondaryColor\/10:hover {
   background-color: rgb(241 60 3 / 0.1);
 }
@@ -2800,11 +2783,6 @@ select {
 .hover\:text-secondaryColor:hover {
   --tw-text-opacity: 1;
   color: rgb(241 60 3 / var(--tw-text-opacity));
-}
-
-.hover\:text-whiteColor:hover {
-  --tw-text-opacity: 1;
-  color: rgb(255 245 234 / var(--tw-text-opacity));
 }
 
 .hover\:underline:hover {
@@ -2925,15 +2903,6 @@ select {
 
 .disabled\:pointer-events-none:disabled {
   pointer-events: none;
-}
-
-.disabled\:cursor-not-allowed:disabled {
-  cursor: not-allowed;
-}
-
-.disabled\:text-gray-500:disabled {
-  --tw-text-opacity: 1;
-  color: rgb(107 114 128 / var(--tw-text-opacity));
 }
 
 .disabled\:opacity-50:disabled {

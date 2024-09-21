@@ -392,7 +392,22 @@ class CourseDetailView(LoginRequiredMixin, CommonContextMixin, DetailView):
         context = super().get_context_data(**kwargs)
         course = self.get_object()
         context['delegates'] = CourseDelegate.objects.filter(course=course)
+        context['registered_students'] = CourseRegistration.objects.filter(course=course,
+                                                                           course__class_level=course.class_level)
         return context
+
+    def post(self, request, *args, **kwargs):
+        if 'delete_course' in request.POST:
+            course_id = request.POST.get('course_id')
+            course = Course.objects.get(id=course_id)
+            course.delete()
+            message = format_html(
+                '<strong>{} {}</strong> was deleted successfully.',
+                course.code,
+                course.title
+            )
+            messages.success(request, message)
+        return self.get(request, *args, **kwargs)
 
 
 class CourseAddView(LoginRequiredMixin, CommonContextMixin, CreateView):
@@ -459,7 +474,9 @@ class CourseUpdateView(LoginRequiredMixin, CommonContextMixin, UpdateView):
         return queryset.get(id=self.kwargs['pk'], slug=self.kwargs['slug'])
 
     def get_success_url(self):
-        return reverse_lazy('core:courses', kwargs={'level_pk': self.kwargs['level_pk']})
+        return reverse_lazy('core:course_detail',
+                            kwargs={'level_pk': self.kwargs['level_pk'], 'pk': self.kwargs['pk'],
+                                    'slug': self.kwargs['slug']})
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -469,9 +486,7 @@ class CourseUpdateView(LoginRequiredMixin, CommonContextMixin, UpdateView):
     def form_valid(self, form):
         form.save()
         message = format_html(
-            'Course updated successfully.<br><a href="{}" class="font-bold underline">View</a>',
-            reverse_lazy('core:course_detail', kwargs={'level_pk': self.kwargs.get('level_pk'), 'pk': form.instance.pk,
-                                                       'slug': form.instance.slug})
+            'Course updated successfully.'
         )
         messages.success(
             self.request,
@@ -541,6 +556,18 @@ class StudentDetailView(LoginRequiredMixin, CommonContextMixin, DetailView):
 
         context['course_attended_count'] = course_attended_count
         return context
+
+    def post(self, request, *args, **kwargs):
+        if 'delete_student' in request.POST or 'delete_delegate' in request.POST:
+            student_id = request.POST.get('student_id')
+            student = Student.objects.get(id=student_id)
+            student.delete()
+            message = format_html(
+                '<strong>{}</strong> was deleted successfully.',
+                student.name
+            )
+            messages.success(request, message)
+        return self.get(request, *args, **kwargs)
 
 
 class StudentAddView(LoginRequiredMixin, CommonContextMixin, CreateView):
