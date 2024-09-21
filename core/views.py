@@ -5,8 +5,9 @@ from datetime import timedelta, datetime
 
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.db.models import Q
 from django.http import JsonResponse
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse_lazy
 from django.utils.html import format_html
 from django.views.decorators.csrf import csrf_exempt
@@ -16,7 +17,7 @@ from .forms import CourseForm, LecturerForm, StudentForm, TeachingRecordForm, At
     FeedbackForm
 from .mixins import CommonContextMixin, ClassLevelAccessMixin
 from .models import Course, Student, Lecturer, TeachingRecord, CourseDelegate, CourseAttendance, \
-    ClassLevel, Attendance, ClassLevelUser, Feedback
+    ClassLevel, Attendance, ClassLevelUser, Feedback, CourseRegistration
 from .utils import group_model_items_by_week, get_faqs, get_quotes, decode_data
 
 
@@ -49,8 +50,8 @@ class LevelView(LoginRequiredMixin, ListView):
 
 
 # Dashboard views
-def group_items_by_week(attendances):
-    grouped_attendances = defaultdict(list)
+def group_items_by_semester_year_and_week(attendances):
+    grouped_attendances = defaultdict(lambda: defaultdict(list))
     for attendance in attendances.order_by('created_at'):
         # Calculate the start of the week (Monday) for each item
         week_start = attendance.created_at - timedelta(days=attendance.created_at.weekday())
@@ -59,9 +60,12 @@ def group_items_by_week(attendances):
         # Format the week range as "Mon 19 Aug - Sun 25 Aug"
         week_range = f"{week_start.strftime('%a %d %b')} - {week_end.strftime('%a %d %b %Y')}"
 
-        # Group items by this week range
-        grouped_attendances[week_range].append(attendance)
-    return grouped_attendances
+        # Group items by semester_year and this week range
+        semester = attendance.class_level.semester
+        year = attendance.class_level.year
+        grouped_attendances[f'{semester} {year}'][week_range].append(attendance)
+
+    return {semester_year: dict(weeks) for semester_year, weeks in grouped_attendances.items()}
 
 
 # core/views.py
@@ -75,14 +79,16 @@ class DashboardView(LoginRequiredMixin, CommonContextMixin, ClassLevelAccessMixi
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        grouped_attendances = group_items_by_week(Attendance.objects.filter(class_level=self.kwargs['level_pk']))
-        for week, attendances in grouped_attendances.items():
-            for attendance in attendances:
-                attendance.course_delegate = CourseDelegate.objects.filter(course=attendance.course,
-                                                                           role='delegate').first()
-                attendance.course_assistant = CourseDelegate.objects.filter(course=attendance.course,
-                                                                            role='assistant').first()
-                attendance.enrollment_count = CourseAttendance.objects.filter(attendance=attendance).count()
+        grouped_attendances = group_items_by_semester_year_and_week(
+            Attendance.objects.filter(class_level=self.kwargs['level_pk']))
+        for semester_year, weeks in grouped_attendances.items():
+            for week, attendances in weeks.items():
+                for attendance in attendances:
+                    attendance.course_delegate = CourseDelegate.objects.filter(course=attendance.course,
+                                                                               role='delegate').first()
+                    attendance.course_assistant = CourseDelegate.objects.filter(course=attendance.course,
+                                                                                role='assistant').first()
+                    attendance.enrollment_count = CourseAttendance.objects.filter(attendance=attendance).count()
         context['grouped_attendances'] = dict(grouped_attendances)
         return context
 
@@ -234,8 +240,10 @@ class CourseAttendanceAddView(LoginRequiredMixin, CommonContextMixin, CreateView
 
     def get_form(self, form_class=None):
         form = super().get_form(form_class)
-        form.fields['student'].queryset = Student.objects.filter(class_level=self.kwargs['level_pk'])
-        form.fields['attendance'].initial = Attendance.objects.get(pk=self.kwargs['pk'])
+        attendance = Attendance.objects.get(pk=self.kwargs['pk'])
+        form.fields['student'].queryset = Student.objects.filter(
+            Q(registration__course=attendance.course) | Q(class_level=attendance.class_level)).distinct()
+        form.fields['attendance'].initial = attendance
         return form
 
     def form_valid(self, form):
@@ -276,15 +284,27 @@ def decode_qr(request, *args, **kwargs):
             # Decode the QR code data
             qr_data = decode_data(encoded_qr_data)
             student_id = qr_data.get('id')
-            class_level_id = qr_data.get('class_level')
+            student_number = qr_data.get('student_number')
+            class_level_id = qr_data.get('class_level_id')
 
             # Fetch the student and class level from the database
-            student = Student.objects.get(id=student_id, class_level_id=class_level_id)
+            student = Student.objects.get(id=student_id, student_number=student_number, class_level_id=class_level_id)
+
+            # Check if student registered the course of the attendance
+            attendance_course = Attendance.objects.get(pk=kwargs['pk']).course
+            has_registered = CourseRegistration.objects.filter(student=student, course=attendance_course).exists()
+
+            if not has_registered:
+                raise ValueError(f'{student.name} is not registered for {attendance_course.title}')
 
             return JsonResponse({
                 'success': True,
                 'student_name': student.name,
-                'class_level': f'{student.class_level.get_level_display()} - Group {student.class_level.group}',
+                'class_level': f'{attendance_course.class_level.get_level_display()} - '
+                               f'Group {attendance_course.class_level.group} - '
+                               f'{attendance_course.class_level.semester} {attendance_course.class_level.year} - '
+                               f'{attendance_course.class_level.department}',
+                'has_registered': has_registered,
             })
         except (Student.DoesNotExist, ClassLevel.DoesNotExist, ValueError, json.JSONDecodeError) as e:
             return JsonResponse({'success': False, 'error': str(e)})
@@ -301,22 +321,37 @@ def add_student_to_course_attendance(request, *args, **kwargs):
             # Decode the QR code data
             qr_data = decode_data(encoded_qr_data)
             student_id = qr_data.get('id')
-            class_level_id = qr_data.get('class_level')
+            student_number = qr_data.get('student_number')
+            class_level_id = qr_data.get('class_level_id')
 
             # Fetch the student and class level from the database
-            student = Student.objects.get(id=student_id, class_level_id=class_level_id)
+            student = Student.objects.get(id=student_id, student_number=student_number, class_level_id=class_level_id)
 
-            # Add the student to the CourseAttendance
-            CourseAttendance.objects.create(
-                student=student,
-                attendance=Attendance.objects.get(pk=kwargs['pk'])
-            )
+            # Add the student to the CourseAttendance if they are registered for the course
+            attendance = Attendance.objects.get(pk=kwargs['pk'])
+            course = attendance.course
 
-            return JsonResponse({
-                'success': True,
-                'student_name': student.name,
-                'class_level': f'{student.class_level.get_level_display()} - Group {student.class_level.group}'
-            })
+            if CourseRegistration.objects.filter(student=student, course=attendance.course).exists():
+                CourseAttendance.objects.create(student=student, attendance=attendance)
+
+                message = format_html(
+                    'Student <strong>{}</strong> was admitted into attendance successfully.',
+                    student.name,
+                )
+
+                messages.success(request, message)
+
+                return JsonResponse({
+                    'success': True,
+                    'student_name': student.name,
+                    'course': f'{course.code} {course.title}',
+                    'class_level': f'{attendance.class_level.get_level_display()} - '
+                                   f'Group {attendance.class_level.group} - {attendance.class_level.semester} '
+                                   f'{attendance.class_level.year} - {attendance.class_level.department}',
+                })
+            else:
+                raise ValueError(f'{student.name} is not registered for {course.title}')
+
         except (Student.DoesNotExist, ClassLevel.DoesNotExist, ValueError, json.JSONDecodeError) as e:
             return JsonResponse({'success': False, 'error': str(e)})
     return JsonResponse({'success': False, 'error': 'Invalid request method'})
@@ -491,7 +526,20 @@ class StudentDetailView(LoginRequiredMixin, CommonContextMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        student = self.get_object()
+        student_semester_courses = Course.objects.filter(
+            Q(registration__student=student) | Q(class_level=student.class_level))
+
+        context['grouped_courses'] = student.get_courses_grouped_by_semester_year_and_class_level()
         context['qr_code_url'] = self.object.generate_qr_code_url()
+        context['courses_count'] = student_semester_courses.count()
+
+        course_attended_count = {}
+        for course in student_semester_courses.all():
+            course_attended_count[course.id] = CourseAttendance.objects.filter(student=student,
+                                                                               attendance__course=course).count()
+
+        context['course_attended_count'] = course_attended_count
         return context
 
 
@@ -555,7 +603,9 @@ class StudentUpdateView(LoginRequiredMixin, CommonContextMixin, UpdateView):
         return queryset.get(id=self.kwargs['pk'], slug=self.kwargs['slug'])
 
     def get_success_url(self):
-        return reverse_lazy('core:students', kwargs={'level_pk': self.kwargs['level_pk']})
+        return reverse_lazy('core:student_detail',
+                            kwargs={'level_pk': self.kwargs['level_pk'], 'pk': self.kwargs['pk'],
+                                    'slug': self.kwargs['slug']})
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -565,9 +615,7 @@ class StudentUpdateView(LoginRequiredMixin, CommonContextMixin, UpdateView):
     def form_valid(self, form):
         form.save()
         message = format_html(
-            'Student updated successfully.<br><a href="{}" class="font-bold underline">View</a>',
-            reverse_lazy('core:student_detail', kwargs={'level_pk': self.kwargs.get('level_pk'), 'pk': form.instance.pk,
-                                                        'slug': form.instance.slug})
+            'Student updated successfully.'
         )
         messages.success(
             self.request,
@@ -583,6 +631,57 @@ class StudentUpdateView(LoginRequiredMixin, CommonContextMixin, UpdateView):
             )
         )
         return super().form_invalid(form)
+
+
+class CourseRegistrationView(LoginRequiredMixin, CommonContextMixin, TemplateView):
+    template_name = 'core/course_registration/course_registration.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        student = Student.objects.get(id=self.kwargs['pk'])
+        context['student'] = student
+        all_courses = Course.objects.filter(class_level__semester=student.class_level.semester,
+                                            class_level__year=student.class_level.year)
+        registered_courses = CourseRegistration.objects.filter(student=student).values_list('course_id', flat=True)
+        for course in all_courses:
+            course.is_registered = course.id in registered_courses
+        context['courses'] = all_courses
+        return context
+
+    def post(self, request, *args, **kwargs):
+        student = Student.objects.get(id=self.kwargs['pk'])
+        course_ids = request.POST.getlist('courses')
+        registered_courses = CourseRegistration.objects.filter(student=student).values_list('course_id', flat=True)
+
+        newly_registered_count = 0
+        unregistered_count = 0
+
+        # Register new courses
+        for course_id in course_ids:
+            course = Course.objects.get(id=course_id)
+            if course.id not in registered_courses:
+                CourseRegistration.objects.create(student=student, course=course)
+                newly_registered_count += 1
+
+        # Unregister unchecked courses
+        for course_id in registered_courses:
+            if str(course_id) not in course_ids:
+                CourseRegistration.objects.filter(student=student, course_id=course_id).delete()
+                unregistered_count += 1
+
+        if newly_registered_count == 0 and unregistered_count == 0:
+            messages.info(
+                request,
+                'No changes were made to the course registration.'
+            )
+        else:
+            message = format_html(
+                '{} Courses registered successfully. {} Courses unregistered successfully.',
+                newly_registered_count,
+                unregistered_count
+            )
+            messages.success(request, message)
+        return redirect('core:student_detail', level_pk=student.class_level.id, pk=student.id, slug=student.slug)
 
 
 class LecturerView(LoginRequiredMixin, CommonContextMixin, ListView):

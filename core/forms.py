@@ -557,6 +557,7 @@ class CourseAttendanceForm(forms.ModelForm):
         disabled=True,
     )
 
+
 class FeedbackForm(forms.ModelForm):
     class Meta:
         model = Feedback
@@ -608,7 +609,8 @@ class FeedbackForm(forms.ModelForm):
                 'name': 'feedback_type',
                 'placeholder': 'Be sure to go as detail as possible about this message you\'re about to write...',
                 'class': 'rounded-2xl block w-full ps-10 p-2.5 bg-whiteColor border-darkColor placeholder-darkColor/50 '
-                         'focus:ring-primaryColor focus:border-primaryColor transition-all duration-300 ease-in-out min-h-24 max-h-60',
+                         'focus:ring-primaryColor focus:border-primaryColor transition-all duration-300 ease-in-out '
+                         'min-h-24 max-h-60',
             }
         ),
         label='Feedback',

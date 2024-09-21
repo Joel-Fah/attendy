@@ -22,13 +22,258 @@
 {% block body %}
 <div class="relative p-4 md:ml-64">
     <div class="flex flex-col gap-4 items-start justify-center w-full mt-14">
-        {{ student }}
+        <div class="w-full grid grid-cols-12 items-start justify-center gap-2">
+            <div class="col-span-8">
+                <div class="flex items-center justify-between">
+                    <div class="space-y-1">
+                        <h2 class="flex gap-2 items-center text-3xl text-primaryColor font-bold capitalize">
+                            {{ student }}
+                            {% if student.is_delegate %}
+                            <small class="text-sm font-normal text-secondaryColor bg-secondaryColor/10 rounded-xl px-2.5 py-0.5">
+                                Delegate
+                            </small>
+                            {% endif %}
+                        </h2>
+                        <small class="text-gray-500">
+                            This student was registered on :
+                            <span class="text-darkColor">{{ student.created_at|format_date }}</span>
+                        </small>
+                    </div>
 
-        <img src="{{ qr_code_url }}" alt="Student qr code">
+                    <div class="flex items-center gap-2">
+                        <a href="{% url 'core:student_update' level_pk=level.id pk=student.id slug=student.slug %}" class="select-none p-2 hover:bg-primaryColor/5 border border-primaryColor text-primaryColor rounded-2xl transition-colors duration-200 ease-linear" title="Edit student info">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none">
+                                <path d="M10.5 22H6.59087C5.04549 22 3.81631 21.248 2.71266 20.1966C0.453365 18.0441 4.1628 16.324 5.57757 15.4816C8.12805 13.9629 11.2057 13.6118 14 14.4281" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                                <path d="M16.5 6.5C16.5 8.98528 14.4853 11 12 11C9.51472 11 7.5 8.98528 7.5 6.5C7.5 4.01472 9.51472 2 12 2C14.4853 2 16.5 4.01472 16.5 6.5Z" stroke="currentColor" stroke-width="1.5" />
+                                <path d="M18.4332 13.8485C18.7685 13.4851 18.9362 13.3035 19.1143 13.1975C19.5442 12.9418 20.0736 12.9339 20.5107 13.1765C20.6918 13.2771 20.8646 13.4537 21.2103 13.8067C21.5559 14.1598 21.7287 14.3364 21.8272 14.5214C22.0647 14.9679 22.0569 15.5087 21.8066 15.9478C21.7029 16.1298 21.5251 16.3011 21.1694 16.6437L16.9378 20.7194C16.2638 21.3686 15.9268 21.6932 15.5056 21.8577C15.0845 22.0222 14.6214 22.0101 13.6954 21.9859L13.5694 21.9826C13.2875 21.9752 13.1466 21.9715 13.0646 21.8785C12.9827 21.7855 12.9939 21.6419 13.0162 21.3548L13.0284 21.1988C13.0914 20.3906 13.1228 19.9865 13.2807 19.6232C13.4385 19.2599 13.7107 18.965 14.2552 18.375L18.4332 13.8485Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" />
+                            </svg>
+                        </a>
+
+                        <a type="button" data-ripple-light="true" data-dialog-target="animated-dialog-delegate-{{ student.id }}"
+                        class="select-none cursor-pointer text-danger p-2 hover:bg-danger/10 border border-danger rounded-2xl transition-colors duration-200 ease-linear" title="Delete student">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none">
+                                <path d="M19.5 5.5L18.8803 15.5251C18.7219 18.0864 18.6428 19.3671 18.0008 20.2879C17.6833 20.7431 17.2747 21.1273 16.8007 21.416C15.8421 22 14.559 22 11.9927 22C9.42312 22 8.1383 22 7.17905 21.4149C6.7048 21.1257 6.296 20.7408 5.97868 20.2848C5.33688 19.3626 5.25945 18.0801 5.10461 15.5152L4.5 5.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+                                <path d="M9 11.7349H15" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+                                <path d="M10.5 15.6543H13.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+                                <path d="M3 5.5H21M16.0555 5.5L15.3729 4.09173C14.9194 3.15626 14.6926 2.68852 14.3015 2.39681C14.2148 2.3321 14.1229 2.27454 14.0268 2.2247C13.5937 2 13.0739 2 12.0343 2C10.9686 2 10.4358 2 9.99549 2.23412C9.89791 2.28601 9.80479 2.3459 9.7171 2.41317C9.32145 2.7167 9.10044 3.20155 8.65842 4.17126L8.05273 5.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+                            </svg>
+                        </a>
+                        
+                        <div data-dialog-backdrop="animated-dialog-delegate-{{ student.id }}" data-dialog-backdrop-close="true"
+                            class="pointer-events-none fixed inset-0 z-[999] grid h-screen w-screen place-items-center bg-black bg-opacity-60 opacity-0 backdrop-blur-sm transition-opacity duration-300">
+                            <div data-dialog="animated-dialog-delegate-{{ student.id }}"
+                                data-dialog-mount="opacity-100 translate-y-0 scale-100"
+                                data-dialog-unmount="opacity-0 -translate-y-28 scale-90 pointer-events-none"
+                                data-dialog-transition="transition-all duration-300"
+                                class="relative m-4 w-2/5 min-w-[40%] max-w-[40%] rounded-2xl bg-whiteColor antialiased shadow-2xl">
+                                <div class="flex flex-col items-center p-5 text-2xl antialiased shrink-0">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none">
+                                        <path d="M13 22H6.59087C5.04549 22 3.81631 21.248 2.71266 20.1966C0.453365 18.0441 4.1628 16.324 5.57757 15.4816C7.97679 14.053 10.8425 13.6575 13.5 14.2952" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                                        <path d="M16.5 6.5C16.5 8.98528 14.4853 11 12 11C9.51472 11 7.5 8.98528 7.5 6.5C7.5 4.01472 9.51472 2 12 2C14.4853 2 16.5 4.01472 16.5 6.5Z" stroke="currentColor" stroke-width="1.5" />
+                                        <path d="M16 22L19 19M19 19L22 16M19 19L16 16M19 19L22 22" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+                                    </svg>
+                                    <span class="text-xl">You're about to delete</span>
+                                    <span class="text-danger">{{ student.name }}</span>
+                                </div>
+                                <div class="relative py-2 px-5 text-base antialiased leading-relaxed">
+                                    By deleting this student, you will lose all the data associated with
+                                    {% if student.gender == 'Male' %}
+                                      him. 
+                                      {% else %}
+                                      her. 
+                                    {% endif %}
+                                    After deletion, this action cannot be undone.
+                                    Are you sure you want to delete this student from the entire system?
+                                </div>
+                                <div class="flex flex-wrap items-center justify-end p-4 shrink-0 text-blue-gray-500">
+                                    <button data-ripple-dark="true" data-dialog-close="true"
+                                        class="px-6 py-3 mr-1 font-sans text-sm font-bold uppercase transition-all rounded-xl middle none center hover:bg-info/10">
+                                        Cancel
+                                    </button>
+                                    <form action="{% url 'core:students' level_pk=level.id %}" method="post">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="student_id" value="{{ student.id }}">
+                                        <button name="delete_delegate" data-ripple-light="true" data-dialog-close="true"
+                                            class="middle none center rounded-xl bg-danger py-3 px-6 text-sm font-bold uppercase text-whiteColor shadow-md shadow-red-500/20 transition-all hover:shadow-lg hover:shadow-red-500/40">
+                                            Delete student
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex flex-col gap-4">
+                    <div class="flex flex-col gap-2">
+                        <div class="flex items-center gap-2">
+                            <h3 class="text-2xl whitespace-nowrap">
+                                Overview
+                            </h3>
+                            <hr class="w-full border-gray-400">
+                        </div>
+
+                        <div class="grid grid-cols-12 gap-2 items-center w-full px-1">
+                            <div class="col-span-5 flex flex-col text-center bg-whiteHover rounded-2xl p-4">
+                                <small class="text-sm text-secondaryColor">Full name:</small>
+                                {{ student }}
+                            </div>
+
+                            <div class="col-span-4 flex flex-col text-center bg-whiteHover rounded-2xl p-4">
+                                <small class="text-sm text-secondaryColor">Student number:</small>
+                                {{ student.student_number }}
+                            </div>
+
+                            <div class="col-span-3 flex flex-col text-center bg-whiteHover rounded-2xl p-4">
+                                <small class="text-sm text-secondaryColor">Gender:</small>
+                                {{ student.gender }}
+                            </div>
+
+                            <div class="col-span-7 flex flex-col text-center bg-whiteHover rounded-2xl p-4">
+                                <small class="text-sm text-secondaryColor">Email:</small>
+                                {{ student.email }}
+                            </div>
+
+                            <div class="col-span-5 flex flex-col text-center bg-whiteHover rounded-2xl p-4">
+                                <small class="text-sm text-secondaryColor">Phone number:</small>
+                                {{ student.phone }}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex flex-col gap-2">
+                        <div class="flex items-center gap-2">
+                            <h3 class="flex items-center gap-1 text-2xl whitespace-nowrap">
+                                Registered courses
+                                {% if courses_count > 0 %}
+                                    <span class="text-gray-400">(</span>
+                                        <span
+                                        class="w-auto px-2 py-1 text-sm font-bold text-secondaryColor bg-secondaryColor/10 rounded-lg">
+                                        {{ courses_count }}
+                                        </span>
+                                    <span class="text-gray-400">)</span>
+                                {% endif %}
+                            </h3>
+                            <hr class="w-full border-gray-400">
+                            <a href="{% url 'core:course_registration' level_pk=level.id pk=student.id slug=student.slug %}" class="flex items-center gap-1 text-base text-primaryColor whitespace-nowrap hover:underline">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none" class="w-4">
+                                    <path d="M22 12.999H2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                                    <path d="M20 13.001V10.6578C20 9.84033 20 9.43158 19.8478 9.06404C19.6955 8.69649 19.4065 8.40746 18.8284 7.8294L14.0919 3.09286C13.593 2.59397 13.3436 2.34453 13.0345 2.19672C12.9702 2.16598 12.9044 2.1387 12.8372 2.11499C12.5141 2.00098 12.1614 2.00098 11.4558 2.00098C8.21082 2.00098 6.58831 2.00098 5.48933 2.88705C5.26731 3.06606 5.06508 3.26829 4.88607 3.49031C4 4.58928 4 6.2118 4 9.45682V13.001M13 2.50098V3.00098C13 5.8294 13 7.24362 13.8787 8.1223C14.7574 9.00098 16.1716 9.00098 19 9.00098H19.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                                    <path d="M6 15.999V16.999M10 15.999V21.999M14 15.999V17.999M18 15.999V19.999" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                                </svg>
+                                Manage courses
+                            </a>
+                        </div>
+                        <ul class="px-2 py-1 space-y- text-base">
+                            <li>
+                                <div class="flex items-center gap-2">
+                                    <span class="w-10 h-4 border border-gray-400 border-dashed rounded"></span>
+                                    <p>
+                                        : courses that are part of this class and don't necessarily need course registration
+                                    </p>
+                                </div>
+                            </li>
+                            <li>
+                                <div class="flex items-center gap-2">
+                                    <span class="w-10 h-4 border border-darkColor rounded"></span>
+                                    <p>
+                                        : courses not part of this class but the student is registered to.
+                                    </p>
+                                </div>
+                            </li>
+                        </ul>
+                        <div class="space-y-4 px-2">
+                            <div class="">
+                                {% for semester_year, class_levels in grouped_courses.items %}
+                                <h4 class="block text-lg text-secondaryColor">{{ semester_year }}</h4>
+                                <div class="flex flex-col gap-2.5 px-4 border-l border-secondaryColor/20">
+                                    {% for class_level, courses in class_levels.items %}
+                                    <div class="space-y-2">
+                                        <small class="block text-sm text-secondaryColor">{{ class_level }}</small>
+                                        <div class="flex flex-wrap items-center gap-2 text-base">
+                                            {% for course in courses %}
+                                            <div class="flex flex-col gap-2 py-2 px-4 rounded-2xl border {% if course.is_registered %} border-darkColor {% else %} border-dashed border-gray-400 {% endif %} hover:bg-whiteHover hover:border-secondaryColor transition-colors duration-200 ease-linear">
+                                                <a href="{% url 'core:course_detail' level_pk=level.id pk=course.id slug=course.slug %}"
+                                                    class="">
+                                                    {{ forloop.counter }} - {{ course }}
+                                                </a>
+                                                <hr class="w-full border-gray-400/50">
+                                                <ul>
+                                                    <li>
+                                                        <span class="text-gray-500">Attendances made : </span> {{ course.course_attendance.count }}
+                                                    </li>
+
+                                                    <li></li>
+                                                        <span class="text-gray-500">Attendances attended : </span> 
+                                                          {% for course_id, attendance_count in course_attended_count.items %}
+                                                            {% if course.id == course_id %}
+                                                              {{ attendance_count }}
+                                                            {% endif %}
+                                                          {% endfor %}
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                                {% empty %}
+                                <div class="flex flex-col gap-4 items-center justify-center">
+                                    <img src="{% static 'core/images/process-courses.svg' %}" alt="No registered courses" class="w-1/3 m-auto">
+                                    <span class="px-4 py-1.5 rounded-full border border-dashed border-gray-500 text-gray-500 text-xs text-center m-auto">
+                                        This student has not registered any course yet
+                                    </span>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-span-4 px-1">
+                <h2 class="text-2xl">
+                    Attendance access QR Code
+                </h2>
+
+                <div class="p-1">
+                    <div class="flex flex-col gap-2">
+                        <p class="text-sm text-gray-500">
+                            The QR code enables the student to get scanned while an attendance is going on. You can download it and make it
+                            available to him/her.
+                        </p>
+                        <div class="p-2 border border-1 border-dashed border-gray-400 m-auto rounded-xl">
+                            <img src="{{ qr_code_url }}" alt="Student qr code" class="shadow-lg text-primaryColor select-none touch-none">
+                        </div>
+                        <a href="{{ qr_code_url }}" class="flex items-center justify-center gap-2 p-2 bg-primaryColor/10 hover:bg-primaryColor/20 rounded-xl text-primaryColor text-center text-base transition-all duration-100 ease-linear focus:ring-1 focus:ring-primaryColor" download>
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none">
+                                <path d="M3.00012 14L3.23397 14.6626C4.14412 17.2413 4.5992 18.5307 5.63754 19.2654C6.67588 20 8.04322 20 10.7779 20H13.2224C15.957 20 17.3244 20 18.3627 19.2654C19.401 18.5307 19.8561 17.2413 20.7663 14.6626L21.0001 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+                                <path d="M12.0001 14V4M12.0001 14C11.2999 14 9.99165 12.0057 9.50012 11.5M12.0001 14C12.7003 14 14.0086 12.0057 14.5001 11.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                            </svg>
+                            <span>
+                                Download QR Code
+                                <span class="text-gray-600">(~15KB/.png)</span>
+                            </span>
+                        </a>
+                    </div>
+                </div>
+                <div class="mt-2 px-1">
+                    <hr class="w-full border-gray-400">
+                    
+                    <small class="text-gray-400">
+                        You are viewing this student's entry as it was last updated on:
+                        <span class="text-secondaryColor"> {{ student.updated_at|format_date }} </span>
+                    </small>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
+
+{% include "components/message.html" %}
 {% endblock body %}
 
 {# Additional javascript #}
 {% block javascript %}
+<script src="{% static 'core/js/dialog.js' %}"></script>
 {% endblock javascript %}

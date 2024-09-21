@@ -1,8 +1,9 @@
 from django.contrib import admin
+from django.utils.safestring import mark_safe
 from django_summernote.admin import SummernoteModelAdmin
 from django import forms
 from .models import Student, CourseDelegate, Lecturer, TeachingRecord, Course, CourseAttendance, \
-    ClassLevel, ClassLevelUser, Attendance, Profile, Feedback
+    ClassLevel, ClassLevelUser, Attendance, Profile, Feedback, CourseRegistration
 
 
 # Register your models here.
@@ -36,6 +37,20 @@ class CourseAdmin(admin.ModelAdmin):
         return f'{obj.class_level.get_level_display()} - Group {obj.class_level.group}'
 
 
+class CourseRegistrationAdmin(admin.ModelAdmin):
+    model = CourseRegistration
+    list_display = ['student__name', 'course__title', 'semester_year']
+    list_filter = ['course__class_level__semester', 'course__class_level__year']
+    search_fields = ['student__name', 'course__title']
+    list_per_page = 25
+
+    readonly_fields = ['updated_at', 'created_at']
+
+    @staticmethod
+    def semester_year(obj):
+        return f'{obj.course.class_level.semester} {obj.course.class_level.year}'
+
+
 class CourseDelegateForm(forms.ModelForm):
     student = forms.ModelChoiceField(
         queryset=Student.objects.filter(is_delegate=True),
@@ -44,8 +59,33 @@ class CourseDelegateForm(forms.ModelForm):
     )
 
     class Meta:
-        model = Course
+        model = CourseDelegate
         fields = '__all__'
+
+    def clean(self):
+        cleaned_data = super().clean()
+        student = cleaned_data.get('student')
+        course = cleaned_data.get('course')
+
+        if student and course:
+            if student.class_level != course.class_level:
+                raise forms.ValidationError(
+                    mark_safe(
+                        f"<strong>{student.name}</strong> ({student.class_level}) cannot be a course delegate for a "
+                        f"course in <strong>{course.class_level}</strong>.<br>"
+                        "The class level of the student must match that of the course."
+                    )
+                )
+
+        return cleaned_data
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['course'].label_from_instance = self.label_from_instance
+
+    @staticmethod
+    def label_from_instance(obj):
+        return f"{obj.title} | {obj.class_level}"
 
 
 class CourseDelegateAdmin(admin.ModelAdmin):
@@ -109,7 +149,7 @@ class CourseAttendanceAdmin(admin.ModelAdmin):
 
 class ClassLevelAdmin(admin.ModelAdmin):
     model = ClassLevel
-    list_display = ['level', 'group', 'department', 'semester_year', 'main_hall']
+    list_display = ['level', 'group', 'department', 'main_hall', 'semester_year']
     list_filter = ['level', 'group', 'department']
     search_fields = ['level', 'group']
     list_per_page = 25
@@ -178,3 +218,4 @@ admin.site.register(ClassLevel, ClassLevelAdmin)
 admin.site.register(ClassLevelUser, ClassLevelUserAdmin)
 admin.site.register(Profile, ProfileAdmin)
 admin.site.register(Feedback, FeedbackAdmin)
+admin.site.register(CourseRegistration, CourseRegistrationAdmin)

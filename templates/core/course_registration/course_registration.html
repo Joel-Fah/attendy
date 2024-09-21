@@ -1,0 +1,125 @@
+{% extends 'core/base_app.html' %}
+{% load static %}
+{% load tailwind_tags %}
+{% load custom_date_formatter duration_formatter %}
+
+{# Title of the page #}
+{% block title %} Register courses for {{ student }} {% endblock %}
+
+{% block extra_styles %}
+    <style>
+        #lect_img {
+            background: linear-gradient(170deg, rgba(0, 0, 0, 0.9) 25%, rgba(0, 0, 0, 0.1) 75%), url("{% static 'core/images/courses.jpg' %}");
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+    </style>
+{% endblock extra_styles %}
+
+{# Header of the page #}
+{% block header %}
+    {% include "components/header_app.html" %}
+{% endblock header %}
+
+{# Body of the page #}
+{% block body %}
+    <div class="relative p-4 md:ml-64">
+        <div class="flex flex-col gap-4 items-start justify-center w-full mt-14">
+            <div class="grid grid-cols-12 items-center justify-center gap-2 w-full">
+                <div class="col-start-2 col-span-4 flex flex-col gap-4">
+                    <div class="flex flex-col gap-2">
+                        <h2 class="text-2xl">Register courses for {{ student }}</h2>
+                        <p class="text-sm">
+                            Registering courses for this student will help keep track of
+                            {% if student.gender == 'Male' %}
+                              his 
+                              {% else %}
+                              her 
+                            {% endif %}
+                            attendance for the said courses for each semester.
+                        </p>
+                        <hr class="w-full border-gray-400">
+                        <small class="text-gray-400">
+                            You are viewing courses for {{ student.class_level.semester }} {{ student.class_level.year }}
+                        </small>
+                    </div>
+
+                    <form action="{% url 'core:course_registration' level_pk=level.id pk=student.id slug=student.slug %}" method="post" class="max-w-sm w-full">
+                        {% csrf_token %}
+
+                        <!-- Display non fields errors -->
+                        {% if form.non_field_errors %}
+                            <small class="text-sm text-danger bg-danger/10 rounded-xl px-2 py-1">
+                                {% for error in form.non_field_errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </small>
+                        {% endif %}
+
+                        {{ registered_courses }}
+
+                        <div class="flex flex-col gap-2">
+                            {# Courses checkboxes #}
+                            {% for course in courses %}
+                            <div class="inline-flex items-center p-2 border border-1 border-dashed border-gray-400 rounded-xl">
+                                <label class="flex items-center cursor-pointer relative" for="course_{{ course.id }}">
+                                    <input type="checkbox" name="courses" value="{{ course.id }}" {% if course.is_registered %} checked {% endif %}
+                                        class="peer h-5 w-5 cursor-pointer transition-all appearance-none rounded-md shadow hover:shadow-md border border-slate-300 checked:bg-primaryColor checked:border-slate-800"
+                                        id="course_{{ course.id }}" />
+                                    <span
+                                        class="absolute text-white opacity-0 peer-checked:opacity-100 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" viewBox="0 0 20 20" fill="currentColor"
+                                            stroke="currentColor" stroke-width="1">
+                                            <path fill-rule="evenodd"
+                                                d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                                                clip-rule="evenodd"></path>
+                                        </svg>
+                                    </span>
+                                </label>
+                                <label class="cursor-pointer ml-2 text-slate-600 text-sm" for="course_{{ course.id }}">
+                                    {{ course }}
+                                </label>
+                            </div>
+                            {% endfor %}
+
+                            {# Submit button #}
+                            <div class="text-whiteColor">
+                                <button type="submit"
+                                        class="block mb-2 focus:outline-none rounded-2xl w-full px-5 py-2 text-center bg-primaryColor hover:bg-blue-950 focus:ring-2 focus:ring-secondaryColor focus:ring-offset-1 transition-all duration-300 ease-in-out">
+                                    Update course list
+                                </button>
+                                <small class="text-gray-500 text-xs">
+                                    Thess courses will account for <strong>{{ level.semester }} {{ level.year }}</strong>
+                                </small>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+
+                <div id="lect_img" class="relative col-start-8 col-span-4 h-screen">
+                    <blockquote
+                            class="flex flex-col gap-2 text-[16px] leading-tight text-whiteColor p-4 text-left max-w-64">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none"
+                             class="text-secondaryColor">
+                            <path d="M5.07579 17C4.08939 4.54502 12.9123 1.0121 19.9734 2.22417C20.2585 6.35185 18.2389 7.89748 14.3926 8.61125C15.1353 9.38731 16.4477 10.3639 16.3061 11.5847C16.2054 12.4534 15.6154 12.8797 14.4355 13.7322C11.8497 15.6004 8.85421 16.7785 5.07579 17Z"
+                                  stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
+                                  stroke-linejoin="round"/>
+                            <path d="M4 22C4 15.5 7.84848 12.1818 10.5 10" stroke="currentColor" stroke-width="1.5"
+                                  stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        Lectures are like Netflix series—except you can't skip to the good parts, and the plot twists
+                        are just more homework.
+                        <cite class="block font-semibold mt-2 text-secondaryColor">ChatGPT</cite>
+                    </blockquote>
+                    <img src="{% static 'core/images/logo-shapes.svg' %}" alt="Attendy shapes"
+                         class="w-20 absolute bottom-3 right-3">
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock body %}
+
+{# Additional javascript #}
+{% block javascript %}
+{% endblock javascript %}

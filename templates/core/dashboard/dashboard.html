@@ -229,7 +229,9 @@
                     </div>
 
                     <div class="col-span-12 flex flex-col gap-2.5">
-                        {% for week, attendances in grouped_attendances.items %}
+                        {% for semester_year, weeks in grouped_attendances.items %}
+                        <h4 class="block text-lg text-secondaryColor">{{ semester_year }}</h4>
+                            {% for week, attendances in weeks.items %}
                             <div class="">
                                 <small class="block text-sm text-secondaryColor">{{ week }}</small>
                                 <ul class="border-l border-secondaryColor/20">
@@ -270,20 +272,20 @@
                                                 <div class="flex items-center gap-2">
                                                     {% if attendance.teaching_record %}
                                                         <a href="{% url 'core:record_detail' level_pk=level.id pk=attendance.teaching_record.id slug=attendance.course.slug %}"
-                                                           class="text-nowrap px-4 py-2 rounded-xl bg-secondaryColor text-white text-sm">
+                                                        class="text-nowrap px-4 py-2 rounded-xl bg-secondaryColor text-white text-sm">
                                                             View associated record
                                                         </a>
                                                     {% else %}
                                                         <a href=""
-                                                           class="text-nowrap px-4 py-2 rounded-xl outline outline-1 outline-secondaryColor text-secondaryColor text-sm">
+                                                        class="text-nowrap px-4 py-2 rounded-xl outline outline-1 outline-secondaryColor text-secondaryColor text-sm">
                                                             Add a teaching record
                                                         </a>
                                                     {% endif %}
                                                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24"
-                                                         height="24" fill="none" class="text-secondaryColor">
+                                                        height="24" fill="none" class="text-secondaryColor">
                                                         <path d="M9.00005 6C9.00005 6 15 10.4189 15 12C15 13.5812 9 18 9 18"
-                                                              stroke="currentColor" stroke-width="1.5"
-                                                              stroke-linecap="round" stroke-linejoin="round"/>
+                                                            stroke="currentColor" stroke-width="1.5"
+                                                            stroke-linecap="round" stroke-linejoin="round"/>
                                                     </svg>
                                                 </div>
                                             </div>
@@ -291,20 +293,21 @@
                                     {% endfor %}
                                 </ul>
                             </div>
+                            {% endfor %}
                         {% empty %}
                             <div class="grid grid-cols-12 items-center justify-center w-full my-4 mt-8">
                                 <div class="col-span-4 flex flex-col text-center gap-1">
-                                   <span  class="px-6 py-2 rounded-full border border-dashed border-gray-500 text-gray-500 text-base w-max m-auto">
+                                <span class="px-6 py-2 rounded-full border border-dashed border-gray-500 text-gray-500 text-base w-max m-auto">
                                     Nothing to show here for now...
-                                   </span>
+                                </span>
                                     <span class="text-xs">
                                         Come back in the mean time or contact the support
                                     </span>
                                 </div>
                                 <img src="{% static 'core/images/process-attendance.svg' %}" alt="Manage attendances"
-                                     class="col-span-4 h-full bg-white object-cover relative z-0 scale-90 -top-5 -right-2 md:-right-5 rotate-3 shadow-lg rounded-xl ring-2 ring-offset-2 ring-secondaryColor">
+                                    class="col-span-4 h-full bg-white object-cover relative z-0 scale-90 -top-5 -right-2 md:-right-5 rotate-3 shadow-lg rounded-xl ring-2 ring-offset-2 ring-secondaryColor">
                                 <img src="{% static 'core/images/process-monitor.svg' %}" alt="Interactive dashboard"
-                                     class="col-span-4 h-full bg-white object-cover relative z-10 scale-90 -top-5 -left-2 md:-left-5 -rotate-3 shadow-lg rounded-xl ring-2 ring-offset-2 ring-primaryColor">
+                                    class="col-span-4 h-full bg-white object-cover relative z-10 scale-90 -top-5 -left-2 md:-left-5 -rotate-3 shadow-lg rounded-xl ring-2 ring-offset-2 ring-primaryColor">
                             </div>
                         {% endfor %}
                     </div>
