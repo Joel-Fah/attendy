@@ -2241,6 +2241,10 @@ select {
   padding-top: 1rem;
 }
 
+.ps-2 {
+  padding-inline-start: 0.5rem;
+}
+
 .text-left {
   text-align: left;
 }
@@ -2457,6 +2461,11 @@ select {
 
 .text-whiteColor\/70 {
   color: rgb(255 245 234 / 0.7);
+}
+
+.text-gray-50 {
+  --tw-text-opacity: 1;
+  color: rgb(249 250 251 / var(--tw-text-opacity));
 }
 
 .underline {

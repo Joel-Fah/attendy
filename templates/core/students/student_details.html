@@ -182,45 +182,26 @@
                             </li>
                         </ul>
                         <div class="space-y-4 px-2">
-                            <div class="">
-                                {% for semester_year, class_levels in grouped_courses.items %}
-                                <h4 class="block text-lg text-secondaryColor">{{ semester_year }}</h4>
-                                <div class="flex flex-col gap-2.5 px-4 border-l border-secondaryColor/20">
-                                    {% for class_level, courses in class_levels.items %}
-                                    <div class="space-y-2">
-                                        <small class="block text-sm text-secondaryColor">{{ class_level }}</small>
-                                        <div class="flex flex-wrap items-center gap-2 text-base">
-                                            {% for course in courses %}
-                                            <div class="flex flex-col gap-2 py-2 px-4 rounded-2xl border {% if course.is_registered %} border-darkColor {% else %} border-dashed border-gray-400 {% endif %} hover:bg-whiteHover hover:border-secondaryColor transition-colors duration-200 ease-linear">
-                                                <a href="{% url 'core:course_detail' level_pk=level.id pk=course.id slug=course.slug %}"
-                                                    class="">
-                                                    {{ forloop.counter }} - {{ course }}
-                                                </a>
-                                                <hr class="w-full border-gray-400/50">
-                                                <ul>
-                                                    <li>
-                                                        <span class="text-gray-500">Attendances made : </span> {{ course.course_attendance.count }}
-                                                    </li>
-
-                                                    <li></li>
-                                                        <span class="text-gray-500">Attendances attended : </span> 
-                                                          {% for course_id, attendance_count in course_attended_count.items %}
-                                                            {% if course.id == course_id %}
-                                                              {{ attendance_count }}
-                                                            {% endif %}
-                                                          {% endfor %}
-                                                    </li>
-                                                </ul>
-                                            </div>
-                                            {% endfor %}
+                            <div class="flex flex-col gap-2.5">
+                                {% for class_level, courses in grouped_courses.items %}
+                                <div class="space-y-2">
+                                    <h4 class="block text-lg text-secondaryColor">{{ class_level }}</h4>
+                                    <div class="flex flex-wrap items-center gap-2 text-base ps-2 border-l border-secondaryColor/20">
+                                        {% for course in courses %}
+                                        <div class="flex flex-col gap-2 py-2 px-4 rounded-xl border {% if course.is_registered %} border-darkColor {% else %} border-dashed border-gray-400 {% endif %} hover:bg-whiteHover hover:border-secondaryColor transition-colors duration-200 ease-linear">
+                                            <a href="{% url 'core:course_detail' level_pk=level.id pk=course.id slug=course.slug %}"
+                                                class="">
+                                                {{ forloop.counter }} - {{ course }}
+                                            </a>
                                         </div>
+                                        {% endfor %}
                                     </div>
-                                    {% endfor %}
                                 </div>
                                 {% empty %}
                                 <div class="flex flex-col gap-4 items-center justify-center">
                                     <img src="{% static 'core/images/process-courses.svg' %}" alt="No registered courses" class="w-1/3 m-auto">
-                                    <span class="px-4 py-1.5 rounded-full border border-dashed border-gray-500 text-gray-500 text-xs text-center m-auto">
+                                    <span
+                                        class="px-4 py-1.5 rounded-full border border-dashed border-gray-500 text-gray-500 text-xs text-center m-auto">
                                         This student has not registered any course yet
                                     </span>
                                 </div>
@@ -266,6 +247,25 @@
                     </small>
                 </div>
             </div>
+
+            <div class="col-span-full flex flex-col gap-2 mt-4">
+                <div class="flex items-center gap-2">
+                    <h3 class="flex items-center gap-1 text-2xl whitespace-nowrap">
+                        Visual overview
+                    </h3>
+                    <hr class="w-full border-gray-400">
+                </div>
+
+                <p class="text-sm text-gray-500">
+                    The chart shows the attendance data for each course taken by the student. The x-axis represents the courses, and the
+                    y-axis shows the number of attendances. Each course has two bars: the first bar shows the total attendances, and the
+                    second bar shows the student's attendances, with red indicating lower attendance and green indicating equal attendance.
+                </p>
+
+                <div class="w-full">
+                    <canvas id="attendanceChart" height="150"></canvas>
+                </div>
+            </div>
         </div>
     </div>
 </div>
@@ -276,4 +276,67 @@
 {# Additional javascript #}
 {% block javascript %}
 <script src="{% static 'core/js/dialog.js' %}"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var ctx = document.getElementById('attendanceChart').getContext('2d');
+        var chartData = JSON.parse('{{ chart_data|escapejs }}');
+        var labels = chartData.map(function(item) { return item.course; });
+        var totalAttendanceData = chartData.map(function(item) { return item.total_attendance; });
+        var studentAttendanceData = chartData.map(function(item) { return item.student_attendance; });
+
+        var backgroundColors = [
+            'rgba(75, 192, 192, 0.2)',
+            'rgba(255, 159, 64, 0.2)',
+            'rgba(255, 205, 86, 0.2)',
+            'rgba(54, 162, 235, 0.2)',
+            'rgba(153, 102, 255, 0.2)',
+            'rgba(201, 203, 207, 0.2)'
+        ];
+        var borderColors = [
+            'rgb(75, 192, 192)',
+            'rgb(255, 159, 64)',
+            'rgb(255, 205, 86)',
+            'rgb(54, 162, 235)',
+            'rgb(153, 102, 255)',
+            'rgb(201, 203, 207)'
+        ];
+
+        var studentAttendanceColors = studentAttendanceData.map(function(count, index) {
+            return count < totalAttendanceData[index] ? 'rgba(255, 0, 0, 0.2)' : 'rgba(0, 255, 0, 0.2)';
+        });
+
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [
+                    {
+                        label: 'Total Attendances',
+                        data: totalAttendanceData,
+                        backgroundColor: backgroundColors,
+                        borderColor: borderColors,
+                        borderWidth: 1
+                    },
+                    {
+                        label: 'Student Attendances',
+                        data: studentAttendanceData,
+                        backgroundColor: studentAttendanceColors,
+                        borderColor: studentAttendanceColors.map(color => color.replace('0.2', '1')),
+                        borderWidth: 1
+                    }
+                ]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            precision: 0
+                        }
+                    }
+                }
+            }
+        });
+    });
+</script>
 {% endblock javascript %}

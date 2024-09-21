@@ -198,6 +198,17 @@
                              class="absolute -bottom-1/3 right-0 w-1/2 -rotate-12">
                     </div>
 
+                    <div class="col-span-12 mt-5">
+                        <h2 class="flex items-center gap-2 text-2xl">
+                            Course attendance overview for all courses
+                        </h2>
+                        <p class="text-sm text-gray-500">
+                            This chart shows the number of attendances for each course in the class.
+                            Courses with no attendance yet will eventually show no bar at all.
+                        </p>
+                        <canvas id="attendanceChart" height="120"></canvas>
+                    </div>
+
                     <div class="col-span-12 mt-5 flex items-center justify-between">
                         <h2 class="flex items-center gap-2 text-2xl">
                             Courses attendances by week
@@ -229,11 +240,9 @@
                     </div>
 
                     <div class="col-span-12 flex flex-col gap-2.5">
-                        {% for semester_year, weeks in grouped_attendances.items %}
-                        <h4 class="block text-lg text-secondaryColor">{{ semester_year }}</h4>
-                            {% for week, attendances in weeks.items %}
+                            {% for week, attendances in grouped_attendances.items %}
                             <div class="">
-                                <small class="block text-sm text-secondaryColor">{{ week }}</small>
+                                <h4 class="block text-lg text-secondaryColor">{{ week }}</h4>
                                 <ul class="border-l border-secondaryColor/20">
                                     {% for attendance in attendances %}
                                         <li>
@@ -242,8 +251,8 @@
                                                     <span> {{ forloop.counter }}. </span>
                                                     <div class="">
                                                         <small class="text-xs text-gray-500"> {{ attendance.created_at }}
-                                                            | {{ attendance.course.semester }} {{ attendance.course.year }} </small>
-                                                        <h3 class="text-xl font-medium"> {{ attendance.course.code }} {{ attendance.course.title }}
+                                                            | {{ attendance.class_level.semester }} {{ attendance.class_level.year }} </small>
+                                                        <h3 class="text-xl font-medium"> {{ attendance.course }}
                                                         </h3>
                                                         <small class="flex items-center gap-4">
                                                             <div class="">
@@ -293,8 +302,7 @@
                                     {% endfor %}
                                 </ul>
                             </div>
-                            {% endfor %}
-                        {% empty %}
+                            {% empty %}
                             <div class="grid grid-cols-12 items-center justify-center w-full my-4 mt-8">
                                 <div class="col-span-4 flex flex-col text-center gap-1">
                                 <span class="px-6 py-2 rounded-full border border-dashed border-gray-500 text-gray-500 text-base w-max m-auto">
@@ -309,7 +317,7 @@
                                 <img src="{% static 'core/images/process-monitor.svg' %}" alt="Interactive dashboard"
                                     class="col-span-4 h-full bg-white object-cover relative z-10 scale-90 -top-5 -left-2 md:-left-5 -rotate-3 shadow-lg rounded-xl ring-2 ring-offset-2 ring-primaryColor">
                             </div>
-                        {% endfor %}
+                            {% endfor %}
                     </div>
                 </div>
             </div>
@@ -324,3 +332,58 @@
         </div>
     </main>
 {% endblock body %}
+
+{# Additional javascript #}
+{% block javascript %}
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var ctx = document.getElementById('attendanceChart').getContext('2d');
+        var courseAttendanceCounts = JSON.parse('{{ course_attendance_counts|escapejs }}');
+        var labels = courseAttendanceCounts.map(function(item) { return item.title; });
+        var data = courseAttendanceCounts.map(function(item) { return item.count; });
+
+        var backgroundColors = [
+            'rgba(255, 99, 132, 0.2)',
+            'rgba(255, 159, 64, 0.2)',
+            'rgba(255, 205, 86, 0.2)',
+            'rgba(75, 192, 192, 0.2)',
+            'rgba(54, 162, 235, 0.2)',
+            'rgba(153, 102, 255, 0.2)',
+            'rgba(201, 203, 207, 0.2)'
+        ];
+        var borderColors = [
+            'rgb(255, 99, 132)',
+            'rgb(255, 159, 64)',
+            'rgb(255, 205, 86)',
+            'rgb(75, 192, 192)',
+            'rgb(54, 162, 235)',
+            'rgb(153, 102, 255)',
+            'rgb(201, 203, 207)'
+        ];
+
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Number of Attendances',
+                    data: data,
+                    backgroundColor: backgroundColors,
+                    borderColor: borderColors,
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            precision: 0
+                        }
+                    }
+                }
+            }
+        });
+    });
+</script>
+{% endblock javascript %}

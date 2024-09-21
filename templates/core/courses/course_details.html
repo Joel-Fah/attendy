@@ -24,8 +24,8 @@
     <div class="flex flex-col gap-4 items-start justify-center w-full mt-14">
         <div class="flex items-center justify-between w-full">
             <div class="space-y-1">
-                <h2 class="text-3xl">
-                    {{ course.code }} {{ course.title }}
+                <h2 class="text-3xl text-primaryColor">
+                    {{ course }}
                 </h2>
                 <small class="text-gray-500">
                     Registered on:
@@ -152,6 +152,16 @@
                                     </div>
                                 </li>
                             </ul>
+
+                            <div class="grid grid-cols-12 items-center gap-2 mt-4">
+                                <div class="col-span-full">
+                                    <h2 class="text-2xl text-primaryColor">Visual Data</h2>
+                                </div>
+
+                                <div class="col-span-4">
+                                    <canvas id="genderChart"></canvas>
+                                </div>
+                            </div>
                         </div>
     
                         <div class="hidden opacity-0" id="message" role="tabpanel">
@@ -224,19 +234,19 @@
             </div>
 
             <div class=" flex flex-col gap-2 col-start-10 col-span-3">
-                <h3 class="">Course delegates and assistants</h3>
+                <h3 class="text-xl text-primaryColor">Course delegates and assistants</h3>
                 
                 <div class="flex flex-col gap-4">
                     <div class="flex flex-col items-start bg-whiteHover rounded-xl px-4 py-1.5 space-y-2">
                         {% for delegate in delegates %}
                             {% if delegate.role == 'delegate' %}
                                 <p class="text-darkColor block">
-                                    <span class="text-sm text-secondaryColor me-1">Del.</span>
+                                    <span class="text-xs text-secondaryColor me-1">Del.</span>
                                     {{ delegate.student.name }}
                                 </p>
                                 {% else %}
                                 <p class="text-darkColor block">
-                                    <span class="text-sm text-secondaryColor me-1">Ast.</span>
+                                    <span class="text-xs text-secondaryColor me-1">Ast.</span>
                                     {{ delegate.student.name }}
                                 </p>
                             {% endif %}
@@ -262,7 +272,6 @@
                 </div>
             </div>
         </div>
-
     </div>
 </div>
 {% endblock body %}
@@ -272,4 +281,32 @@
 <!-- from cdn -->
 <script src="{% static 'core/js/tabs.js' %}"></script>
 <script src="{% static 'core/js/dialog.js' %}"></script>
+
+<!-- Gender Distribution Pie Chart -->
+<script>
+    var genderData = JSON.parse('{{ gender_distribution|escapejs }}');
+    var ctx = document.getElementById('genderChart').getContext('2d');
+    var genderChart = new Chart(ctx, {
+        type: 'pie',
+        data: {
+            labels: ['Male', 'Female'],
+            datasets: [{
+                data: [genderData.male, genderData.female],
+                backgroundColor: ['#36A2EB', '#FF6384']
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'top',
+                },
+                title: {
+                    display: true,
+                    text: 'Gender Distribution of registered students'
+                }
+            }
+        }
+    });
+</script>
 {% endblock javascript %}

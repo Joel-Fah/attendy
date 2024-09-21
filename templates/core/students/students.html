@@ -223,6 +223,16 @@
                                         </ul>
                                     {% endif %}
                                 </nav>
+
+                                <div class="grid grid-cols-12 items-center gap-2 mt-4">
+                                    <div class="col-span-full">
+                                        <h2 class="text-2xl text-primaryColor">Visual Data</h2>
+                                    </div>
+    
+                                    <div class="col-span-4">
+                                        <canvas id="genderChart"></canvas>
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
@@ -246,6 +256,9 @@
                                             <th scope="col" class="px-6 py-3">
                                                 Phone No
                                             </th>
+                                            <th scope="col" class="px-6 py-3">
+                                                Gender
+                                            </th>
                                             <th scope="col" class="px-6 py-3 bg-whiteHover">
                                                 Actions
                                             </th>
@@ -268,6 +281,9 @@
                                             </td>
                                             <td class="px-6 py-4">
                                                 {{ student.phone }}
+                                            </td>
+                                            <td class="px-6 py-4">
+                                                {{ student.gender }}
                                             </td>
                                             <td class="px-6 py-4 bg-whiteHover">
                                                 <div class="flex gap-2">
@@ -359,4 +375,32 @@
 <!-- from cdn -->
 <script src="{% static 'core/js/tabs.js' %}"></script>
 <script src="{% static 'core/js/dialog.js' %}"></script>
+
+<!-- Gender Distribution Pie Chart -->
+<script>
+    var genderData = JSON.parse('{{ gender_distribution|escapejs }}');
+    var ctx = document.getElementById('genderChart').getContext('2d');
+    var genderChart = new Chart(ctx, {
+        type: 'pie',
+        data: {
+            labels: ['Male', 'Female'],
+            datasets: [{
+                data: [genderData.male, genderData.female],
+                backgroundColor: ['#36A2EB', '#FF6384']
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'top',
+                },
+                title: {
+                    display: true,
+                    text: 'Gender Distribution'
+                }
+            }
+        }
+    });
+</script>
 {% endblock javascript %}

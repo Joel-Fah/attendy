@@ -45,7 +45,7 @@ INSTALLED_APPS = [
     'django_summernote',
     'tailwind',
     'theme',
-    'django_browser_reload'
+    'django_browser_reload',
 ]
 
 MIDDLEWARE = [

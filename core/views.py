@@ -5,7 +5,7 @@ from datetime import timedelta, datetime
 
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.db.models import Q
+from django.db.models import Q, Count
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse_lazy
@@ -50,8 +50,8 @@ class LevelView(LoginRequiredMixin, ListView):
 
 
 # Dashboard views
-def group_items_by_semester_year_and_week(attendances):
-    grouped_attendances = defaultdict(lambda: defaultdict(list))
+def group_items_by_week(attendances):
+    grouped_attendances = defaultdict(list)
     for attendance in attendances.order_by('created_at'):
         # Calculate the start of the week (Monday) for each item
         week_start = attendance.created_at - timedelta(days=attendance.created_at.weekday())
@@ -60,12 +60,10 @@ def group_items_by_semester_year_and_week(attendances):
         # Format the week range as "Mon 19 Aug - Sun 25 Aug"
         week_range = f"{week_start.strftime('%a %d %b')} - {week_end.strftime('%a %d %b %Y')}"
 
-        # Group items by semester_year and this week range
-        semester = attendance.class_level.semester
-        year = attendance.class_level.year
-        grouped_attendances[f'{semester} {year}'][week_range].append(attendance)
+        # Group items by this week range
+        grouped_attendances[week_range].append(attendance)
 
-    return {semester_year: dict(weeks) for semester_year, weeks in grouped_attendances.items()}
+    return dict(grouped_attendances)
 
 
 # core/views.py
@@ -79,17 +77,24 @@ class DashboardView(LoginRequiredMixin, CommonContextMixin, ClassLevelAccessMixi
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        grouped_attendances = group_items_by_semester_year_and_week(
-            Attendance.objects.filter(class_level=self.kwargs['level_pk']))
-        for semester_year, weeks in grouped_attendances.items():
-            for week, attendances in weeks.items():
-                for attendance in attendances:
-                    attendance.course_delegate = CourseDelegate.objects.filter(course=attendance.course,
-                                                                               role='delegate').first()
-                    attendance.course_assistant = CourseDelegate.objects.filter(course=attendance.course,
-                                                                                role='assistant').first()
-                    attendance.enrollment_count = CourseAttendance.objects.filter(attendance=attendance).count()
+        grouped_attendances = group_items_by_week(
+            Attendance.objects.filter(class_level=self.kwargs['level_pk'])
+        )
+        for week, attendances in grouped_attendances.items():
+            for attendance in attendances:
+                attendance.course_delegate = CourseDelegate.objects.filter(course=attendance.course,
+                                                                           role='delegate').first()
+                attendance.course_assistant = CourseDelegate.objects.filter(course=attendance.course,
+                                                                            role='assistant').first()
+                attendance.enrollment_count = CourseAttendance.objects.filter(attendance=attendance).count()
         context['grouped_attendances'] = dict(grouped_attendances)
+
+        # Calculate number of attendances per course, including courses with zero attendance
+        courses = Course.objects.filter(class_level=self.kwargs['level_pk'])
+        course_attendance_counts = courses.annotate(count=Count('course_attendance')).values('title', 'count').order_by(
+            'title')
+        context['course_attendance_counts'] = json.dumps(list(course_attendance_counts))
+
         return context
 
 
@@ -391,9 +396,19 @@ class CourseDetailView(LoginRequiredMixin, CommonContextMixin, DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         course = self.get_object()
+        registered_students = CourseRegistration.objects.filter(course=course,
+                                                                course__class_level=course.class_level)
         context['delegates'] = CourseDelegate.objects.filter(course=course)
-        context['registered_students'] = CourseRegistration.objects.filter(course=course,
-                                                                           course__class_level=course.class_level)
+        context['registered_students'] = registered_students
+
+        # Calculate male and female students
+        male_students = registered_students.filter(student__gender='Male').count()
+        female_students = registered_students.filter(student__gender='Female').count()
+        context['gender_distribution'] = json.dumps({
+            'male': male_students,
+            'female': female_students
+        })
+
         return context
 
     def post(self, request, *args, **kwargs):
@@ -515,7 +530,16 @@ class StudentView(LoginRequiredMixin, CommonContextMixin, ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        students = self.get_queryset()
         context['delegates'] = Student.objects.filter(is_delegate=True).order_by('name')
+
+        # Calculate male and female students
+        male_students = students.filter(gender='Male').count()
+        female_students = students.filter(gender='Female').count()
+        context['gender_distribution'] = json.dumps({
+            'male': male_students,
+            'female': female_students
+        })
         return context
 
     def post(self, request, *args, **kwargs):
@@ -543,18 +567,32 @@ class StudentDetailView(LoginRequiredMixin, CommonContextMixin, DetailView):
         context = super().get_context_data(**kwargs)
         student = self.get_object()
         student_semester_courses = Course.objects.filter(
-            Q(registration__student=student) | Q(class_level=student.class_level))
+            Q(registration__student=student) | Q(class_level=student.class_level)).distinct()
 
-        context['grouped_courses'] = student.get_courses_grouped_by_semester_year_and_class_level()
+        context['grouped_courses'] = student.get_courses_grouped_by_class_level()
         context['qr_code_url'] = self.object.generate_qr_code_url()
         context['courses_count'] = student_semester_courses.count()
 
         course_attended_count = {}
+        total_attendance_count = {}
         for course in student_semester_courses.all():
             course_attended_count[course.id] = CourseAttendance.objects.filter(student=student,
                                                                                attendance__course=course).count()
+            total_attendance_count[course.id] = Attendance.objects.filter(course=course).count()
 
         context['course_attended_count'] = course_attended_count
+        context['total_attendance_count'] = total_attendance_count
+
+        # Prepare data for the chart
+        chart_data = []
+        for course in student_semester_courses:
+            chart_data.append({
+                'course': course.title,
+                'total_attendance': total_attendance_count[course.id],
+                'student_attendance': course_attended_count[course.id]
+            })
+        context['chart_data'] = json.dumps(chart_data)
+
         return context
 
     def post(self, request, *args, **kwargs):

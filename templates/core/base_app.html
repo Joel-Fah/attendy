@@ -28,6 +28,9 @@
     <link rel="stylesheet" href="{% static 'core/css/app.css' %}">
     {% block extra_styles %}{% endblock extra_styles %}
 
+    <!-- Chart.js -->
+    <script src="{% static 'core/js/chart-v4.4.4.js' %}"></script>
+
 </head>
 
 <body class="font-sans text-lg text-darkColor bg-whiteColor {% block body_styles %}{% endblock body_styles %}">
@@ -46,7 +49,6 @@
     {% endblock javascript %}
     <!-- Flowbite JS script -->
     <script src="{% static 'core/js/flowbite.js' %}"></script>
-
 </body>
 
 </html>

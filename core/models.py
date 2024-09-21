@@ -71,18 +71,17 @@ class Student(models.Model):
         self.slug = slugify(self.name)
         super().save(*args, **kwargs)
 
-    def get_courses_grouped_by_semester_year_and_class_level(self):
-        grouped_courses = defaultdict(lambda: defaultdict(list))
+    def get_courses_grouped_by_class_level(self):
+        grouped_courses = defaultdict(list)
         courses = Course.objects.filter(
-            Q(registration__student=self) | Q(class_level=self.class_level))  # Get courses for the student
+            Q(registration__student=self) | Q(class_level=self.class_level)).distinct()  # Get courses for the student
 
         for course in courses:
-            semester_year = f'{course.class_level.semester} {course.class_level.year}'
             class_level = course.class_level
             course.is_registered = self.is_course_registered(course)
-            grouped_courses[semester_year][class_level].append(course)
+            grouped_courses[class_level].append(course)
 
-        return {semester_year: dict(class_levels) for semester_year, class_levels in grouped_courses.items()}
+        return dict(grouped_courses)
 
     def is_course_registered(self, course):
         return CourseRegistration.objects.filter(student=self, course=course).exists()
