@@ -311,6 +311,8 @@
             })
             .then(response => response.json())
             .then(data => {
+                <!-- print data -->
+                console.log(data);
                 if (data.success) {
                     // Ask for user confirmation
                     const confirmation = confirm(`Do you want to add \n\tStudent: ${data.student_name}\n\tClass/Level: ${data.class_level}\n\tHas this course registered?: ${data.has_registered} \nto the current attendance?`);

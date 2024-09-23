@@ -297,18 +297,24 @@ def decode_qr(request, *args, **kwargs):
 
             # Check if student registered the course of the attendance
             attendance_course = Attendance.objects.get(pk=kwargs['pk']).course
-            has_registered = CourseRegistration.objects.filter(student=student, course=attendance_course).exists()
+            has_registered = CourseRegistration.objects.filter(Q(student=student, course=attendance_course) | Q(
+                student__class_level=attendance_course.class_level)).exists()
+            class_level = f'{attendance_course.class_level.get_level_display()} - '
+            f'Group {attendance_course.class_level.group} - '
+            f'{attendance_course.class_level.semester} {attendance_course.class_level.year} - '
+            f'{attendance_course.class_level.department}'
 
             if not has_registered:
-                raise ValueError(f'{student.name} is not registered for {attendance_course.title}')
+                return JsonResponse({
+                    'success': False,
+                    'error': f'{student.name} is not registered for {attendance_course.title} '
+                             f'nor is part of {class_level}'
+                })
 
             return JsonResponse({
                 'success': True,
                 'student_name': student.name,
-                'class_level': f'{attendance_course.class_level.get_level_display()} - '
-                               f'Group {attendance_course.class_level.group} - '
-                               f'{attendance_course.class_level.semester} {attendance_course.class_level.year} - '
-                               f'{attendance_course.class_level.department}',
+                'class_level': class_level,
                 'has_registered': has_registered,
             })
         except (Student.DoesNotExist, ClassLevel.DoesNotExist, ValueError, json.JSONDecodeError) as e:
@@ -336,7 +342,8 @@ def add_student_to_course_attendance(request, *args, **kwargs):
             attendance = Attendance.objects.get(pk=kwargs['pk'])
             course = attendance.course
 
-            if CourseRegistration.objects.filter(student=student, course=attendance.course).exists():
+            if CourseRegistration.objects.filter(Q(student=student, course=attendance.course) | Q(
+                    student__class_level=attendance.course.class_level)).exists():
                 CourseAttendance.objects.create(student=student, attendance=attendance)
 
                 message = format_html(
@@ -462,10 +469,6 @@ class CourseAddView(LoginRequiredMixin, CommonContextMixin, CreateView):
             self.request,
             message
         )
-        messages.info(
-            self.request,
-            'A teaching record has also been created for this course.'
-        )
         return super().form_valid(form)
 
     def form_invalid(self, form):
@@ -540,6 +543,24 @@ class StudentView(LoginRequiredMixin, CommonContextMixin, ListView):
             'male': male_students,
             'female': female_students
         })
+
+        # Prepare data for plotting attendance summary
+        attendance_data = []
+        courses = Course.objects.filter(class_level=self.kwargs['level_pk'])
+        for student in students:
+            student_attendance = {}
+            for course in courses:
+                attendance_count = CourseAttendance.objects.filter(student=student, attendance__course=course).count()
+                student_attendance[course.title] = attendance_count
+            attendance_data.append({
+                'student': student.name,
+                'attendance': student_attendance
+            })
+
+        # Pass the data to the context
+        context['attendance_data'] = json.dumps(attendance_data)
+        context['attendance_courses'] = json.dumps([course.title for course in courses])
+
         return context
 
     def post(self, request, *args, **kwargs):

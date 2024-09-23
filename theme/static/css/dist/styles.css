@@ -1833,10 +1833,6 @@ select {
   border-color: rgb(156 163 175 / var(--tw-border-opacity));
 }
 
-.border-gray-400\/50 {
-  border-color: rgb(156 163 175 / 0.5);
-}
-
 .border-gray-500 {
   --tw-border-opacity: 1;
   border-color: rgb(107 114 128 / var(--tw-border-opacity));
@@ -2221,6 +2217,10 @@ select {
   padding-inline-start: 2.5rem;
 }
 
+.ps-2 {
+  padding-inline-start: 0.5rem;
+}
+
 .ps-2\.5 {
   padding-inline-start: 0.625rem;
 }
@@ -2239,10 +2239,6 @@ select {
 
 .pt-4 {
   padding-top: 1rem;
-}
-
-.ps-2 {
-  padding-inline-start: 0.5rem;
 }
 
 .text-left {
@@ -2461,11 +2457,6 @@ select {
 
 .text-whiteColor\/70 {
   color: rgb(255 245 234 / 0.7);
-}
-
-.text-gray-50 {
-  --tw-text-opacity: 1;
-  color: rgb(249 250 251 / var(--tw-text-opacity));
 }
 
 .underline {

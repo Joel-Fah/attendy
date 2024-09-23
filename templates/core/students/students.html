@@ -229,8 +229,12 @@
                                         <h2 class="text-2xl text-primaryColor">Visual Data</h2>
                                     </div>
     
-                                    <div class="col-span-4">
+                                    <div class="col-span-12 w-1/3 m-auto">
                                         <canvas id="genderChart"></canvas>
+                                    </div>
+
+                                    <div class="col-span-12"></div>
+                                        <canvas id="attendanceChart"></canvas>
                                     </div>
                                 </div>
                             </div>
@@ -401,6 +405,49 @@
                 }
             }
         }
+    });
+</script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var ctx = document.getElementById('attendanceChart').getContext('2d');
+        var attendanceData = JSON.parse('{{ attendance_data|escapejs }}');
+        var courses = JSON.parse('{{ attendance_courses|escapejs }}');
+
+        var datasets = attendanceData.map(function (data) {
+            return {
+                label: data.student,
+                data: courses.map(function (course) {
+                    return data.attendance[course] || 0;
+                }),
+                fill: false,
+                borderColor: 'rgba(' + Math.floor(Math.random() * 255) + ',' + Math.floor(Math.random() * 255) + ',' + Math.floor(Math.random() * 255) + ', 1)',
+                pointRadius: 5,
+                pointHoverRadius: 10,
+                pointHitRadius: 30,
+                pointBorderWidth: 2,
+            };
+        });
+
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: courses,
+                datasets: datasets
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                    },
+                    title: {
+                        display: true,
+                        text: 'Student Attendance Summary'
+                    }
+                }
+            }
+        });
     });
 </script>
 {% endblock javascript %}
