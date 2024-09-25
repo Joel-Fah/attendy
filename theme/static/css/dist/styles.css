@@ -1980,6 +1980,14 @@ select {
   background-color: rgb(255 236 213 / var(--tw-bg-opacity));
 }
 
+.bg-danger\/5 {
+  background-color: rgb(219 68 55 / 0.05);
+}
+
+.bg-success\/5 {
+  background-color: rgb(15 157 88 / 0.05);
+}
+
 .bg-opacity-10 {
   --tw-bg-opacity: 0.1;
 }
