@@ -7,7 +7,7 @@ from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Q, Count
 from django.http import JsonResponse
-from django.shortcuts import get_object_or_404, redirect
+from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse_lazy
 from django.utils.html import format_html
 from django.views.decorators.csrf import csrf_exempt
@@ -1007,3 +1007,10 @@ class FeedbackView(LoginRequiredMixin, CreateView):
         random_quote = random.choice(get_quotes())
         context['quote'] = random_quote
         return context
+
+# Handlers
+def handler404(request, exception):
+    return render(request, 'core/errors/404.html', status=404)
+
+def handler500(request):
+    return render(request, 'core/errors/500.html', status=500)

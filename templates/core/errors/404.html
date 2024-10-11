@@ -1,0 +1,27 @@
+{% extends "core/errors/base_errors.html" %}
+{% load static %}
+{% load tailwind_tags %}
+
+{% block title %}Not what you're looking for!{% endblock title %}
+
+{% block body %}
+    <div class="flex flex-col items-center justify-center gap-4">
+        <img src="{% static 'core/images/error_404.svg' %}" alt="Error 404: Page not found" class="w-2/5 select-none pointer-events-none">
+        <div class="space-y-2 text-center">
+            <h2 class="text-2xl">
+                I don't know what you're looking for, but it's not here.
+            </h2>
+            <p>
+                While you're here, you might consider
+            </p>
+        </div>
+        <a href="{% url 'core:home' %}" class="px-4 py-2 rounded-2xl border border-primaryColor text-primaryColor hover:bg-whiteHover transition-all duration-100 ease-linear">
+            Going back to the home page
+        </a>
+    </div>
+{% endblock body %}
+
+{# Footer of the page #}
+{% block footer %}
+{% include "components/footer.html" %}
+{% endblock footer %}

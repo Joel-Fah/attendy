@@ -5,6 +5,7 @@ from .views import HomeView, DashboardView, CourseView, StudentView, LecturerVie
     TeachingRecordUpdateView, LevelView, DashboardDetailView, AttendanceDetailView, AttendanceAddView, \
     CourseAttendanceAddView, AttendanceUpdateView, decode_qr, add_student_to_course_attendance, FeedbackView, \
     CourseRegistrationView
+from .views import handler404, handler500
 
 # Create your urls here
 app_name = 'core'
@@ -65,5 +66,5 @@ urlpatterns = [
          name='add_student_to_course_attendance'),
 
     # Feedback URLs
-    path('app/feedback/', FeedbackView.as_view(), name='feedback'),
+    path('app/feedback/', FeedbackView.as_view(), name='feedback'), 
 ]

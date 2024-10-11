@@ -1,0 +1,32 @@
+{% load static tailwind_tags %}
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth bg-whiteColor">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}{% endblock title %}</title>
+
+    {# Favicon #}
+    <link rel="shortcut icon" href="{% static 'core/images/attendy.svg' %}" type="image/x-icon">
+
+    {# Icons ~ HugeIcons, Free Stroke rounded icons. #}
+    <!-- SVG codes of icons are directly obtained (copied) from https://hugeicons.com/icons -->
+
+    {# CSS: Tailwind, Custom #}
+    {% tailwind_css %}
+</head>
+<body class="h-screen">
+    <main>
+        {% block body %}
+        
+        {% endblock body %}
+    </main>
+
+    {# Footer of the page #}
+    {% block footer %}
+
+    {% endblock footer %}
+</body>
+</html>

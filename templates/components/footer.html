@@ -10,7 +10,7 @@
 
   <div
     class="flex flex-row flex-wrap items-center justify-center text-center bg-whiteColor gap-y-6 gap-x-12 md:justify-between">
-    <img src="{% static 'core/images/attendy-text.svg' %}" alt="Attendy" class="" />
+    <a href="{% url 'core:home' %}"><img src="{% static 'core/images/attendy-text.svg' %}" alt="Attendy" class="" /></a>
     <small class="block font-sans text-base antialiased font-normal leading-relaxed text-center text-blue-gray-900">
       © {{ current_year }} attendy. All rights reserved.
     </small>
