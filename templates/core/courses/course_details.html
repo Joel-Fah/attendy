@@ -193,32 +193,32 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        {% for registration in registered_students %}
+                                        {% for student in registered_students %}
                                         <tr class="border-b border-darkColor/10 hover:bg-secondaryColor/5">
                                             <td class="w-4 p-4">
                                                 {{ forloop.counter }}
                                             </td>
                                             <th scope="row" class="flex items-center gap-1 px-6 py-4 font-medium whitespace-nowrap">
-                                                {{ registration.student.name}}
-                                                {% if registration.student.is_delegate %}
+                                                {{ student.name }}
+                                                {% if student.is_delegate %}
                                                   <div class="w-1.5 h-1.5 rounded-full bg-secondaryColor"></div>
                                                 {% endif %}
                                             </th>
                                             <td class="px-6 py-4">
-                                                {{ registration.student.email }}
+                                                {{ student.email }}
                                             </td>
                                             <td class="px-6 py-4">
-                                                {{ registration.student.class_level.department}}
+                                                {{ student.class_level.department}}
                                             </td>
                                             <td class="px-6 py-4">
-                                                {{ registration.student.phone }}
+                                                {{ student.phone }}
                                             </td>
                                             <td class="px-6 py-4">
-                                                {{ registration.student.gender }}
+                                                {{ student.gender }}
                                             </td>
                                             <td class="px-6 py-4 bg-whiteHover">
                                                 <div class="flex gap-2">
-                                                    <a href="{% url 'core:student_detail' level_pk=level.id pk=registration.student.id slug=registration.student.slug %}" class="font-medium text-primaryColor hover:underline">
+                                                    <a href="{% url 'core:student_detail' level_pk=level.id pk=student.id slug=student.slug %}" class="font-medium text-primaryColor hover:underline">
                                                         View
                                                     </a>
                                                 </div>

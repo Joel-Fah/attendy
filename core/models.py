@@ -89,16 +89,16 @@ class Student(models.Model):
     def generate_qr_code_url(self):
         if not self.encoded_data:
             data = {
-                'id': self.id,
-                'student_number': self.student_number,
-                'class_level_id': self.class_level.id
+                "id": self.id,
+                "student_number": self.student_number,
+                "class_level_id": self.class_level.id
             }
             self.encoded_data = encode_data(data)
             self.save()
 
         qr = qrcode.QRCode(
             version=1,
-            error_correction=qrcode.constants.ERROR_CORRECT_H,  # Use high error correction to accommodate the logo
+            error_correction=qrcode.constants.ERROR_CORRECT_M,  # Use high error correction to accommodate the logo
             box_size=10,
             border=2,
         )
@@ -161,10 +161,11 @@ class Course(models.Model):
     class Meta:
         verbose_name = "Course"
         verbose_name_plural = "Courses"
+        unique_together = ('class_level', 'code')
 
     class_level = models.ForeignKey('ClassLevel', on_delete=models.CASCADE, related_name='class_level_course')
     code = models.CharField(max_length=7, null=False,
-                            blank=False, unique=True, help_text="Course code")
+                            blank=False, help_text="Course code")
     title = models.CharField(max_length=255, null=False,
                              blank=False, help_text="Name of the course")
     lecturer = models.ForeignKey(

@@ -297,26 +297,22 @@ def decode_qr(request, *args, **kwargs):
 
             # Check if student registered the course of the attendance
             attendance_course = Attendance.objects.get(pk=kwargs['pk']).course
-            has_registered = CourseRegistration.objects.filter(Q(student=student, course=attendance_course) | Q(
-                student__class_level=attendance_course.class_level)).exists()
-            class_level = f'{attendance_course.class_level.get_level_display()} - '
-            f'Group {attendance_course.class_level.group} - '
-            f'{attendance_course.class_level.semester} {attendance_course.class_level.year} - '
-            f'{attendance_course.class_level.department}'
+            has_registered = CourseRegistration.objects.filter(student=student, course=attendance_course).exists() or \
+                             student.class_level == attendance_course.class_level
+            class_level = f'{attendance_course.class_level.get_level_display()} - Group {attendance_course.class_level.group} - {attendance_course.class_level.semester} {attendance_course.class_level.year} - {attendance_course.class_level.department}'
 
-            if not has_registered:
+            if has_registered:
                 return JsonResponse({
-                    'success': False,
-                    'error': f'{student.name} is not registered for {attendance_course.title} '
-                             f'nor is part of {class_level}'
+                    "success": True,
+                    "student_name": student.name,
+                    "class_level": class_level,
+                    "has_registered": has_registered,
                 })
-
-            return JsonResponse({
-                'success': True,
-                'student_name': student.name,
-                'class_level': class_level,
-                'has_registered': has_registered,
-            })
+            else:
+                return JsonResponse({
+                    "success": False,
+                    "error": f'The student "{student.name}" is not registered for {attendance_course.title}'
+                })
         except (Student.DoesNotExist, ClassLevel.DoesNotExist, ValueError, json.JSONDecodeError) as e:
             return JsonResponse({'success': False, 'error': str(e)})
     return JsonResponse({'success': False, 'error': 'Invalid request method'})
@@ -341,9 +337,10 @@ def add_student_to_course_attendance(request, *args, **kwargs):
             # Add the student to the CourseAttendance if they are registered for the course
             attendance = Attendance.objects.get(pk=kwargs['pk'])
             course = attendance.course
+            has_registered = Course.objects.filter(
+                Q(registration__student=student, id=attendance.course.id) | Q(class_level=student.class_level)).exists()
 
-            if CourseRegistration.objects.filter(Q(student=student, course=attendance.course) | Q(
-                    student__class_level=attendance.course.class_level)).exists():
+            if has_registered:
                 CourseAttendance.objects.create(student=student, attendance=attendance)
 
                 message = format_html(
@@ -357,9 +354,7 @@ def add_student_to_course_attendance(request, *args, **kwargs):
                     'success': True,
                     'student_name': student.name,
                     'course': f'{course.code} {course.title}',
-                    'class_level': f'{attendance.class_level.get_level_display()} - '
-                                   f'Group {attendance.class_level.group} - {attendance.class_level.semester} '
-                                   f'{attendance.class_level.year} - {attendance.class_level.department}',
+                    'class_level': f'{attendance.class_level.get_level_display()} - Group {attendance.class_level.group} - {attendance.class_level.semester} {attendance.class_level.year} - {attendance.class_level.department}',
                 })
             else:
                 raise ValueError(f'{student.name} is not registered for {course.title}')
@@ -403,14 +398,15 @@ class CourseDetailView(LoginRequiredMixin, CommonContextMixin, DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         course = self.get_object()
-        registered_students = CourseRegistration.objects.filter(course=course,
-                                                                course__class_level=course.class_level)
+        registered_students = Student.objects.filter(
+            Q(registration__course=course) | Q(class_level=course.class_level))
+
         context['delegates'] = CourseDelegate.objects.filter(course=course)
         context['registered_students'] = registered_students
 
         # Calculate male and female students
-        male_students = registered_students.filter(student__gender='Male').count()
-        female_students = registered_students.filter(student__gender='Female').count()
+        male_students = registered_students.filter(gender='Male').count()
+        female_students = registered_students.filter(gender='Female').count()
         context['gender_distribution'] = json.dumps({
             'male': male_students,
             'female': female_students
@@ -1008,9 +1004,11 @@ class FeedbackView(LoginRequiredMixin, CreateView):
         context['quote'] = random_quote
         return context
 
+
 # Handlers
 def handler404(request, exception):
     return render(request, 'core/errors/404.html', status=404)
+
 
 def handler500(request):
     return render(request, 'core/errors/500.html', status=500)

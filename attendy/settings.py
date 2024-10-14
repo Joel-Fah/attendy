@@ -202,4 +202,5 @@ ACCOUNT_FORMS = {
     'login': 'core.forms.UserLoginForm',
 }
 
+# SITE_URL = 'http://192.168.233.46:8000/'
 SITE_URL = 'http://127.0.0.1:8000/'

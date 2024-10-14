@@ -38,6 +38,7 @@
 
             <div class="w-1/3">
                 <!-- QR Reader Container -->
+                 Qr content <div id="qr-content"></div>
                 <div id="qr-reader"></div>
             </div>
         </div>
@@ -311,8 +312,7 @@
             })
             .then(response => response.json())
             .then(data => {
-                <!-- print data -->
-                console.log(data);
+                document.getElementById('qr-content').innerHTML = data.student_name;
                 if (data.success) {
                     // Ask for user confirmation
                     const confirmation = confirm(`Do you want to add \n\tStudent: ${data.student_name}\n\tClass/Level: ${data.class_level}\n\tHas this course registered?: ${data.has_registered} \nto the current attendance?`);
@@ -344,7 +344,12 @@
                         .catch(error => console.error('Error:', error));
                     }
                 } else {
-                    alert('Failed to decode QR code.');
+                    // if data.error is not empty, show the error message
+                    if (data.error) {
+                        alert(data.error);
+                    } else {
+                        alert('Failed to decode the QR code. Please try again.');
+                    }
                 }
             })
             .catch(error => console.error('Error:', error));

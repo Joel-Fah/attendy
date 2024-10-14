@@ -11,7 +11,7 @@ from .models import Student, CourseDelegate, Lecturer, TeachingRecord, Course, C
 
 class StudentAdmin(admin.ModelAdmin):
     model = Student
-    list_display = ['student_number', 'name', 'phone', 'gender', 'is_delegate']
+    list_display = ['class_level', 'student_number', 'name', 'phone', 'gender', 'is_delegate']
     list_filter = ['class_level__department', 'gender', 'is_delegate']
     search_fields = ['name', 'student_number', 'email', 'phone']
     list_per_page = 25
