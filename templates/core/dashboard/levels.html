@@ -81,10 +81,10 @@
 
         <div class="absolute -top-8 blur-2xl opacity-50 w-full max-w-screen-xl h-16 bg-gradient-to-r from-primaryColor to-secondaryColor rounded-[300%]"></div>
 
-        <section class="relative -top-32 px-14 py-10 grid grid-cols-12 gap-2 m-auto max-w-screen-xl">
+        <section class="relative -top-40 lg:-top-32 px-4 lg:px-14 py-5 lg:py-10 grid grid-cols-12 gap-2 m-auto max-w-screen-xl">
             {% for level in levels %}
                 {% if level.is_visible %}
-                <a href="{% url 'core:dashboard' level_pk=level.id level_slug=level.slug %}" class="col-span-4 flex flex-col items-start gap-2 text-left shadow hover:shadow-lg rounded-2xl p-4 border outline outline-0 outline-transparent hover:outline hover:outline-1 hover:outline-darkColor border-darkColor bg-whiteColor hover:bg-whiteHover transition-all duration-200 ease-linear">
+                <a href="{% url 'core:dashboard' level_pk=level.id level_slug=level.slug %}" class="col-span-full lg:col-span-4 flex flex-col items-start gap-2 text-left shadow hover:shadow-lg rounded-2xl p-4 border outline outline-0 outline-transparent hover:outline hover:outline-1 hover:outline-darkColor border-darkColor bg-whiteColor hover:bg-whiteHover transition-all duration-200 ease-linear">
                     <div class="leading-tight uppercase w-full">
                         {% if level.group %}
                         <h3 class="text-2xl font-bold">

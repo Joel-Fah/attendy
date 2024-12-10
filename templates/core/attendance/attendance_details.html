@@ -36,9 +36,8 @@
                 </small>
             </div>
 
-            <div class="w-1/3">
+            <div class="w-2/5">
                 <!-- QR Reader Container -->
-                 Qr content <div id="qr-content"></div>
                 <div id="qr-reader"></div>
             </div>
         </div>
@@ -312,7 +311,7 @@
             })
             .then(response => response.json())
             .then(data => {
-                document.getElementById('qr-content').innerHTML = data.student_name;
+                // document.getElementById('qr-content').innerHTML = data.student_name;
                 if (data.success) {
                     // Ask for user confirmation
                     const confirmation = confirm(`Do you want to add \n\tStudent: ${data.student_name}\n\tClass/Level: ${data.class_level}\n\tHas this course registered?: ${data.has_registered} \nto the current attendance?`);
