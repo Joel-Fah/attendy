@@ -1,17 +1,21 @@
 import json
+import os
 import random
 from collections import defaultdict
 from datetime import timedelta, datetime
 
+from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Q, Count
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse, FileResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse_lazy
 from django.utils.html import format_html
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import TemplateView, ListView, DetailView, CreateView, UpdateView
+from reportlab.lib.enums import TA_CENTER
+from reportlab.lib.units import inch
 
 from .forms import CourseForm, LecturerForm, StudentForm, TeachingRecordForm, AttendanceForm, CourseAttendanceForm, \
     FeedbackForm
@@ -19,6 +23,11 @@ from .mixins import CommonContextMixin, ClassLevelAccessMixin
 from .models import Course, Student, Lecturer, TeachingRecord, CourseDelegate, CourseAttendance, \
     ClassLevel, Attendance, ClassLevelUser, Feedback, CourseRegistration
 from .utils import group_model_items_by_week, get_faqs, get_quotes, decode_data
+
+from reportlab.lib.pagesizes import A4
+from reportlab.lib import colors
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer, Image
 
 
 # Create your views here.
@@ -426,6 +435,108 @@ class CourseDetailView(LoginRequiredMixin, CommonContextMixin, DetailView):
             )
             messages.success(request, message)
         return self.get(request, *args, **kwargs)
+
+
+class CoursePDFView(LoginRequiredMixin, CommonContextMixin, DetailView):
+    model = Course
+    template_name = 'core/courses/course_details.html'
+    context_object_name = 'course'
+
+    def get(self, request, *args, **kwargs):
+        course = self.get_object()
+        course_delegate = CourseDelegate.objects.filter(course=course, role='delegate')
+        registered_students = Student.objects.filter(
+            Q(registration__course=course) | Q(class_level=course.class_level)).distinct().order_by('name')
+
+        # Generate PDF file path
+        pdf_folder_path = os.path.join(settings.MEDIA_ROOT, 'course_class_list')
+        os.makedirs(pdf_folder_path, exist_ok=True)
+        pdf_file_path = os.path.join(pdf_folder_path, f"{course.title}_class_list.pdf")
+
+        doc = SimpleDocTemplate(pdf_file_path, pagesize=A4, rightMargin=24, leftMargin=24, topMargin=20, bottomMargin=18)
+        elements = []
+
+        # Add the image at the top
+        image_path = str(settings.BASE_DIR / 'static/core/images/ictu_logo.png')
+        logo = Image(image_path)
+        logo.drawHeight = 1.25 * inch
+        logo.drawWidth = 1.25 * inch
+        elements.append(logo)
+
+        styles = getSampleStyleSheet()
+        styles['Normal'].leading = 20
+        title = Paragraph("Information and Communication Technology University<br/>Institute (ICT-U) Cameroon".upper(),
+                          ParagraphStyle(
+                              name='Heading3',
+                              alignment=TA_CENTER,
+                              fontSize=12,
+                              spaceBefore=16,
+                              spaceAfter=16,
+                              textColor=colors.black,
+                              fontName='Times-Roman',
+                              leading=16
+                          ))
+        elements.append(title)
+        sub_title = Paragraph(f"Class List for {course.title}", ParagraphStyle(
+                              name='Heading2',
+                              alignment=TA_CENTER,
+                              fontSize=14,
+                              spaceBefore=16,
+                              spaceAfter=16,
+                              textColor=colors.black,
+                              fontName='Helvetica-Bold',
+                          ))
+        elements.append(sub_title)
+
+        course_details = f"""
+        <strong>COURSE TITLE:</strong> {course.title} &nbsp;
+        <strong>COURSE CODE:</strong> {course.code} &nbsp;
+        <strong>LECTURER:</strong> {course.lecturer.name} &nbsp;
+        <strong>COURSE DELEGATE:</strong> {course_delegate.first().student.name if course_delegate.exists() else '_' * 10} &nbsp;
+        """
+        elements.append(Paragraph(course_details, styles['Normal']))
+        elements.append(Spacer(width=20, height=10))
+
+        data = [['No.', 'Name', 'Email', 'Dep\'t', 'Phone No.', 'Gender']]
+        for i, student in enumerate(registered_students, start=1):
+            data.append([i, student.name, student.email, student.class_level.department, student.phone, student.gender[0].upper()])
+
+        table = Table(data, colWidths=[None, None, None, None, None, None], hAlign='LEFT')
+        table.setStyle(TableStyle([
+            ('BACKGROUND', (0, 0), (-1, 0), colors.white),
+            ('TEXTCOLOR', (0, 0), (-1, 0), colors.black),
+            ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+            ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+            ('BOTTOMPADDING', (0, 0), (-1, 0), 8),
+            ('BACKGROUND', (0, 1), (-1, -1), colors.white),
+            ('GRID', (0, 0), (-1, -1), 1, colors.black),
+        ]))
+        elements.append(table)
+
+        # Add footer with placeholders for signatures
+        elements.append(Spacer(width=20, height=50))
+        footer = Table(
+            [[f'{"_" * 30}\nLecturer'.upper(), '', '', '', f'{"_" * 30}\nAdmin Assistant'.upper()]],
+            colWidths=[None, None, None, None, None],
+            hAlign='LEFT'
+        )
+        footer.setStyle(TableStyle([
+            ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+            ('FONTNAME', (0, 0), (-1, -1), 'Times-Roman'),
+            ('BOTTOMPADDING', (0, 0), (-1, -1), 12),
+        ]))
+        elements.append(footer)
+
+        doc.build(elements)
+
+        # Serve the PDF file
+        response = FileResponse(open(pdf_file_path, 'rb'), content_type='application/pdf')
+        response['Content-Disposition'] = f'attachment; filename="{course.title}_class_list.pdf"'
+
+        # Redirect to course details page
+        redirect_url = reverse_lazy('core:course_detail',
+                                    kwargs={'level_pk': course.class_level.id, 'pk': course.id, 'slug': course.slug})
+        return response
 
 
 class CourseAddView(LoginRequiredMixin, CommonContextMixin, CreateView):
