@@ -4,7 +4,7 @@ from .views import HomeView, DashboardView, CourseView, StudentView, LecturerVie
     StudentAddView, CourseAddView, CourseUpdateView, StudentUpdateView, LecturerUpdateView, \
     TeachingRecordUpdateView, LevelView, DashboardDetailView, AttendanceDetailView, AttendanceAddView, \
     CourseAttendanceAddView, AttendanceUpdateView, decode_qr, add_student_to_course_attendance, FeedbackView, \
-    CourseRegistrationView, CoursePDFView
+    CourseRegistrationView, CoursePDFView, AttendancePDFView, TeachingRecordPDFView
 from .views import handler404, handler500
 
 # Create your urls here
@@ -45,6 +45,8 @@ urlpatterns = [
     path('app/<int:level_pk>/records/', TeachingRecordView.as_view(), name='records'),
     path('app/<int:level_pk>/records/<int:pk>/<slug:slug>/', TeachingRecordDetailView.as_view(),
          name='record_detail'),
+path('app/<int:level_pk>/records/<int:pk>/<slug:slug>/pdf/', TeachingRecordPDFView.as_view(),
+         name='record_pdf'),
     path('app/<int:level_pk>/records/<int:pk>/<slug:slug>/edit', TeachingRecordUpdateView.as_view(),
          name='record_update'),
 
@@ -55,6 +57,8 @@ urlpatterns = [
     # Attendance URLs
     path('app/<int:level_pk>/<slug:level_slug>/attendance/<int:pk>/', AttendanceDetailView.as_view(),
          name='attendance_detail'),
+path('app/<int:level_pk>/<slug:level_slug>/attendance/<int:pk>/pdf/', AttendancePDFView.as_view(),
+         name='attendance_pdf'),
     path('app/<int:level_pk>/<slug:level_slug>/attendance/<int:pk>/edit/', AttendanceUpdateView.as_view(),
          name='attendance_update'),
     path('app/<int:level_pk>/<slug:level_slug>/attendance/add/', AttendanceAddView.as_view(), name='attendance_add'),

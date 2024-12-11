@@ -1,7 +1,7 @@
-from collections import defaultdict
-from datetime import datetime, timedelta
 import base64
 import json
+from collections import defaultdict
+from datetime import datetime, timedelta
 
 
 def calculate_duration(start_time, end_time):
@@ -157,3 +157,51 @@ def encode_data(data):
 def decode_data(encoded_data):
     decoded_data = base64.urlsafe_b64decode(encoded_data.encode()).decode()
     return json.loads(decoded_data)
+
+def date_formatter(date: datetime) -> str:
+    """
+    This function takes a date object and returns a string representation of the date in the format 'Monday 19 August 2021'.
+
+    Args:
+        date (datetime): The date to format.
+
+    Returns:
+        str: The formatted date string.
+    """
+    return date.strftime('%A %d %B %Y')
+
+def short_date_formatter(date: datetime) -> str:
+    """
+        This function takes a date object and returns a string representation of the date in the format 'Mon. 19 Aug. 2021'.
+
+        Args:
+            date (datetime): The date to format.
+
+        Returns:
+            str: The formatted date string.
+        """
+    return date.strftime('%a. %d %b. %Y')
+
+def time_formatter(time: datetime) -> str:
+    """
+    This function takes a time object and returns a string representation of the time in the format '12:00 PM'.
+
+    Args:
+        time (datetime): The time to format.
+
+    Returns:
+        str: The formatted time string.
+    """
+    return time.strftime('%I:%M %p')
+
+def datetime_formatter(date_time: datetime) -> str:
+    """
+    This function takes a datetime object and returns a string representation of the datetime in the format 'Monday 19 August 2021, 12:00 PM'.
+
+    Args:
+        date_time (datetime): The datetime to format.
+
+    Returns:
+        str: The formatted datetime string.
+    """
+    return f"{date_formatter(date_time)} at {time_formatter(date_time)}"

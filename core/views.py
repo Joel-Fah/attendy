@@ -8,26 +8,26 @@ from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Q, Count
-from django.http import JsonResponse, HttpResponse, FileResponse
+from django.http import JsonResponse, FileResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse_lazy
 from django.utils.html import format_html
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import TemplateView, ListView, DetailView, CreateView, UpdateView
-from reportlab.lib.enums import TA_CENTER
+from reportlab.lib import colors
+from reportlab.lib.enums import TA_CENTER, TA_JUSTIFY
+from reportlab.lib.pagesizes import A4
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib.units import inch
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer, Image
 
 from .forms import CourseForm, LecturerForm, StudentForm, TeachingRecordForm, AttendanceForm, CourseAttendanceForm, \
     FeedbackForm
 from .mixins import CommonContextMixin, ClassLevelAccessMixin
 from .models import Course, Student, Lecturer, TeachingRecord, CourseDelegate, CourseAttendance, \
     ClassLevel, Attendance, ClassLevelUser, Feedback, CourseRegistration
-from .utils import group_model_items_by_week, get_faqs, get_quotes, decode_data
-
-from reportlab.lib.pagesizes import A4
-from reportlab.lib import colors
-from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
-from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer, Image
+from .utils import group_model_items_by_week, get_faqs, get_quotes, decode_data, date_formatter, time_formatter, \
+    calculate_duration, short_date_formatter
 
 
 # Create your views here.
@@ -156,6 +156,121 @@ class AttendanceDetailView(LoginRequiredMixin, CommonContextMixin, DetailView):
             )
             messages.success(request, message)
         return self.get(request, *args, **kwargs)
+
+
+class AttendancePDFView(LoginRequiredMixin, CommonContextMixin, DetailView):
+    model = Attendance
+    template_name = 'core/attendance/attendance_details.html'
+    context_object_name = 'attendance'
+
+    def get(self, request, *args, **kwargs):
+        attendance = self.get_object()
+        course_delegate = CourseDelegate.objects.filter(course=attendance.course, student__is_delegate=True,
+                                                        role='delegate')
+        enrollments = CourseAttendance.objects.filter(attendance=self.get_object(),
+                                                      attendance__class_level=self.kwargs[
+                                                          'level_pk']).order_by('created_at')
+
+        # Generate PDF file path
+        filename = f"{attendance.course.title}_attendance_sheet_{attendance.course_date}.pdf"
+        pdf_folder_path = os.path.join(settings.MEDIA_ROOT, 'attendance_sheets')
+        os.makedirs(pdf_folder_path, exist_ok=True)
+        pdf_file_path = os.path.join(pdf_folder_path, filename)
+
+        doc = SimpleDocTemplate(pdf_file_path, title=filename, pagesize=A4, rightMargin=24, leftMargin=24, topMargin=20,
+                                bottomMargin=18)
+        elements = []
+
+        # Add the image at the top
+        image_path = str(settings.BASE_DIR / 'static/core/images/ictu_logo.png')
+        logo = Image(image_path)
+        logo.drawHeight = 1.25 * inch
+        logo.drawWidth = 1.25 * inch
+        elements.append(logo)
+
+        styles = getSampleStyleSheet()
+        styles['Normal'].leading = 20
+        title = Paragraph("Information and Communication Technology University<br/>Institute (ICT-U) Cameroon".upper(),
+                          ParagraphStyle(
+                              name='Heading3',
+                              alignment=TA_CENTER,
+                              fontSize=12,
+                              spaceBefore=16,
+                              spaceAfter=16,
+                              textColor=colors.black,
+                              fontName='Times-Roman',
+                              leading=16
+                          ))
+        elements.append(title)
+        sub_title = Paragraph(f"Course Attendance Sheet", ParagraphStyle(
+            name='Heading2',
+            alignment=TA_CENTER,
+            fontSize=14,
+            spaceBefore=16,
+            spaceAfter=16,
+            textColor=colors.black,
+            fontName='Helvetica-Bold',
+        ))
+        elements.append(sub_title)
+
+        course_details = f"""
+        <strong>COURSE TITLE: </strong> {attendance.course.title} &nbsp;
+        <strong>COURSE CODE: </strong> {attendance.course.code} &nbsp;
+        <strong>LECTURER: </strong> {attendance.course.lecturer.name} &nbsp;
+        <strong>DATE: </strong> {date_formatter(attendance.course_date)} &nbsp;
+        <strong>START TIME: </strong> {time_formatter(attendance.course_start_time)} &nbsp;
+        <strong>END TIME: </strong> {time_formatter(attendance.course_end_time)} &nbsp;
+        <strong>DURATION: </strong> {attendance.course_duration} &nbsp;
+        <strong>CLASS TYPE: </strong> {'Catchup Class' if attendance.is_catchup else 'Normal Class'} &nbsp;
+        <strong>COURSE DELEGATE: </strong> {course_delegate.first().student.name if course_delegate.exists() else '_' * 10} &nbsp;
+        """
+        elements.append(Paragraph(course_details, styles['Normal']))
+        elements.append(Spacer(width=20, height=10))
+
+        data = [['No.', 'Names', 'Email', 'Dep\'t', 'Phone No.', 'Gender', 'Signature']]
+        for i, enrollment in enumerate(enrollments, start=1):
+            data.append(
+                [i, enrollment.student.name, enrollment.student.email, enrollment.student.class_level.department,
+                 enrollment.student.phone, enrollment.student.gender[0].upper(), ''])
+
+        table = Table(data, colWidths=[None, None, None, None, None, None, None], hAlign='LEFT')
+        table.setStyle(TableStyle([
+            ('BACKGROUND', (0, 0), (-1, 0), colors.white),
+            ('TEXTCOLOR', (0, 0), (-1, 0), colors.black),
+            ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+            ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+            ('BOTTOMPADDING', (0, 0), (-1, 0), 8),
+            ('BACKGROUND', (0, 1), (-1, -1), colors.white),
+            ('GRID', (0, 0), (-1, -1), 1, colors.black),
+        ]))
+        elements.append(table)
+
+        # Add footer with placeholders for signatures
+        elements.append(Spacer(width=20, height=50))
+        footer = Table(
+            [[f'{"_" * 30}\nLecturer'.upper(), '', '', '', '', '', '', f'{"_" * 30}\nAdmin Assistant'.upper()]],
+            colWidths=[None, None, None, None, None, None, None, None],
+            hAlign='LEFT'
+        )
+        footer.setStyle(TableStyle([
+            ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+            ('FONTNAME', (0, 0), (-1, -1), 'Times-Roman'),
+            ('BOTTOMPADDING', (0, 0), (-1, -1), 12),
+        ]))
+        elements.append(footer)
+
+        doc.build(elements)
+
+        # Serve the PDF file
+        response = FileResponse(open(pdf_file_path, 'rb'), content_type='application/pdf')
+        response['Content-Disposition'] = f'attachment; filename={filename}'
+
+        # Redirect to attendance details page
+        reverse_lazy('core:attendance_detail',
+                     kwargs={'level_pk': self.kwargs['level_pk'],
+                             'level_slug': self.kwargs['level_slug'],
+                             'pk': attendance.pk})
+        return response
 
 
 class AttendanceAddView(LoginRequiredMixin, CommonContextMixin, CreateView):
@@ -444,16 +559,18 @@ class CoursePDFView(LoginRequiredMixin, CommonContextMixin, DetailView):
 
     def get(self, request, *args, **kwargs):
         course = self.get_object()
-        course_delegate = CourseDelegate.objects.filter(course=course, role='delegate')
+        course_delegate = CourseDelegate.objects.filter(course=course, student__is_delegate=True, role='delegate')
         registered_students = Student.objects.filter(
             Q(registration__course=course) | Q(class_level=course.class_level)).distinct().order_by('name')
 
         # Generate PDF file path
+        filename = f"{course.title}_class_list.pdf"
         pdf_folder_path = os.path.join(settings.MEDIA_ROOT, 'course_class_list')
         os.makedirs(pdf_folder_path, exist_ok=True)
-        pdf_file_path = os.path.join(pdf_folder_path, f"{course.title}_class_list.pdf")
+        pdf_file_path = os.path.join(pdf_folder_path, filename)
 
-        doc = SimpleDocTemplate(pdf_file_path, pagesize=A4, rightMargin=24, leftMargin=24, topMargin=20, bottomMargin=18)
+        doc = SimpleDocTemplate(pdf_file_path, title=filename, pagesize=A4, rightMargin=24, leftMargin=24, topMargin=20,
+                                bottomMargin=18)
         elements = []
 
         # Add the image at the top
@@ -478,14 +595,14 @@ class CoursePDFView(LoginRequiredMixin, CommonContextMixin, DetailView):
                           ))
         elements.append(title)
         sub_title = Paragraph(f"Class List for {course.title}", ParagraphStyle(
-                              name='Heading2',
-                              alignment=TA_CENTER,
-                              fontSize=14,
-                              spaceBefore=16,
-                              spaceAfter=16,
-                              textColor=colors.black,
-                              fontName='Helvetica-Bold',
-                          ))
+            name='Heading2',
+            alignment=TA_CENTER,
+            fontSize=14,
+            spaceBefore=16,
+            spaceAfter=16,
+            textColor=colors.black,
+            fontName='Helvetica-Bold',
+        ))
         elements.append(sub_title)
 
         course_details = f"""
@@ -497,9 +614,10 @@ class CoursePDFView(LoginRequiredMixin, CommonContextMixin, DetailView):
         elements.append(Paragraph(course_details, styles['Normal']))
         elements.append(Spacer(width=20, height=10))
 
-        data = [['No.', 'Name', 'Email', 'Dep\'t', 'Phone No.', 'Gender']]
+        data = [['No.', 'Names', 'Email', 'Dep\'t', 'Phone No.', 'Gender']]
         for i, student in enumerate(registered_students, start=1):
-            data.append([i, student.name, student.email, student.class_level.department, student.phone, student.gender[0].upper()])
+            data.append([i, student.name, student.email, student.class_level.department, student.phone,
+                         student.gender[0].upper()])
 
         table = Table(data, colWidths=[None, None, None, None, None, None], hAlign='LEFT')
         table.setStyle(TableStyle([
@@ -516,8 +634,8 @@ class CoursePDFView(LoginRequiredMixin, CommonContextMixin, DetailView):
         # Add footer with placeholders for signatures
         elements.append(Spacer(width=20, height=50))
         footer = Table(
-            [[f'{"_" * 30}\nLecturer'.upper(), '', '', '', f'{"_" * 30}\nAdmin Assistant'.upper()]],
-            colWidths=[None, None, None, None, None],
+            [[f'{"_" * 30}\nLecturer'.upper(), '', '', '', '', '', '', f'{"_" * 30}\nAdmin Assistant'.upper()]],
+            colWidths=[None, None, None, None, None, None, None, None],
             hAlign='LEFT'
         )
         footer.setStyle(TableStyle([
@@ -531,11 +649,11 @@ class CoursePDFView(LoginRequiredMixin, CommonContextMixin, DetailView):
 
         # Serve the PDF file
         response = FileResponse(open(pdf_file_path, 'rb'), content_type='application/pdf')
-        response['Content-Disposition'] = f'attachment; filename="{course.title}_class_list.pdf"'
+        response['Content-Disposition'] = f'attachment; filename={filename}'
 
         # Redirect to course details page
-        redirect_url = reverse_lazy('core:course_detail',
-                                    kwargs={'level_pk': course.class_level.id, 'pk': course.id, 'slug': course.slug})
+        reverse_lazy('core:course_detail',
+                     kwargs={'level_pk': course.class_level.id, 'pk': course.id, 'slug': course.slug})
         return response
 
 
@@ -1036,6 +1154,146 @@ class TeachingRecordDetailView(LoginRequiredMixin, CommonContextMixin, DetailVie
             attendance__course__class_level_id=class_level_id
         ).count()
         return context
+
+
+class TeachingRecordPDFView(LoginRequiredMixin, CommonContextMixin, DetailView):
+    model = TeachingRecord
+    template_name = 'core/records/record_details.html'
+    context_object_name = 'record'
+
+    def get(self, request, *args, **kwargs):
+        record = self.get_object()
+        course_delegate = CourseDelegate.objects.filter(course=record.attendance.course, student__is_delegate=True,
+                                                        role='delegate')
+        enrollments = CourseAttendance.objects.filter(attendance=record.attendance,
+                                                      attendance__class_level=self.kwargs[
+                                                          'level_pk']).order_by('created_at')
+
+        # Generate PDF file path
+        filename = f"{record.attendance.course.title}_teaching_record.pdf"
+        pdf_folder_path = os.path.join(settings.MEDIA_ROOT, 'teaching_records')
+        os.makedirs(pdf_folder_path, exist_ok=True)
+        pdf_file_path = os.path.join(pdf_folder_path, filename)
+
+        doc = SimpleDocTemplate(pdf_file_path, title=filename, pagesize=A4, rightMargin=24, leftMargin=24, topMargin=20,
+                                bottomMargin=18)
+        elements = []
+
+        # Add the image at the top
+        image_path = str(settings.BASE_DIR / 'static/core/images/ictu_long_logo.png')
+        logo = Image(image_path, hAlign="LEFT")
+        logo.drawHeight = 1 * inch
+        logo.drawWidth = 1.75 * inch
+        elements.append(logo)
+
+        styles = getSampleStyleSheet()
+        styles['Normal'].leading = 20
+        title = Paragraph("Teaching Record and Syllabus Coverage Protocol",
+                          ParagraphStyle(
+                              name='Heading3',
+                              alignment=TA_CENTER,
+                              fontSize=12,
+                              spaceBefore=16,
+                              spaceAfter=16,
+                              textColor=colors.black,
+                              fontName='Times-Roman',
+                              leading=16
+                          ))
+        elements.append(title)
+
+        # Heading Table
+        bold_style = ParagraphStyle(name='Bold', fontName='Times-Roman', fontSize=12)
+
+        heading_table_data = [
+            [Paragraph('Name of Lecturer', bold_style), record.attendance.course.lecturer],
+            [Paragraph('Course Code/Title', bold_style), record.attendance.course],
+            [Paragraph('Start Time - Finish Time', bold_style),
+             f'{time_formatter(record.attendance.course_start_time)} - {time_formatter(record.attendance.course_end_time)}'],
+            [Paragraph('Duration', bold_style), record.attendance.course_duration],
+            [Paragraph('Number of students', bold_style), enrollments.count()],
+            [Paragraph('Date', bold_style), date_formatter(record.attendance.course_date)],
+        ]
+        heading_table = Table(heading_table_data, colWidths=[2 * inch, None], hAlign='LEFT')
+        heading_table.setStyle(TableStyle([
+            ('BACKGROUND', (0, 0), (-1, 0), colors.white),
+            ('TEXTCOLOR', (0, 0), (-1, 0), colors.black),
+            ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+            ('FONTNAME', (0, 0), (-1, 0), 'Helvetica'),
+            ('BOTTOMPADDING', (0, 0), (-1, 0), 8),
+            ('BACKGROUND', (0, 1), (-1, -1), colors.white),
+            ('GRID', (0, 0), (-1, -1), 1, colors.black),
+        ]))
+        elements.append(heading_table)
+        elements.append(Spacer(width=20, height=16))
+
+        # Subtitle
+        subtitle_data_row = Table(
+            [[Paragraph('Lessons and Brief Contents / Assignments',
+                        style=ParagraphStyle(name='Heading3', fontName='Times-Roman', fontSize=12, spaceBefore=2,
+                                             spaceAfter=2, alignment=TA_CENTER))]],
+            colWidths=[None],
+            hAlign='CENTER',
+            style=TableStyle([
+                ('BACKGROUND', (0, 0), (-1, 0), colors.lightgrey),
+                ('TEXTCOLOR', (0, 0), (-1, 0), colors.black),
+                ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+                ('FONTNAME', (0, 0), (-1, 0), 'Times-Roman'),
+                ('BOTTOMPADDING', (0, 0), (-1, 0), 8),
+                ('GRID', (0, 0), (-1, -1), 1, colors.black),
+            ])
+        )
+        elements.append(subtitle_data_row)
+        elements.append(Spacer(width=20, height=16))
+
+        # Lessons content
+        # Replace <p><br></p> with <div><br/></div> and add <br/> between </p><p>
+        description = record.description.replace('<p><br></p>', '<div><br/><br/></div>').replace('</p><p>', '</p><br/><p>')
+
+
+        # Use the updated description in the Paragraph
+        content = Paragraph(description, style=ParagraphStyle(
+            name='Normal',
+            fontName='Helvetica',
+            fontSize=12,
+            alignment=TA_JUSTIFY,
+            leading=20,
+            textColor=colors.black,
+        ))
+        elements.append(content)
+        elements.append(Spacer(width=20, height=10))
+
+        # Footer table data
+        times_roman_style = ParagraphStyle(name='Normal', fontName='Times-Roman', fontSize=12)
+        footer_table_data = [
+            [Paragraph(title, style=times_roman_style) for title in ['Official', 'Names', 'Signatures', 'Date']],
+            [Paragraph('Lecturer', style=times_roman_style), record.attendance.course.lecturer.name, '',
+             short_date_formatter(record.attendance.course_date)],
+            [Paragraph('Course Delegate', style=times_roman_style),
+             course_delegate.first().student.name if course_delegate.exists() else '', '',
+             short_date_formatter(record.attendance.course_date)],
+            [Paragraph('Quality Assurance', style=times_roman_style), '', '',
+             short_date_formatter(record.attendance.course_date)],
+        ]
+        footer_table = Table(footer_table_data, colWidths=[1.75 * inch, 2.75 * inch, None, None], hAlign='LEFT')
+        footer_table.setStyle(TableStyle([
+            ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+            ('FONTNAME', (0, 0), (-1, -1), 'Helvetica'),
+            ('BOTTOMPADDING', (0, 0), (-1, -1), 8),
+            ('GRID', (0, 0), (-1, -1), 1, colors.black),
+        ]))
+        elements.append(footer_table)
+
+        doc.build(elements)
+
+        response = FileResponse(open(pdf_file_path, 'rb'), content_type='application/pdf')
+        response['Content-Disposition'] = f'attachment; filename={filename}'
+
+        # Redirect to teaching record details page
+        reverse_lazy('core:record_detail',
+                     kwargs={'level_pk': record.attendance.class_level.id, 'pk': record.pk,
+                             'slug': record.attendance.course.slug})
+
+        return response
 
 
 class TeachingRecordUpdateView(LoginRequiredMixin, CommonContextMixin, UpdateView):
