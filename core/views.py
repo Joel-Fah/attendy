@@ -464,6 +464,13 @@ def add_student_to_course_attendance(request, *args, **kwargs):
             has_registered = Course.objects.filter(
                 Q(registration__student=student, id=attendance.course.id) | Q(class_level=student.class_level)).exists()
 
+            # Check if student is already attending the course
+            if CourseAttendance.objects.filter(student=student, attendance=attendance).exists():
+                return JsonResponse({
+                    'success': False,
+                    'error': f'{student.name} is already admitted into attendance for {course.title}'
+                })
+
             if has_registered:
                 CourseAttendance.objects.create(student=student, attendance=attendance)
 
