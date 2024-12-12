@@ -27,7 +27,7 @@ from .mixins import CommonContextMixin, ClassLevelAccessMixin
 from .models import Course, Student, Lecturer, TeachingRecord, CourseDelegate, CourseAttendance, \
     ClassLevel, Attendance, ClassLevelUser, Feedback, CourseRegistration
 from .utils import group_model_items_by_week, get_faqs, get_quotes, decode_data, date_formatter, time_formatter, \
-    calculate_duration, short_date_formatter
+    short_date_formatter, parse_html_to_flowables
 
 
 # Create your views here.
@@ -1182,7 +1182,7 @@ class TeachingRecordPDFView(LoginRequiredMixin, CommonContextMixin, DetailView):
         # Add the image at the top
         image_path = str(settings.BASE_DIR / 'static/core/images/ictu_long_logo.png')
         logo = Image(image_path, hAlign="LEFT")
-        logo.drawHeight = 1 * inch
+        logo.drawHeight = 0.9 * inch
         logo.drawWidth = 1.75 * inch
         elements.append(logo)
 
@@ -1202,23 +1202,24 @@ class TeachingRecordPDFView(LoginRequiredMixin, CommonContextMixin, DetailView):
         elements.append(title)
 
         # Heading Table
-        bold_style = ParagraphStyle(name='Bold', fontName='Times-Roman', fontSize=12)
+        times_roman_style = ParagraphStyle(name='Normal', fontName='Times-Roman', fontSize=12)
 
         heading_table_data = [
-            [Paragraph('Name of Lecturer', bold_style), record.attendance.course.lecturer],
-            [Paragraph('Course Code/Title', bold_style), record.attendance.course],
-            [Paragraph('Start Time - Finish Time', bold_style),
+            [Paragraph('Name of Lecturer', times_roman_style), record.attendance.course.lecturer],
+            [Paragraph('Course Code/Title', times_roman_style), record.attendance.course],
+            [Paragraph('Start Time - Finish Time', times_roman_style),
              f'{time_formatter(record.attendance.course_start_time)} - {time_formatter(record.attendance.course_end_time)}'],
-            [Paragraph('Duration', bold_style), record.attendance.course_duration],
-            [Paragraph('Number of students', bold_style), enrollments.count()],
-            [Paragraph('Date', bold_style), date_formatter(record.attendance.course_date)],
+            [Paragraph('Duration', times_roman_style), record.attendance.course_duration],
+            [Paragraph('Number of students', times_roman_style), enrollments.count()],
+            [Paragraph('Date', times_roman_style), date_formatter(record.attendance.course_date)],
         ]
         heading_table = Table(heading_table_data, colWidths=[2 * inch, None], hAlign='LEFT')
         heading_table.setStyle(TableStyle([
             ('BACKGROUND', (0, 0), (-1, 0), colors.white),
             ('TEXTCOLOR', (0, 0), (-1, 0), colors.black),
             ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
-            ('FONTNAME', (0, 0), (-1, 0), 'Helvetica'),
+            ('FONTNAME', (0, 1), (-1, 1), 'Helvetica'),
+            ('FONTSIZE', (0, 1), (-1, 1), 12),
             ('BOTTOMPADDING', (0, 0), (-1, 0), 8),
             ('BACKGROUND', (0, 1), (-1, -1), colors.white),
             ('GRID', (0, 0), (-1, -1), 1, colors.black),
@@ -1247,23 +1248,16 @@ class TeachingRecordPDFView(LoginRequiredMixin, CommonContextMixin, DetailView):
 
         # Lessons content
         # Replace <p><br></p> with <div><br/></div> and add <br/> between </p><p>
-        description = record.description.replace('<p><br></p>', '<div><br/><br/></div>').replace('</p><p>', '</p><br/><p>')
+        description = record.description.replace('<p><br></p>', '<div><br/><br/></div>').replace('</p><p>',
+                                                                                                 '</p><br/><p>')
 
-
-        # Use the updated description in the Paragraph
-        content = Paragraph(description, style=ParagraphStyle(
-            name='Normal',
-            fontName='Helvetica',
-            fontSize=12,
-            alignment=TA_JUSTIFY,
-            leading=20,
-            textColor=colors.black,
-        ))
-        elements.append(content)
+        # Handle summernote content
+        styles['Normal'].fontSize = 12
+        summernote_content = parse_html_to_flowables(description, styles)
+        elements.extend(summernote_content)
         elements.append(Spacer(width=20, height=10))
 
         # Footer table data
-        times_roman_style = ParagraphStyle(name='Normal', fontName='Times-Roman', fontSize=12)
         footer_table_data = [
             [Paragraph(title, style=times_roman_style) for title in ['Official', 'Names', 'Signatures', 'Date']],
             [Paragraph('Lecturer', style=times_roman_style), record.attendance.course.lecturer.name, '',

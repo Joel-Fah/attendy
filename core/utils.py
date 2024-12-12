@@ -3,6 +3,13 @@ import json
 from collections import defaultdict
 from datetime import datetime, timedelta
 
+from bs4 import BeautifulSoup
+from reportlab.lib import colors
+from reportlab.lib.styles import ParagraphStyle
+from reportlab.platypus import (
+    Paragraph, Table, TableStyle, HRFlowable, Spacer
+)
+
 
 def calculate_duration(start_time, end_time):
     """
@@ -116,7 +123,18 @@ def get_faqs():
             'question': "Why can’t I create two attendances for the same time and class? Magic?",
             'answer': "Almost! Time travel is tricky, and our system likes to keep things in order. One class, "
                       "one time. It’s the law of the universe… or at least, our app."
-        }
+        },
+        # about generating PDFs
+        {
+            'question': "Can I download the PDF of any attendance record?",
+            'answer': "Absolutely! Just head to the attendance page and click the print button. It’s like magic, "
+                      "but with more paper."
+        },
+        {
+            'question': "Can I export to PDF the teaching records for any attendance?",
+            'answer': "You bet! Just go to the teaching record\'s details page and click the print record button. It’s like having "
+                      "your own personal archive, but without the dust."
+        },
     ]
 
 
@@ -155,8 +173,18 @@ def encode_data(data):
 
 
 def decode_data(encoded_data):
+    """
+    Decode the encoded data and return the original data.
+
+    Args:
+        encoded_data (str): The encoded data to decode.
+
+    Returns:
+        dict: The original data.
+    """
     decoded_data = base64.urlsafe_b64decode(encoded_data.encode()).decode()
     return json.loads(decoded_data)
+
 
 def date_formatter(date: datetime) -> str:
     """
@@ -170,6 +198,7 @@ def date_formatter(date: datetime) -> str:
     """
     return date.strftime('%A %d %B %Y')
 
+
 def short_date_formatter(date: datetime) -> str:
     """
         This function takes a date object and returns a string representation of the date in the format 'Mon. 19 Aug. 2021'.
@@ -181,6 +210,7 @@ def short_date_formatter(date: datetime) -> str:
             str: The formatted date string.
         """
     return date.strftime('%a. %d %b. %Y')
+
 
 def time_formatter(time: datetime) -> str:
     """
@@ -194,6 +224,7 @@ def time_formatter(time: datetime) -> str:
     """
     return time.strftime('%I:%M %p')
 
+
 def datetime_formatter(date_time: datetime) -> str:
     """
     This function takes a datetime object and returns a string representation of the datetime in the format 'Monday 19 August 2021, 12:00 PM'.
@@ -205,3 +236,130 @@ def datetime_formatter(date_time: datetime) -> str:
         str: The formatted datetime string.
     """
     return f"{date_formatter(date_time)} at {time_formatter(date_time)}"
+
+
+def handle_inline_tags(text):
+    """
+    Converts custom inline HTML tags into ReportLab's mini-HTML markup.
+
+    Args:
+        text (str): The HTML text to process.
+
+    Returns:
+        str: The processed text with custom inline tags converted to ReportLab's mini-HTML markup.
+    """
+    replacements = {
+        '<b>': '<b>', '</b>': '</b>',
+        '<strong>': '<b>', '</strong>': '</b>',
+        '<i>': '<i>', '</i>': '</i>',
+        '<em>': '<i>', '</em>': '</i>',
+        '<u>': '<u>', '</u>': '</u>',
+        '<s>': '<strike>', '</s>': '</strike>',
+        '<sub>': '<sub rise="0" size="-4">', '</sub>': '</sub>',
+        '<sup>': '<super rise="6" size="-4">', '</sup>': '</super>',
+    }
+
+    for old, new in replacements.items():
+        text = text.replace(old, new)
+
+    # Handle <a> links to make them blue, underlined, and clickable
+    soup = BeautifulSoup(text, 'html.parser')
+    for a_tag in soup.find_all('a'):
+        href = a_tag.get('href', '#')
+        link_text = a_tag.get_text()  # Extracts only the inner text of the <a> tag
+
+        # Create a ReportLab-style link with proper formatting
+        styled_link = f'<a href="{href}" color="blue" fontName="Helvetica" underline="true" underlineColor="blue">{link_text}</a>'
+        a_tag.replace_with(BeautifulSoup(styled_link, 'html.parser').a)
+
+    # Handle <blockquote> tags to add a left indent and italic style and remove the class attribute
+    for blockquote in soup.find_all('blockquote'):
+        blockquote['style'] = 'margin-left: 20px; font-style: italic;'
+        blockquote.attrs.pop('class', None)
+
+    return str(soup)
+
+
+def parse_html_to_flowables(html, styles):
+    """
+    Parses the HTML and converts it to ReportLab flowables.
+
+    Args:
+        html (str): The HTML content to parse.
+        styles (dict): The styles to apply to the flowables.
+
+    Returns:
+        list: The list of ReportLab flowables.
+    """
+    soup = BeautifulSoup(html, 'html.parser')
+    flowables = []
+
+    for element in soup.children:
+        if element.name == 'p':
+            text = handle_inline_tags(str(element))
+            para = Paragraph(text, styles['Normal'])
+            flowables.append(para)
+
+        elif element.name in ['ul', 'ol']:
+            for index, li in enumerate(element.find_all('li'), start=1):
+                marker = '•' if element.name == 'ul' else f'{index}.'  # "•" for ul, 1., 2., 3. for ol
+                li_text = handle_inline_tags(str(li))
+                para = Paragraph(f'{marker} {li_text}',
+                                 style=ParagraphStyle(name='ListStyle', parent=styles['Normal'], leftIndent=20))
+                flowables.append(para)
+
+        elif element.name == 'table':
+            table_data = []
+            for row in element.find_all('tr'):
+                row_data = []
+                for cell in row.find_all(['th', 'td']):
+                    cell_text = handle_inline_tags(str(cell))
+                    cell_para = Paragraph(cell_text, styles['Normal'])
+                    row_data.append(cell_para)
+                table_data.append(row_data)
+
+            table = Table(table_data)
+            table.setStyle(TableStyle([
+                ('GRID', (0, 0), (-1, -1), 1, colors.black),
+                ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+                ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+                ('BACKGROUND', (0, 0), (-1, 0), colors.lightslategrey),
+                ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+            ]))
+            flowables.append(table)
+            flowables.append(Spacer(1, 8))
+
+        elif element.name == 'hr':
+            flowables.append(Spacer(1, 8))
+            flowables.append(HRFlowable(width="100%", thickness=0.75))  # Adds a line break to simulate <hr>
+            flowables.append(Spacer(1, 8))
+
+        elif element.name in ['h1', 'h2', 'h3', 'h4', 'h5', 'h6']:
+            level = int(element.name[1])
+            style = styles[f'Heading{level}']
+            text = handle_inline_tags(str(element))
+            para = Paragraph(text, style)
+            flowables.append(para)
+
+        elif element.name == 'blockquote':
+            text = handle_inline_tags(str(element))
+            blockquote_style = ParagraphStyle(name='BlockQuote', parent=styles['Italic'], fontSize=12, leftIndent=20,
+                                              rightIndent=20, backColor=colors.HexColor("#F5F5F5"), borderPadding=8)
+            para = Paragraph(text, blockquote_style)
+            flowables.append(Spacer(1, 10))
+            flowables.append(para)
+            flowables.append(Spacer(1, 10))
+
+        elif element.name in ['code', 'pre']:
+            text = handle_inline_tags(str(element))
+            code_style = ParagraphStyle(name='Code', parent=styles['Code'], fontName='Courier', fontSize=12,
+                                        textColor=colors.red, borderPadding=(0, 4, 0, 4))
+            para = Paragraph(text, code_style)
+            flowables.append(para)
+
+        elif element.name is None and element.strip():
+            text = handle_inline_tags(str(element))
+            para = Paragraph(text, styles['Normal'])
+            flowables.append(para)
+
+    return flowables
