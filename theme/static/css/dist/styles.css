@@ -1046,10 +1046,6 @@ select {
   margin: auto;
 }
 
-.m-0 {
-  margin: 0px;
-}
-
 .-mx-1\.5 {
   margin-left: -0.375rem;
   margin-right: -0.375rem;
@@ -1078,6 +1074,16 @@ select {
 .my-5 {
   margin-top: 1.25rem;
   margin-bottom: 1.25rem;
+}
+
+.my-1 {
+  margin-top: 0.25rem;
+  margin-bottom: 0.25rem;
+}
+
+.my-0\.5 {
+  margin-top: 0.125rem;
+  margin-bottom: 0.125rem;
 }
 
 .mb-0 {
@@ -1156,6 +1162,10 @@ select {
   margin-top: 3.5rem;
 }
 
+.mt-16 {
+  margin-top: 4rem;
+}
+
 .mt-2 {
   margin-top: 0.5rem;
 }
@@ -1172,16 +1182,8 @@ select {
   margin-top: 2rem;
 }
 
-.mt-16 {
-  margin-top: 4rem;
-}
-
 .block {
   display: block;
-}
-
-.inline-block {
-  display: inline-block;
 }
 
 .inline {
@@ -1202,10 +1204,6 @@ select {
 
 .grid {
   display: grid;
-}
-
-.list-item {
-  display: list-item;
 }
 
 .hidden {
@@ -1329,6 +1327,10 @@ select {
   width: 75%;
 }
 
+.w-3\/5 {
+  width: 60%;
+}
+
 .w-4 {
   width: 1rem;
 }
@@ -1368,10 +1370,6 @@ select {
 
 .w-screen {
   width: 100vw;
-}
-
-.w-3\/5 {
-  width: 60%;
 }
 
 .min-w-\[40\%\] {
@@ -1549,32 +1547,12 @@ select {
   list-style-position: inside;
 }
 
-.list-none {
-  list-style-type: none;
-}
-
 .list-disc {
   list-style-type: disc;
 }
 
-.list-\[dashed\] {
-  list-style-type: dashed;
-}
-
-.list-\[dash\] {
-  list-style-type: dash;
-}
-
-.list-\[\'dash\'\] {
-  list-style-type: 'dash';
-}
-
-.list-\[\] {
-  list-style-type: ;
-}
-
-.list-\[\'-\'\] {
-  list-style-type: '-';
+.list-none {
+  list-style-type: none;
 }
 
 .appearance-none {
@@ -1732,6 +1710,12 @@ select {
   --tw-space-y-reverse: 0;
   margin-top: calc(1rem * calc(1 - var(--tw-space-y-reverse)));
   margin-bottom: calc(1rem * var(--tw-space-y-reverse));
+}
+
+.space-x-2 > :not([hidden]) ~ :not([hidden]) {
+  --tw-space-x-reverse: 0;
+  margin-right: calc(0.5rem * var(--tw-space-x-reverse));
+  margin-left: calc(0.5rem * calc(1 - var(--tw-space-x-reverse)));
 }
 
 .divide-y > :not([hidden]) ~ :not([hidden]) {
@@ -2160,10 +2144,6 @@ select {
 
 .p-8 {
   padding: 2rem;
-}
-
-.p-0 {
-  padding: 0px;
 }
 
 .px-0 {
@@ -3046,12 +3026,12 @@ select {
     width: 83.333333%;
   }
 
-  .md\:w-auto {
-    width: auto;
-  }
-
   .md\:w-2\/5 {
     width: 40%;
+  }
+
+  .md\:w-auto {
+    width: auto;
   }
 
   .md\:translate-x-0 {

@@ -15,7 +15,7 @@ from django.utils.html import format_html
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import TemplateView, ListView, DetailView, CreateView, UpdateView
 from reportlab.lib import colors
-from reportlab.lib.enums import TA_CENTER, TA_JUSTIFY
+from reportlab.lib.enums import TA_CENTER, TA_JUSTIFY, TA_LEFT
 from reportlab.lib.pagesizes import A4
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib.units import inch
@@ -258,6 +258,19 @@ class AttendancePDFView(LoginRequiredMixin, CommonContextMixin, DetailView):
             ('BOTTOMPADDING', (0, 0), (-1, -1), 12),
         ]))
         elements.append(footer)
+
+        done_on = Paragraph(
+            text=f"Generated on {date_formatter(datetime.now())} at {time_formatter(datetime.now())}",
+            style=ParagraphStyle(
+                name='Small',
+                parent=styles['Normal'],
+                fontSize=8,
+                textColor=colors.grey,
+                alignment=TA_LEFT,
+            )
+        )
+        elements.append(Spacer(width=1, height=4))
+        elements.append(done_on)
 
         doc.build(elements)
 
@@ -652,6 +665,19 @@ class CoursePDFView(LoginRequiredMixin, CommonContextMixin, DetailView):
         ]))
         elements.append(footer)
 
+        done_on = Paragraph(
+            text=f"Generated on {date_formatter(datetime.now())} at {time_formatter(datetime.now())}",
+            style=ParagraphStyle(
+                name='Small',
+                parent=styles['Normal'],
+                fontSize=8,
+                textColor=colors.grey,
+                alignment=TA_LEFT,
+            )
+        )
+        elements.append(Spacer(width=1, height=4))
+        elements.append(done_on)
+
         doc.build(elements)
 
         # Serve the PDF file
@@ -958,12 +984,24 @@ class CourseRegistrationView(LoginRequiredMixin, CommonContextMixin, TemplateVie
         context = super().get_context_data(**kwargs)
         student = Student.objects.get(id=self.kwargs['pk'])
         context['student'] = student
-        all_courses = Course.objects.filter(class_level__semester=student.class_level.semester,
-                                            class_level__year=student.class_level.year)
+
+        # Group courses by level
+        all_courses = Course.objects.filter(
+            # class_level__semester=student.class_level.semester,
+            class_level__year=student.class_level.year)
+        grouped_all_courses = defaultdict(list)
+        for course in all_courses:
+            class_level = course.class_level
+            key = f"{class_level.get_level_display()} - Group {class_level.group}"
+            grouped_all_courses[key].append(course)
+
+        # Convert defaultdict to a regular dict
+        grouped_all_courses = dict(grouped_all_courses)
+
         registered_courses = CourseRegistration.objects.filter(student=student).values_list('course_id', flat=True)
         for course in all_courses:
             course.is_registered = course.id in registered_courses
-        context['courses'] = all_courses
+        context['courses'] = grouped_all_courses
         return context
 
     def post(self, request, *args, **kwargs):
@@ -1283,6 +1321,19 @@ class TeachingRecordPDFView(LoginRequiredMixin, CommonContextMixin, DetailView):
             ('GRID', (0, 0), (-1, -1), 1, colors.black),
         ]))
         elements.append(footer_table)
+
+        done_on = Paragraph(
+            text=f"Generated on {date_formatter(datetime.now())} at {time_formatter(datetime.now())}",
+            style=ParagraphStyle(
+                name='Small',
+                parent=styles['Normal'],
+                fontSize=8,
+                textColor=colors.grey,
+                alignment=TA_LEFT,
+            )
+        )
+        elements.append(Spacer(width=1, height=4))
+        elements.append(done_on)
 
         doc.build(elements)
 
