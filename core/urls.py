@@ -4,7 +4,8 @@ from .views import HomeView, DashboardView, CourseView, StudentView, LecturerVie
     StudentAddView, CourseAddView, CourseUpdateView, StudentUpdateView, LecturerUpdateView, \
     TeachingRecordUpdateView, LevelView, DashboardDetailView, AttendanceDetailView, AttendanceAddView, \
     CourseAttendanceAddView, AttendanceUpdateView, decode_qr, add_student_to_course_attendance, FeedbackView, \
-    CourseRegistrationView, CoursePDFView, AttendancePDFView, TeachingRecordPDFView
+    CourseRegistrationView, CoursePDFView, AttendancePDFView, TeachingRecordPDFView, StudentPDFView, \
+    DownloadTemplateFileView
 from .views import handler404, handler500
 
 # Create your urls here
@@ -25,6 +26,8 @@ urlpatterns = [
 
     # Student URLs
     path('app/<int:level_pk>/students/', StudentView.as_view(), name='students'),
+path('app/<int:level_pk>/students/download-template/', DownloadTemplateFileView.as_view(), name='download_template'),
+    path('app/<int:level_pk>/students/pdf/', StudentPDFView.as_view(), name='students_pdf'),
     path('app/<int:level_pk>/students/<int:pk>/<slug:slug>/', StudentDetailView.as_view(), name='student_detail'),
     path('app/<int:level_pk>/students/add', StudentAddView.as_view(), name='student_add'),
     path('app/<int:level_pk>/students/<int:pk>/<slug:slug>/edit/', StudentUpdateView.as_view(), name='student_update'),

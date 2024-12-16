@@ -1,3 +1,4 @@
+import csv
 import json
 import os
 import random
@@ -7,15 +8,16 @@ from datetime import timedelta, datetime
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.core.exceptions import ValidationError
 from django.db.models import Q, Count
 from django.http import JsonResponse, FileResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse_lazy
 from django.utils.html import format_html
 from django.views.decorators.csrf import csrf_exempt
-from django.views.generic import TemplateView, ListView, DetailView, CreateView, UpdateView
+from django.views.generic import TemplateView, ListView, DetailView, CreateView, UpdateView, View
 from reportlab.lib import colors
-from reportlab.lib.enums import TA_CENTER, TA_JUSTIFY, TA_LEFT
+from reportlab.lib.enums import TA_CENTER, TA_LEFT
 from reportlab.lib.pagesizes import A4
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib.units import inch
@@ -585,7 +587,7 @@ class CoursePDFView(LoginRequiredMixin, CommonContextMixin, DetailView):
 
         # Generate PDF file path
         filename = f"{course.title}_class_list.pdf"
-        pdf_folder_path = os.path.join(settings.MEDIA_ROOT, 'course_class_list')
+        pdf_folder_path = os.path.join(settings.MEDIA_ROOT, 'course_class_lists')
         os.makedirs(pdf_folder_path, exist_ok=True)
         pdf_file_path = os.path.join(pdf_folder_path, filename)
 
@@ -792,7 +794,7 @@ class StudentView(LoginRequiredMixin, CommonContextMixin, ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         students = self.get_queryset()
-        context['delegates'] = Student.objects.filter(is_delegate=True).order_by('name')
+        context['delegates'] = Student.objects.filter(is_delegate=True, class_level=self.kwargs['level_pk']).order_by('name')
 
         # Calculate male and female students
         male_students = students.filter(gender='Male').count()
@@ -831,7 +833,170 @@ class StudentView(LoginRequiredMixin, CommonContextMixin, ListView):
                 student.name
             )
             messages.success(request, message)
+        elif 'dropzone-file' in request.FILES:
+            csv_file = request.FILES['dropzone-file']
+            if not csv_file.name.endswith('.csv'):
+                messages.error(request, 'This is not a CSV file.')
+                return self.get(request, *args, **kwargs)
+
+            try:
+                class_level = ClassLevel.objects.get(pk=self.kwargs['level_pk'])
+                decoded_file = csv_file.read().decode('utf-8').splitlines()
+                reader = csv.DictReader(decoded_file)
+                print(f"CSV reader >>> {reader}")
+                students_added = 0
+                for row in reader:
+                    student_number = row['Student Number']
+                    student_name = row['Student Name']
+                    email = row['Email Address']
+                    phone = row['Phone Number']
+                    gender = row['Gender']
+                    is_delegate = row['is_delegate'].lower() == 'true'
+
+                    student, created = Student.objects.update_or_create(
+                        student_number=student_number,
+                        defaults={
+                            'class_level': class_level,
+                            'student_number': student_number,
+                            'name': student_name,
+                            'email': email,
+                            'phone': phone,
+                            'gender': gender,
+                            'is_delegate': is_delegate,
+                        }
+                    )
+                    if created:
+                        students_added += 1
+
+                messages.success(request, f'{students_added} students added to {class_level}.')
+            except (csv.Error, ValidationError) as e:
+                messages.error(request, f'Error processing CSV file: {e}')
         return self.get(request, *args, **kwargs)
+
+
+class StudentPDFView(LoginRequiredMixin, CommonContextMixin, ListView):
+    model = Student
+    template_name = 'core/students/students.html'
+    paginate_by = 25
+    context_object_name = 'students'
+
+    def get_queryset(self):
+        return self.model.objects.filter(class_level=self.kwargs['level_pk']).order_by('name')
+
+    def get(self, request, *args, **kwargs):
+        students = self.get_queryset()
+        class_level = ClassLevel.objects.get(pk=self.kwargs['level_pk'])
+        class_delegates = students.filter(is_delegate=True)
+
+        # Generate PDF file path
+        filename = f"{class_level}_overall_class_list.pdf"
+        pdf_folder_path = os.path.join(settings.MEDIA_ROOT, 'overall_class_lists')
+        os.makedirs(pdf_folder_path, exist_ok=True)
+        pdf_file_path = os.path.join(pdf_folder_path, filename)
+
+        doc = SimpleDocTemplate(pdf_file_path, title=filename, pagesize=A4, rightMargin=24, leftMargin=24, topMargin=20,
+                                bottomMargin=18)
+        elements = []
+
+        # Add the image at the top
+        image_path = str(settings.BASE_DIR / 'static/core/images/ictu_logo.png')
+        logo = Image(image_path)
+        logo.drawHeight = 1.25 * inch
+        logo.drawWidth = 1.25 * inch
+        elements.append(logo)
+
+        styles = getSampleStyleSheet()
+        styles['Normal'].leading = 20
+        title = Paragraph("Information and Communication Technology University<br/>Institute (ICT-U) Cameroon".upper(),
+                          ParagraphStyle(
+                              name='Heading3',
+                              alignment=TA_CENTER,
+                              fontSize=12,
+                              spaceBefore=16,
+                              spaceAfter=16,
+                              textColor=colors.black,
+                              fontName='Times-Roman',
+                              leading=16
+                          ))
+        elements.append(title)
+        sub_title = Paragraph(f"Overall Class List for<br/>{class_level}", ParagraphStyle(
+            name='Heading2',
+            alignment=TA_CENTER,
+            fontSize=14,
+            spaceBefore=16,
+            spaceAfter=16,
+            textColor=colors.black,
+            fontName='Helvetica-Bold',
+            leading=16,
+        ))
+        elements.append(sub_title)
+
+        class_details = f"""
+                <strong>CLASS LEVEL:</strong> {class_level.get_level_display()} &nbsp;
+                <strong>CLASS GROUP:</strong> Group {class_level.group} &nbsp;
+                <strong>DEPARTMENT:</strong> {class_level.department} &nbsp;
+                <strong>SEMESTER:</strong> {class_level.semester} {class_level.year} &nbsp;
+                <strong>MAIN HALL:</strong> {class_level.main_hall} &nbsp;
+                {f'<strong>ALT. HALL:</strong> {class_level.secondary_hall} &nbsp;' if class_level.secondary_hall else ''}
+                <strong>CLASS SIZE:</strong> {students.count()} &nbsp;
+                <strong>CLASS/COURSE DELEGATE(S):</strong> {', '.join([delegate.name for delegate in class_delegates]) if class_delegates else '_' * 30} &nbsp;
+                """
+        elements.append(Paragraph(class_details, styles['Normal']))
+        elements.append(Spacer(width=20, height=10))
+
+        data = [['No.', 'Names', 'Email', 'Phone No.', 'Gender', 'Obs.']]
+        for i, student in enumerate(students, start=1):
+            data.append([i, student.name, student.email, student.phone, student.gender[0].upper(),
+                         f'Delegate' if student.is_delegate else ''])
+
+        table = Table(data, colWidths=[None, None, None, None, None, None], hAlign='LEFT')
+        table.setStyle(TableStyle([
+            ('BACKGROUND', (0, 0), (-1, 0), colors.white),
+            ('TEXTCOLOR', (0, 0), (-1, 0), colors.black),
+            ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+            ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+            ('BOTTOMPADDING', (0, 0), (-1, 0), 8),
+            ('BACKGROUND', (0, 1), (-1, -1), colors.white),
+            ('GRID', (0, 0), (-1, -1), 1, colors.black),
+        ]))
+        elements.append(table)
+
+        # Add footer with placeholders for signatures
+        elements.append(Spacer(width=20, height=50))
+        footer = Table(
+            [[f'{"_" * 30}\nAdministration'.upper(), '', '', '', '', '', '', f'{"_" * 30}\nAdmin Assistant'.upper()]],
+            colWidths=[None, None, None, None, None, None, None, None],
+            hAlign='LEFT'
+        )
+        footer.setStyle(TableStyle([
+            ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+            ('FONTNAME', (0, 0), (-1, -1), 'Times-Roman'),
+            ('BOTTOMPADDING', (0, 0), (-1, -1), 12),
+        ]))
+        elements.append(footer)
+
+        done_on = Paragraph(
+            text=f"Generated on {date_formatter(datetime.now())} at {time_formatter(datetime.now())}",
+            style=ParagraphStyle(
+                name='Small',
+                parent=styles['Normal'],
+                fontSize=8,
+                textColor=colors.grey,
+                alignment=TA_LEFT,
+            )
+        )
+        elements.append(Spacer(width=1, height=4))
+        elements.append(done_on)
+
+        doc.build(elements)
+
+        # Serve the PDF file
+        response = FileResponse(open(pdf_file_path, 'rb'), content_type='application/pdf')
+        response['Content-Disposition'] = f'attachment; filename={filename}'
+
+        # Redirect to students page
+        reverse_lazy('core:students', kwargs={'level_pk': self.kwargs['level_pk']})
+        return response
 
 
 class StudentDetailView(LoginRequiredMixin, CommonContextMixin, DetailView):
@@ -1425,6 +1590,20 @@ class FeedbackView(LoginRequiredMixin, CreateView):
         context['quote'] = random_quote
         return context
 
+
+# Utils classes
+class DownloadTemplateFileView(LoginRequiredMixin, View):
+    def get(self, request, *args, **kwargs):
+        class_level_id = self.kwargs['level_pk']
+        class_level = get_object_or_404(ClassLevel, pk=class_level_id)
+        file_path = os.path.join(settings.STATIC_ROOT, 'core/files/add_students_to_class.csv')
+
+        if not os.path.exists(file_path):
+            return HttpResponseNotFound('The requested file was not found on the server.')
+
+        response = FileResponse(open(file_path, 'rb'), content_type='text/csv')
+        response['Content-Disposition'] = f'attachment; filename=Add students to {class_level} template file.csv'
+        return response
 
 # Handlers
 def handler404(request, exception):
