@@ -59,13 +59,16 @@
                         </tr>
                     </thead>
                     <tbody>
-                        {% for lecturer in lecturers %}
+                        {% for lecturer in filteredLecturers %}
                         <tr class="border-b border-darkColor/10 hover:bg-secondaryColor/5">
                             <td class="w-4 p-4">
                                 {{ forloop.counter }}
                             </td>
                             <th scope="row" class="flex items-center gap-1 px-6 py-4 font-medium whitespace-nowrap">
                                 {{ lecturer.name}}
+                                {% if True %}
+                                    <div class="w-1.5 h-1.5 rounded-full bg-secondaryColor"></div>
+                                {% endif %}
                             </th>
                             <td class="px-6 py-4">
                                 {{ lecturer.department }}

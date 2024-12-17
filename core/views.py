@@ -10,7 +10,7 @@ from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import ValidationError
 from django.db.models import Q, Count
-from django.http import JsonResponse, FileResponse
+from django.http import JsonResponse, FileResponse, HttpResponseNotFound
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse_lazy
 from django.utils.html import format_html
@@ -794,7 +794,8 @@ class StudentView(LoginRequiredMixin, CommonContextMixin, ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         students = self.get_queryset()
-        context['delegates'] = Student.objects.filter(is_delegate=True, class_level=self.kwargs['level_pk']).order_by('name')
+        context['delegates'] = Student.objects.filter(is_delegate=True, class_level=self.kwargs['level_pk']).order_by(
+            'name')
 
         # Calculate male and female students
         male_students = students.filter(gender='Male').count()
@@ -871,6 +872,10 @@ class StudentView(LoginRequiredMixin, CommonContextMixin, ListView):
                 messages.success(request, f'{students_added} students added to {class_level}.')
             except (csv.Error, ValidationError) as e:
                 messages.error(request, f'Error processing CSV file: {e}')
+
+            # redirect to same page
+            reverse_lazy('core:students', kwargs={'level_pk': self.kwargs['level_pk']})
+
         return self.get(request, *args, **kwargs)
 
 
@@ -1209,10 +1214,10 @@ class LecturerView(LoginRequiredMixin, CommonContextMixin, ListView):
     model = Lecturer
     template_name = 'core/lecturers/lecturers.html'
     paginate_by = 25
-    context_object_name = 'lecturers'
+    context_object_name = 'filteredLecturers'
 
     def get_queryset(self):
-        return self.model.objects.filter(course_lecturer__class_level=self.kwargs['level_pk']).order_by('name')
+        return self.model.objects.filter(course_lecturer__class_level=self.kwargs['level_pk']).distinct().order_by('name')
 
     def post(self, request, *args, **kwargs):
         if 'delete_lecturer' in request.POST:
@@ -1594,16 +1599,21 @@ class FeedbackView(LoginRequiredMixin, CreateView):
 # Utils classes
 class DownloadTemplateFileView(LoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
+        model_name = self.kwargs['model_name']
         class_level_id = self.kwargs['level_pk']
         class_level = get_object_or_404(ClassLevel, pk=class_level_id)
-        file_path = os.path.join(settings.STATIC_ROOT, 'core/files/add_students_to_class.csv')
+
+        file_name = f'add_{model_name.lower()}s_to_class.csv'
+        file_path = os.path.join(settings.STATIC_ROOT, 'core/files', file_name)
 
         if not os.path.exists(file_path):
             return HttpResponseNotFound('The requested file was not found on the server.')
 
         response = FileResponse(open(file_path, 'rb'), content_type='text/csv')
-        response['Content-Disposition'] = f'attachment; filename=Add students to {class_level} template file.csv'
+        response[
+            'Content-Disposition'] = f'attachment; filename=Add {model_name.lower()}s to {class_level} template file.csv'
         return response
+
 
 # Handlers
 def handler404(request, exception):

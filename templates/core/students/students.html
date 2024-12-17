@@ -437,7 +437,7 @@
                             <div id="csv-preview" class="mt-4 w-full overflow-auto"></div>
                         </div>
                         <div class="flex items-center justify-between p-4">
-                            <a href="{% url 'core:download_template' level_pk=level.id %}" download type="button" class="text-sm text-primaryColor hover:underline">Download template file</a>
+                            <a href="{% url 'core:download_template' level_pk=level.id model_name='student' %}" download type="button" class="text-sm text-primaryColor hover:underline">Download template file</a>
 
                             <div class="flex flex-wrap items-center justify-end shrink-0 text-blue-gray-500">
                                 <button data-ripple-dark="true" data-dialog-close="true"
