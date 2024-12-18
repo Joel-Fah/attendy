@@ -520,7 +520,6 @@
             }
     
             dropzoneFileInput.files = files;
-            // Optionally, you can trigger the change event to handle the file upload
             const event = new Event('change');
             dropzoneFileInput.dispatchEvent(event);
         });
@@ -530,7 +529,7 @@
             if (file) {
                 filenameDisplay.textContent = file.name;
                 filePreview.classList.remove('hidden');
-                dropzoneLabel.classList.add('h-32'); // Reduce the height of the dropzone
+                dropzoneLabel.classList.add('h-32');
                 previewCSV(file);
             }
         });
@@ -540,7 +539,7 @@
             filenameDisplay.textContent = 'No file selected';
             filePreview.classList.add('hidden');
             csvPreview.innerHTML = '';
-            dropzoneLabel.classList.remove('h-32'); // Reset the height of the dropzone
+            dropzoneLabel.classList.remove('h-32');
         });
     
         function previewCSV(file) {

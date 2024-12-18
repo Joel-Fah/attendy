@@ -51,7 +51,10 @@
                                 Dep't
                             </th>
                             <th scope="col" class="px-6 py-3">
-                                Phone No
+                                Email
+                            </th>
+                            <th scope="col" class="px-6 py-3">
+                                Phone No.
                             </th>
                             <th scope="col" class="px-6 py-3 bg-whiteHover">
                                 Actions
@@ -66,12 +69,16 @@
                             </td>
                             <th scope="row" class="flex items-center gap-1 px-6 py-4 font-medium whitespace-nowrap">
                                 {{ lecturer.name}}
-                                {% if True %}
-                                    <div class="w-1.5 h-1.5 rounded-full bg-secondaryColor"></div>
-                                {% endif %}
                             </th>
                             <td class="px-6 py-4">
                                 {{ lecturer.department }}
+                            </td>
+                            <td class="px-6 py-4">
+                                {% if lecturer.email %}
+                                {{ lecturer.email }}
+                                {% else %}
+                                N/A
+                                {% endif %}
                             </td>
                             <td class="px-6 py-4">
                                 {% if lecturer.phone %}
@@ -204,6 +211,118 @@
                 stroke-linejoin="round" />
         </svg>
     </a>
+
+    <div data-dial-init class="fixed end-2 bottom-2 group">
+        <div id="speed-dial-menu-click" class="flex flex-col items-center justify-center hidden mb-4 space-y-2">
+            <!-- Print lecturers list -->
+            <a href="{% url 'core:lecturers_pdf' level_pk=level.id %}" type="button" data-tooltip-target="tooltip-print" data-tooltip-placement="left" class="flex justify-center items-center p-3 rounded-full border-gray-600 shadow-sm hover:text-white text-gray-400 bg-gray-700 hover:bg-gray-600 focus:ring-4 focus:outline-none focus:ring-gray-400">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none">
+                    <path d="M7.35396 18C5.23084 18 4.16928 18 3.41349 17.5468C2.91953 17.2506 2.52158 16.8271 2.26475 16.3242C1.87179 15.5547 1.97742 14.5373 2.18868 12.5025C2.36503 10.8039 2.45321 9.95455 2.88684 9.33081C3.17153 8.92129 3.55659 8.58564 4.00797 8.35353C4.69548 8 5.58164 8 7.35396 8H16.646C18.4184 8 19.3045 8 19.992 8.35353C20.4434 8.58564 20.8285 8.92129 21.1132 9.33081C21.5468 9.95455 21.635 10.8039 21.8113 12.5025C22.0226 14.5373 22.1282 15.5547 21.7352 16.3242C21.4784 16.8271 21.0805 17.2506 20.5865 17.5468C19.8307 18 18.7692 18 16.646 18" stroke="currentColor" stroke-width="1.5" />
+                    <path d="M17 8V6C17 4.11438 17 3.17157 16.4142 2.58579C15.8284 2 14.8856 2 13 2H11C9.11438 2 8.17157 2 7.58579 2.58579C7 3.17157 7 4.11438 7 6V8" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" />
+                    <path d="M13.9887 16L10.0113 16C9.32602 16 8.98337 16 8.69183 16.1089C8.30311 16.254 7.97026 16.536 7.7462 16.9099C7.57815 17.1904 7.49505 17.5511 7.32884 18.2724C7.06913 19.3995 6.93928 19.963 7.02759 20.4149C7.14535 21.0174 7.51237 21.5274 8.02252 21.7974C8.40513 22 8.94052 22 10.0113 22L13.9887 22C15.0595 22 15.5949 22 15.9775 21.7974C16.4876 21.5274 16.8547 21.0174 16.9724 20.4149C17.0607 19.963 16.9309 19.3995 16.6712 18.2724C16.505 17.5511 16.4218 17.1904 16.2538 16.9099C16.0297 16.536 15.6969 16.254 15.3082 16.1089C15.0166 16 14.674 16 13.9887 16Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" />
+                    <path d="M18 12H18.009" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
+                <span class="sr-only">Print</span>
+            </a>
+            <div id="tooltip-print" role="tooltip" class="absolute z-10 invisible inline-block w-auto px-3 py-2 text-sm font-medium text-white transition-opacity duration-300 rounded-lg shadow-sm opacity-0 tooltip bg-gray-700">
+                Print
+                <div class="tooltip-arrow" data-popper-arrow></div>
+            </div>
+
+            <!-- New lecturer from csv -->
+            <a type="button" data-tooltip-target="tooltip-csv" data-tooltip-placement="left" data-ripple-light="true" data-dialog-target="animated-dialog-csv" 
+            class="cursor-pointer flex justify-center items-center p-3 rounded-full border-gray-600 shadow-sm hover:text-white text-gray-400 bg-gray-700 hover:bg-gray-600 focus:ring-4 focus:outline-none focus:ring-gray-400">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none">
+                    <path d="M7.5 17.2196C7.44458 16.0292 6.62155 16 5.50505 16C3.78514 16 3.5 16.406 3.5 18V20C3.5 21.594 3.78514 22 5.50505 22C6.62154 22 7.44458 21.9708 7.5 20.7804M20.5 16L18.7229 20.6947C18.3935 21.5649 18.2288 22 17.968 22C17.7071 22 17.5424 21.5649 17.213 20.6947L15.4359 16M12.876 16H11.6951C11.2231 16 10.9872 16 10.8011 16.0761C10.1672 16.3354 10.1758 16.9448 10.1758 17.5C10.1758 18.0553 10.1672 18.6647 10.8011 18.9239C10.9872 19 11.2232 19 11.6951 19C12.167 19 12.4029 19 12.5891 19.0761C13.2229 19.3354 13.2143 19.9447 13.2143 20.5C13.2143 21.0553 13.2229 21.6647 12.5891 21.9239C12.4029 22 12.167 22 11.6951 22H10.4089" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+                    <path d="M20 13V10.6569C20 9.83935 20 9.4306 19.8478 9.06306C19.6955 8.69552 19.4065 8.40649 18.8284 7.82843L14.0919 3.09188C13.593 2.593 13.3436 2.34355 13.0345 2.19575C12.9702 2.165 12.9044 2.13772 12.8372 2.11401C12.5141 2 12.1614 2 11.4558 2C8.21082 2 6.58831 2 5.48933 2.88607C5.26731 3.06508 5.06508 3.26731 4.88607 3.48933C4 4.58831 4 6.21082 4 9.45584V13M13 2.5V3C13 5.82843 13 7.24264 13.8787 8.12132C14.7574 9 16.1716 9 19 9H19.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
+                <span class="sr-only">Csv</span>
+            </a>
+            <div id="tooltip-csv" role="tooltip" class="absolute z-10 invisible inline-block w-auto px-3 py-2 text-sm font-medium text-white transition-opacity duration-300 rounded-lg shadow-sm opacity-0 tooltip bg-gray-700">
+                Csv
+                <div class="tooltip-arrow" data-popper-arrow></div>
+            </div>
+
+            <div data-dialog-backdrop="animated-dialog-csv" data-dialog-backdrop-close="true"
+                class="pointer-events-none fixed inset-0 z-[999] grid h-screen w-screen place-items-center bg-black bg-opacity-60 opacity-0 backdrop-blur-sm transition-opacity duration-300">
+                <div data-dialog="animated-dialog-csv" data-dialog-mount="opacity-100 translate-y-0 scale-100"
+                    data-dialog-unmount="opacity-0 -translate-y-28 scale-90 pointer-events-none"
+                    data-dialog-transition="transition-all duration-300"
+                    class="relative m-4 w-3/5 min-w-[40%] max-w-[50%] rounded-2xl bg-whiteColor antialiased shadow-2xl">
+                    <div
+                        class="flex flex-col items-center p-5 text-2xl antialiased shrink-0">
+                        Add class lecturers by
+                        <span class="text-primaryColor">uploading a <strong>.csv</strong> file</span>
+                    </div>
+                    <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <div class="relative overflow-auto max-h-72 py-2 px-5 text-base antialiased leading-relaxed">
+                            <div class="flex items-center justify-center w-full">
+                                <label for="dropzone-file" id="dropzone-label" class="flex flex-col items-center justify-center w-full h-64 border-2 border-gray-400 border-dashed rounded-lg cursor-pointer bg-whiteColor hover:bg-whiteHover transition-colors duration-100 ease-in-out">
+                                    <div class="flex flex-col items-center justify-center pt-5 pb-6 text-gray-500">
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none">
+                                            <path d="M17.4776 9.01106C17.485 9.01102 17.4925 9.01101 17.5 9.01101C19.9853 9.01101 22 11.0294 22 13.5193C22 15.8398 20.25 17.7508 18 18M17.4776 9.01106C17.4924 8.84606 17.5 8.67896 17.5 8.51009C17.5 5.46695 15.0376 3 12 3C9.12324 3 6.76233 5.21267 6.52042 8.03192M17.4776 9.01106C17.3753 10.1476 16.9286 11.1846 16.2428 12.0165M6.52042 8.03192C3.98398 8.27373 2 10.4139 2 13.0183C2 15.4417 3.71776 17.4632 6 17.9273M6.52042 8.03192C6.67826 8.01687 6.83823 8.00917 7 8.00917C8.12582 8.00917 9.16474 8.38194 10.0005 9.01101" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                                            <path d="M12 13L12 21M12 13C11.2998 13 9.99153 14.9943 9.5 15.5M12 13C12.7002 13 14.0085 14.9943 14.5 15.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                                        </svg>
+                                        <p class="mb-2 text-sm"><span class="font-semibold">Click to upload</span> or drag and drop here</p>
+                                        <p class="text-xs">CSV (~10MB)</p>
+                                    </div>
+                                    <input id="dropzone-file" name="dropzone-file" type="file" accept=".csv" class="hidden" />
+                                </label>
+                            </div>
+                            <div id="file-preview" class="hidden flex flex-col items-center justify-center gap-1 p-4 m-2 text-gray-600 text-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="w-[56px] h-[56px]" viewBox="0 0 24 24" width="24" height="24" fill="none">
+                                    <path d="M22 12.999H2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                                    <path d="M20 13.001V10.6578C20 9.84033 20 9.43158 19.8478 9.06404C19.6955 8.69649 19.4065 8.40746 18.8284 7.8294L14.0919 3.09286C13.593 2.59397 13.3436 2.34453 13.0345 2.19672C12.9702 2.16598 12.9044 2.1387 12.8372 2.11499C12.5141 2.00098 12.1614 2.00098 11.4558 2.00098C8.21082 2.00098 6.58831 2.00098 5.48933 2.88705C5.26731 3.06606 5.06508 3.26829 4.88607 3.49031C4 4.58928 4 6.2118 4 9.45682V13.001M13 2.50098V3.00098C13 5.8294 13 7.24362 13.8787 8.1223C14.7574 9.00098 16.1716 9.00098 19 9.00098H19.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                                    <path d="M6 15.999V16.999M10 15.999V21.999M14 15.999V17.999M18 15.999V19.999" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                                </svg>
+                                <p id="filename" class="text-base">No file selected</p>
+                            </div>
+                            <div id="csv-preview" class="mt-4 w-full overflow-auto"></div>
+                        </div>
+                        <div class="flex items-center justify-between p-4">
+                            <a href="{% url 'core:download_template' level_pk=level.id model_name='lecturer' %}" download type="button" class="text-sm text-primaryColor hover:underline">Download template file</a>
+
+                            <div class="flex flex-wrap items-center justify-end shrink-0 text-blue-gray-500">
+                                <button data-ripple-dark="true" data-dialog-close="true"
+                                    class="px-6 py-3 mr-1 font-sans text-sm font-bold uppercase transition-all rounded-xl middle none center hover:bg-info/10">
+                                    Cancel
+                                </button>
+                                <button data-ripple-light="true" data-dialog-close="true"
+                                    class="middle none center rounded-xl bg-primaryColor py-3 px-6 text-sm font-bold uppercase text-whiteColor shadow-md shadow-primaryColor/20 transition-all hover:shadow-lg hover:shadow-primaryColor/40">
+                                    Submit file
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- New lecturer -->
+            <a href="{% url 'core:lecturer_add' level_pk=level.id %}" data-tooltip-target="tooltip-add" data-tooltip-placement="left" class="flex justify-center items-center p-3 rounded-full border-gray-600 shadow-sm hover:text-white text-gray-400 bg-gray-700 hover:bg-gray-600 focus:ring-4 focusfocus:outline-none focus:ring-gray-400">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none">
+                    <path d="M12.5 22H6.59087C5.04549 22 3.81631 21.248 2.71266 20.1966C0.453365 18.0441 4.1628 16.324 5.57757 15.4816C7.67837 14.2307 10.1368 13.7719 12.5 14.1052C13.3575 14.2261 14.1926 14.4514 15 14.7809" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                    <path d="M16.5 6.5C16.5 8.98528 14.4853 11 12 11C9.51472 11 7.5 8.98528 7.5 6.5C7.5 4.01472 9.51472 2 12 2C14.4853 2 16.5 4.01472 16.5 6.5Z" stroke="currentColor" stroke-width="1.5" />
+                    <path d="M18.5 22L18.5 15M15 18.5H22" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+                </svg>
+                <span class="sr-only">Add</span>
+            </a>
+            <div id="tooltip-add" role="tooltip" class="absolute z-10 invisible inline-block w-auto px-3 py-2 text-sm font-medium text-white transition-opacity duration-300 rounded-lg shadow-sm opacity-0 tooltip bg-gray-700">
+                Add
+                <div class="tooltip-arrow" data-popper-arrow></div>
+            </div>
+            
+        </div>
+        <button type="button" data-dial-toggle="speed-dial-menu-click" data-dial-trigger="click" aria-controls="speed-dial-menu-click" aria-expanded="false" 
+        class="flex items-center justify-center p-3 bg-primaryColor rounded-2xl shadow-md text-whiteColor hover:scale-110 hover:bg-blue-950 transition-all duration-100 ease-linear">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none">
+            <path d="M10 5L20 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+            <path d="M4 12L20 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+            <path d="M4 19L14 19" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+            <span class="sr-only">Open actions menu</span>
+        </button>
+    </div>
 </div>
 
 {% include "components/message.html" %}

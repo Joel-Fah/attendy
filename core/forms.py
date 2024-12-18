@@ -158,6 +158,26 @@ class LecturerForm(forms.ModelForm):
         required=True,
     )
 
+    email = forms.EmailField(
+        widget=forms.EmailInput(
+            attrs={
+                'id': 'email',
+                'name': 'email',
+                'placeholder': 'Lecturer\'s email address',
+                'class': 'rounded-2xl block w-full ps-10 p-2.5 bg-whiteColor border-darkColor placeholder-darkColor/50 '
+                         'focus:ring-primaryColor focus:border-primaryColor transition-all duration-300 ease-in-out',
+            }
+        ),
+        label='Email address',
+        help_text='Enter the email address of the lecturer.',
+        error_messages={
+            'required': 'Please enter the email address of the lecturer',
+            'invalid': 'Enter a valid email address.',
+            'unique': 'A lecturer with that email already exists.',
+        },
+        required=True,
+    )
+
     phone = forms.CharField(
         widget=forms.TextInput(
             attrs={

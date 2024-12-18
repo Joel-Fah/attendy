@@ -103,7 +103,7 @@ class CourseDelegateAdmin(admin.ModelAdmin):
 
 class LecturerAdmin(admin.ModelAdmin):
     model = Lecturer
-    list_display = ['name', 'department', 'phone']
+    list_display = ['name', 'department', 'email', 'phone']
     list_filter = ['department']
     search_fields = ['name', 'phone']
     list_per_page = 25
@@ -175,7 +175,7 @@ class AttendanceAdmin(admin.ModelAdmin):
     model = Attendance
     list_display = ['id', 'course__title', 'course__lecturer__name', 'course_date', 'class_level_name', 'record_id']
     list_filter = ['course_date', 'is_catchup', 'class_level']
-    search_fields = ['course_title']
+    search_fields = ['course__title']
     list_per_page = 25
 
     readonly_fields = ['course_duration', 'updated_at', 'created_at']

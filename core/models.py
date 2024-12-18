@@ -244,6 +244,7 @@ class Lecturer(models.Model):
     department = models.CharField(max_length=255, choices=DepartmentChoices.choices, null=False, blank=False,
                                   help_text="Department of the lecturer: BMS or ICT", default=DepartmentChoices.ICT)
     phone = models.CharField(max_length=255, null=True, blank=True, help_text="Lecturer's phone number: 6xx xx xx xx")
+    email = models.EmailField(null=False, blank=False, unique=True, help_text="Lecturer's email address")
 
     created_at = models.DateTimeField(auto_now_add=True, help_text="Date and time this lecturer was added")
     updated_at = models.DateTimeField(auto_now=True, help_text="Date and time this lecturer was last updated")
