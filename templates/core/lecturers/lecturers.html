@@ -56,6 +56,9 @@
                             <th scope="col" class="px-6 py-3">
                                 Phone No.
                             </th>
+                            <th scope="col" class="px-6 py-3">
+                                Gender
+                            </th>
                             <th scope="col" class="px-6 py-3 bg-whiteHover">
                                 Actions
                             </th>
@@ -86,6 +89,9 @@
                                 {% else %}
                                 N/A
                                 {% endif %}
+                            </td>
+                            <td class="px-6 py-4">
+                                {{ lecturer.gender }}
                             </td>
                             <td class="px-6 py-4 bg-whiteHover">
                                 <div class="flex gap-2">

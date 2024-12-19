@@ -4,7 +4,7 @@ from django.contrib.auth.models import User
 from django_summernote.widgets import SummernoteWidget
 
 from .models import Course, Lecturer, Student, DepartmentChoices, TeachingRecord, ClassLevel, Attendance, \
-    CourseAttendance, Feedback
+    CourseAttendance, Feedback, GenderChoices
 
 
 # Create your forms here
@@ -194,6 +194,22 @@ class LecturerForm(forms.ModelForm):
         required=False,
     )
 
+    gender = forms.ChoiceField(
+        widget=forms.Select(
+            attrs={
+                'id': 'gender',
+                'name': 'gender',
+                'placeholder': 'Select gender',
+                'class': 'rounded-2xl block w-full ps-10 p-2.5 bg-whiteColor border-darkColor placeholder-darkColor/50 '
+                         'focus:ring-primaryColor focus:border-primaryColor transition-all duration-300 ease-in-out',
+            }
+        ),
+        label='Gender',
+        help_text='Select the gender of the lecturer.',
+        choices=GenderChoices.choices,
+        required=True,
+    )
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['department'].default = DepartmentChoices.ICT
@@ -322,7 +338,7 @@ class StudentForm(forms.ModelForm):
         ),
         label='Gender',
         help_text='Select the gender of the student.',
-        choices=Student.GenderChoices.choices,
+        choices=GenderChoices.choices,
         required=True,
     )
 

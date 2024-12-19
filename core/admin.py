@@ -103,8 +103,8 @@ class CourseDelegateAdmin(admin.ModelAdmin):
 
 class LecturerAdmin(admin.ModelAdmin):
     model = Lecturer
-    list_display = ['name', 'department', 'email', 'phone']
-    list_filter = ['department']
+    list_display = ['name', 'department', 'email', 'phone', 'gender']
+    list_filter = ['department', 'gender']
     search_fields = ['name', 'phone']
     list_per_page = 25
 

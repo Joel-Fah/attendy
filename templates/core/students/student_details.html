@@ -116,7 +116,7 @@
                         <div class="grid grid-cols-12 gap-2 items-center w-full px-1">
                             <div class="col-span-5 flex flex-col text-center bg-whiteHover rounded-2xl p-4">
                                 <small class="text-sm text-secondaryColor">Full name:</small>
-                                {{ student }}
+                                {{ student.name }}
                             </div>
 
                             <div class="col-span-4 flex flex-col text-center bg-whiteHover rounded-2xl p-4">
@@ -328,10 +328,20 @@
             },
             options: {
                 scales: {
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Course'
+                        }
+                    },
                     y: {
                         beginAtZero: true,
                         ticks: {
                             precision: 0
+                        },
+                        title: {
+                            display: true,
+                            text: 'Total attendances'
                         }
                     }
                 }

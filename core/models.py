@@ -35,15 +35,16 @@ class SemesterChoices(models.TextChoices):
     SUMMER = 'SUMMER', 'SUMMER'
 
 
+class GenderChoices(models.TextChoices):
+    MALE = 'Male', 'Male'
+    FEMALE = 'Female', 'Female'
+
+
 class Student(models.Model):
     class Meta:
         verbose_name = "Student"
         verbose_name_plural = "Students"
         unique_together = ('class_level', 'student_number')
-
-    class GenderChoices(models.TextChoices):
-        MALE = 'Male', 'Male'
-        FEMALE = 'Female', 'Female'
 
     class_level = models.ForeignKey('ClassLevel', on_delete=models.CASCADE, related_name='class_level_students')
     name = models.CharField(max_length=255, null=False,
@@ -245,6 +246,9 @@ class Lecturer(models.Model):
                                   help_text="Department of the lecturer: BMS or ICT", default=DepartmentChoices.ICT)
     phone = models.CharField(max_length=255, null=True, blank=True, help_text="Lecturer's phone number: 6xx xx xx xx")
     email = models.EmailField(null=False, blank=False, unique=True, help_text="Lecturer's email address")
+    gender = models.CharField(
+        max_length=255, choices=GenderChoices.choices, null=False, blank=False,
+        help_text="Gender of the lecturer: Male or Female")
 
     created_at = models.DateTimeField(auto_now_add=True, help_text="Date and time this lecturer was added")
     updated_at = models.DateTimeField(auto_now=True, help_text="Date and time this lecturer was last updated")

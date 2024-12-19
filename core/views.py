@@ -9,7 +9,7 @@ from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import ValidationError
-from django.db.models import Q, Count
+from django.db.models import Q, Count, Sum
 from django.http import JsonResponse, FileResponse, HttpResponseNotFound
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse_lazy
@@ -1343,7 +1343,7 @@ class LecturerPDFView(LoginRequiredMixin, CommonContextMixin, ListView):
         for i, lecturer in enumerate(lecturers, start=1):
             data.append([i, lecturer.name, lecturer.department, lecturer.email, lecturer.phone, ''])
 
-        table = Table(data, colWidths=[None, 2.15 * inch, None, None, None, 0.8 * inch], hAlign='LEFT')
+        table = Table(data, colWidths=[None, 2 * inch, None, None, None, 0.8 * inch], hAlign='LEFT')
         table.setStyle(TableStyle([
             ('BACKGROUND', (0, 0), (-1, 0), colors.white),
             ('TEXTCOLOR', (0, 0), (-1, 0), colors.black),
@@ -1400,6 +1400,60 @@ class LecturerDetailView(LoginRequiredMixin, CommonContextMixin, DetailView):
 
     def get_object(self, queryset=None):
         return get_object_or_404(self.model, id=self.kwargs['pk'], slug=self.kwargs['slug'])
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        lecturer = self.get_object()
+        class_level = ClassLevel.objects.get(id=self.kwargs.get('level_pk'))
+        courses_taught = Course.objects.filter(
+            lecturer=lecturer,
+            class_level=class_level
+        ).distinct().order_by('title')
+
+        total_hours_all_courses = 0
+        courses_taught_with_hours = []
+        for course in courses_taught:
+            total_hours = TeachingRecord.objects.filter(attendance__course=course).aggregate(
+                total_hours=Sum('lecturer_duration')
+            )['total_hours'] or timedelta(0)
+            total_hours_in_hours = total_hours.total_seconds() / 3600
+            total_hours_all_courses += total_hours_in_hours
+            courses_taught_with_hours.append({
+                'course': course,
+                'total_hours': total_hours_in_hours
+            })
+
+        # Prepare data for the chart
+        chart_data = []
+        for course in courses_taught:
+            teaching_records = TeachingRecord.objects.filter(attendance__course=course)
+            course_data = {
+                'course': course.title,
+                'data': []
+            }
+            for record in teaching_records:
+                course_data['data'].append({
+                    'day': short_date_formatter(record.attendance.course_date),
+                    'hours': record.lecturer_duration.total_seconds() / 3600 if record.lecturer_duration else 0
+                })
+            chart_data.append(course_data)
+
+        context['chart_data'] = json.dumps(chart_data)
+        context['courses_taught'] = courses_taught_with_hours
+        context['total_hours_all_courses'] = total_hours_all_courses
+        return context
+
+    def post(self, request, *args, **kwargs):
+        if 'delete_lecturer' in request.POST:
+            lecturer_id = request.POST.get('lecturer_id')
+            lecturer = Lecturer.objects.get(id=lecturer_id)
+            lecturer.delete()
+            message = format_html(
+                '<strong>{}</strong> was deleted successfully.',
+                lecturer.name
+            )
+            messages.success(request, message)
+        return self.get(request, *args, **kwargs)
 
 
 class LecturerAddView(LoginRequiredMixin, CommonContextMixin, CreateView):

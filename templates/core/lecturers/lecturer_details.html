@@ -22,11 +22,285 @@
 {% block body %}
 <div class="relative p-4 md:ml-64">
     <div class="flex flex-col gap-4 items-start justify-center w-full mt-14">
-        {{ lecturer }}
+        <div class="w-full grid grid-cols-12 items-start justify-center gap-2">
+            <div class="col-span-8">
+                <div class="flex items-center justify-between">
+                    <div class="space-y-1">
+                        <h2 class="flex gap-2 items-center text-3xl text-primaryColor font-bold capitalize">
+                            {{ lecturer }}
+                        </h2>
+                        <small class="text-gray-500">
+                            This lecturer was registered on :
+                            <span class="text-darkColor">{{ lecturer.created_at|format_date }}</span>
+                        </small>
+                    </div>
+
+                    <div class="flex items-center gap-2">
+                        <a href="{% url 'core:lecturer_update' level_pk=level.id pk=lecturer.id slug=lecturer.slug %}" class="select-none p-2 hover:bg-primaryColor/5 border border-primaryColor text-primaryColor rounded-2xl transition-colors duration-200 ease-linear" title="Edit student info">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none">
+                                <path d="M10.5 22H6.59087C5.04549 22 3.81631 21.248 2.71266 20.1966C0.453365 18.0441 4.1628 16.324 5.57757 15.4816C8.12805 13.9629 11.2057 13.6118 14 14.4281" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                                <path d="M16.5 6.5C16.5 8.98528 14.4853 11 12 11C9.51472 11 7.5 8.98528 7.5 6.5C7.5 4.01472 9.51472 2 12 2C14.4853 2 16.5 4.01472 16.5 6.5Z" stroke="currentColor" stroke-width="1.5" />
+                                <path d="M18.4332 13.8485C18.7685 13.4851 18.9362 13.3035 19.1143 13.1975C19.5442 12.9418 20.0736 12.9339 20.5107 13.1765C20.6918 13.2771 20.8646 13.4537 21.2103 13.8067C21.5559 14.1598 21.7287 14.3364 21.8272 14.5214C22.0647 14.9679 22.0569 15.5087 21.8066 15.9478C21.7029 16.1298 21.5251 16.3011 21.1694 16.6437L16.9378 20.7194C16.2638 21.3686 15.9268 21.6932 15.5056 21.8577C15.0845 22.0222 14.6214 22.0101 13.6954 21.9859L13.5694 21.9826C13.2875 21.9752 13.1466 21.9715 13.0646 21.8785C12.9827 21.7855 12.9939 21.6419 13.0162 21.3548L13.0284 21.1988C13.0914 20.3906 13.1228 19.9865 13.2807 19.6232C13.4385 19.2599 13.7107 18.965 14.2552 18.375L18.4332 13.8485Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" />
+                            </svg>
+                        </a>
+
+                        <a type="button" data-ripple-light="true" data-dialog-target="animated-dialog-delegate-{{ lecturer.id }}"
+                        class="select-none cursor-pointer text-danger p-2 hover:bg-danger/10 border border-danger rounded-2xl transition-colors duration-200 ease-linear" title="Delete lecturer">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none">
+                                <path d="M19.5 5.5L18.8803 15.5251C18.7219 18.0864 18.6428 19.3671 18.0008 20.2879C17.6833 20.7431 17.2747 21.1273 16.8007 21.416C15.8421 22 14.559 22 11.9927 22C9.42312 22 8.1383 22 7.17905 21.4149C6.7048 21.1257 6.296 20.7408 5.97868 20.2848C5.33688 19.3626 5.25945 18.0801 5.10461 15.5152L4.5 5.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+                                <path d="M9 11.7349H15" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+                                <path d="M10.5 15.6543H13.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+                                <path d="M3 5.5H21M16.0555 5.5L15.3729 4.09173C14.9194 3.15626 14.6926 2.68852 14.3015 2.39681C14.2148 2.3321 14.1229 2.27454 14.0268 2.2247C13.5937 2 13.0739 2 12.0343 2C10.9686 2 10.4358 2 9.99549 2.23412C9.89791 2.28601 9.80479 2.3459 9.7171 2.41317C9.32145 2.7167 9.10044 3.20155 8.65842 4.17126L8.05273 5.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+                            </svg>
+                        </a>
+                        
+                        <div data-dialog-backdrop="animated-dialog-delegate-{{ lecturer.id }}" data-dialog-backdrop-close="true"
+                            class="pointer-events-none fixed inset-0 z-[999] grid h-screen w-screen place-items-center bg-black bg-opacity-60 opacity-0 backdrop-blur-sm transition-opacity duration-300">
+                            <div data-dialog="animated-dialog-delegate-{{ lecturer.id }}"
+                                data-dialog-mount="opacity-100 translate-y-0 scale-100"
+                                data-dialog-unmount="opacity-0 -translate-y-28 scale-90 pointer-events-none"
+                                data-dialog-transition="transition-all duration-300"
+                                class="relative m-4 w-2/5 min-w-[40%] max-w-[40%] rounded-2xl bg-whiteColor antialiased shadow-2xl">
+                                <div class="flex flex-col items-center p-5 text-2xl antialiased shrink-0">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none">
+                                        <path d="M13 22H6.59087C5.04549 22 3.81631 21.248 2.71266 20.1966C0.453365 18.0441 4.1628 16.324 5.57757 15.4816C7.97679 14.053 10.8425 13.6575 13.5 14.2952" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                                        <path d="M16.5 6.5C16.5 8.98528 14.4853 11 12 11C9.51472 11 7.5 8.98528 7.5 6.5C7.5 4.01472 9.51472 2 12 2C14.4853 2 16.5 4.01472 16.5 6.5Z" stroke="currentColor" stroke-width="1.5" />
+                                        <path d="M16 22L19 19M19 19L22 16M19 19L16 16M19 19L22 22" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+                                    </svg>
+                                    <span class="text-xl">You're about to delete</span>
+                                    <span class="text-danger">{{ lecturer.name }}</span>
+                                </div>
+                                <div class="relative py-2 px-5 text-base antialiased leading-relaxed">
+                                    By deleting this lecturer, you will lose all the data associated with
+                                    {% if lecturer.gender == 'Male' %}
+                                      him. 
+                                      {% else %}
+                                      her. 
+                                    {% endif %}
+                                    After deletion, this action cannot be undone.
+                                    Are you sure you want to delete this lecturer from the entire system?
+                                </div>
+                                <div class="flex flex-wrap items-center justify-end p-4 shrink-0 text-blue-gray-500">
+                                    <button data-ripple-dark="true" data-dialog-close="true"
+                                        class="px-6 py-3 mr-1 font-sans text-sm font-bold uppercase transition-all rounded-xl middle none center hover:bg-info/10">
+                                        Cancel
+                                    </button>
+                                    <form action="{% url 'core:lecturers' level_pk=level.id %}" method="post">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="lecturer_id" value="{{ lecturer.id }}">
+                                        <button name="delete_lecturer" data-ripple-light="true" data-dialog-close="true"
+                                            class="middle none center rounded-xl bg-danger py-3 px-6 text-sm font-bold uppercase text-whiteColor shadow-md shadow-red-500/20 transition-all hover:shadow-lg hover:shadow-red-500/40">
+                                            Delete lecturer
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex flex-col gap-4">
+                    <div class="flex flex-col gap-2">
+                        <div class="flex items-center gap-2">
+                            <h3 class="text-2xl whitespace-nowrap">
+                                Overview
+                            </h3>
+                            <hr class="w-full border-gray-400">
+                        </div>
+
+                        <div class="grid grid-cols-12 gap-2 items-center w-full px-1">
+                            <div class="col-span-5 flex flex-col text-center bg-whiteHover rounded-2xl p-4">
+                                <small class="text-sm text-secondaryColor">Full name:</small>
+                                {{ lecturer.name }}
+                            </div>
+
+                            <div class="col-span-4 flex flex-col text-center bg-whiteHover rounded-2xl p-4">
+                                <small class="text-sm text-secondaryColor">Department</small>
+                                {{ lecturer.department }}
+                            </div>
+
+                            <div class="col-span-3 flex flex-col text-center bg-whiteHover rounded-2xl p-4">
+                                <small class="text-sm text-secondaryColor">Gender:</small>
+                                {{ lecturer.gender }}
+                            </div>
+
+                            <div class="col-span-4 flex flex-col text-center bg-whiteHover rounded-2xl p-4">
+                                <small class="text-sm text-secondaryColor">Email:</small>
+                                {{ lecturer.email }}
+                            </div>
+
+                            <div class="col-span-4 flex flex-col text-center bg-whiteHover rounded-2xl p-4">
+                                <small class="text-sm text-secondaryColor">Phone number:</small>
+                                {{ lecturer.phone }}
+                            </div>
+
+                            <div class="col-span-4 flex flex-col text-center bg-whiteHover rounded-2xl p-4">
+                                <small class="text-sm text-secondaryColor">Total hours taught:</small>
+                                {{ total_hours_all_courses }} hrs
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex flex-col gap-2">
+                        <div class="flex items-center gap-2">
+                            <h3 class="flex items-center gap-1 text-2xl whitespace-nowrap">
+                                Taught courses
+                                {% if courses_taught.count > 0 %}
+                                    <span class="text-gray-400">(</span>
+                                        <span
+                                        class="w-auto px-2 py-1 text-sm font-bold text-secondaryColor bg-secondaryColor/10 rounded-lg">
+                                        {{ courses_taught.count }}
+                                        </span>
+                                    <span class="text-gray-400">)</span>
+                                {% endif %}
+                            </h3>
+                            <hr class="w-full border-gray-400">
+                        </div>
+                        <p class="text-base text-gray-500 mb-2">
+                            The courses displayed below are the ones taught by this lecturer in this class only for the <strong>{{ level.semester }} {{ level.year }}</strong> semester.
+                        </p>
+                        <div class="flex flex-wrap gap-2.5">
+                            {% for item in courses_taught %}
+                                <div class="flex flex-col gap-2 py-2 px-4 rounded-xl border border-dashed border-gray-400 hover:bg-whiteHover hover:border-secondaryColor transition-colors duration-200 ease-linear">
+                                    <a href="{% url 'core:course_detail' level_pk=level.id pk=item.course.id slug=item.course.slug %}"
+                                        class="leading-tight">
+                                        {{ forloop.counter }} - {{ item.course.title }}
+                                        <small class="block m-0 ps-6 text-gray-500">Total hours taught: <span class="text-secondaryColor">{{ item.total_hours }} hrs</span> </small>
+                                    </a>
+                                </div>
+                                {% empty %}
+                                <div class="flex flex-col gap-4 items-center justify-center">
+                                    <img src="{% static 'core/images/process-courses.svg' %}" alt="No registered courses" class="w-1/3 m-auto">
+                                    <span
+                                        class="px-4 py-1.5 rounded-full border border-dashed border-gray-500 text-gray-500 text-xs text-center m-auto">
+                                        This lecturer has not been assigned courses yet
+                                    </span>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-span-4 px-1">
+                <h2 class="text-2xl">
+                    Attendance access QR Code
+                    <small class="text-sm font-normal text-secondaryColor bg-secondaryColor/10 rounded-xl px-2.5 py-0.5">
+                        Coming soon
+                    </small>
+                </h2>
+
+                <div class="p-1">
+                    <div class="flex flex-col gap-2">
+                        <p class="text-sm text-gray-500">
+                            The QR code enables the lecturer to mark his presence for during a course. It plays the role of the lecturer's signature in this case.
+                            Feel free to download it and make available to your to the corresponding lecturer.
+                        </p>
+                        <div class="w-full h-80 flex items-center justify-center bg-gray-200 p-2 border border-1 border-dashed border-gray-400 m-auto rounded-xl">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none" class="w-20 h-20 text-gray-400">
+                                <path d="M3 6C3 4.58579 3 3.87868 3.43934 3.43934C3.87868 3 4.58579 3 6 3C7.41421 3 8.12132 3 8.56066 3.43934C9 3.87868 9 4.58579 9 6C9 7.41421 9 8.12132 8.56066 8.56066C8.12132 9 7.41421 9 6 9C4.58579 9 3.87868 9 3.43934 8.56066C3 8.12132 3 7.41421 3 6Z" stroke="currentColor" stroke-width="1.5" />
+                                <path d="M3 18C3 16.5858 3 15.8787 3.43934 15.4393C3.87868 15 4.58579 15 6 15C7.41421 15 8.12132 15 8.56066 15.4393C9 15.8787 9 16.5858 9 18C9 19.4142 9 20.1213 8.56066 20.5607C8.12132 21 7.41421 21 6 21C4.58579 21 3.87868 21 3.43934 20.5607C3 20.1213 3 19.4142 3 18Z" stroke="currentColor" stroke-width="1.5" />
+                                <path d="M3 12L9 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                                <path d="M12 3V8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                                <path d="M15 6C15 4.58579 15 3.87868 15.4393 3.43934C15.8787 3 16.5858 3 18 3C19.4142 3 20.1213 3 20.5607 3.43934C21 3.87868 21 4.58579 21 6C21 7.41421 21 8.12132 20.5607 8.56066C20.1213 9 19.4142 9 18 9C16.5858 9 15.8787 9 15.4393 8.56066C15 8.12132 15 7.41421 15 6Z" stroke="currentColor" stroke-width="1.5" />
+                                <path d="M21 12H15C13.5858 12 12.8787 12 12.4393 12.4393C12 12.8787 12 13.5858 12 15M12 17.7692V20.5385M15 15V16.5C15 17.9464 15.7837 18 17 18C17.5523 18 18 18.4477 18 19M16 21H15M18 15C19.4142 15 20.1213 15 20.5607 15.44C21 15.8799 21 16.5881 21 18.0043C21 19.4206 21 20.1287 20.5607 20.5687C20.24 20.8898 19.7767 20.9766 19 21" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+                            </svg>
+                        </div>
+                        <!-- <div class="p-2 border border-1 border-dashed border-gray-400 m-auto rounded-xl">
+                            <img src="{{ qr_code_url }}" alt="Student qr code" class="shadow-lg text-primaryColor select-none touch-none">
+                        </div>
+                        <a href="{{ qr_code_url }}" class="flex items-center justify-center gap-2 p-2 bg-primaryColor/10 hover:bg-primaryColor/20 rounded-xl text-primaryColor text-center text-base transition-all duration-100 ease-linear focus:ring-1 focus:ring-primaryColor" download>
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none">
+                                <path d="M3.00012 14L3.23397 14.6626C4.14412 17.2413 4.5992 18.5307 5.63754 19.2654C6.67588 20 8.04322 20 10.7779 20H13.2224C15.957 20 17.3244 20 18.3627 19.2654C19.401 18.5307 19.8561 17.2413 20.7663 14.6626L21.0001 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+                                <path d="M12.0001 14V4M12.0001 14C11.2999 14 9.99165 12.0057 9.50012 11.5M12.0001 14C12.7003 14 14.0086 12.0057 14.5001 11.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                            </svg>
+                            <span>
+                                Download QR Code
+                                <span class="text-gray-600">(~15KB/.png)</span>
+                            </span>
+                        </a> -->
+                    </div>
+                </div>
+                <div class="mt-2 px-1">
+                    <hr class="w-full border-gray-400">
+                    
+                    <small class="text-gray-400 leading-tight">
+                        You are viewing this lecturer's entry as it was last updated on:
+                        <span class="text-secondaryColor"> {{ lecturer.updated_at|format_date }} </span>
+                    </small>
+                </div>
+            </div>
+
+            <div class="col-span-full flex flex-col gap-2 mt-4">
+                <div class="flex items-center gap-2">
+                    <h3 class="flex items-center gap-1 text-2xl whitespace-nowrap">
+                        Visual overview
+                    </h3>
+                    <hr class="w-full border-gray-400">
+                </div>
+
+                <p class="text-sm text-gray-500">
+                    The graph below shows the number of hours taught by this lecturer for each of his/her taught course each time an attendance was taken. <br>
+                    <ul class="list-disc list-inside ps-4 text-xs text-gray-500">
+                        <li>If the lecturer did not teach on a particular day, the graph will show a zero value for that day.</li>
+                        <li>If no attendance was taken on a course, the graph will not show any value for that day nor the day itself.</li>
+                    </ul>
+                </p>
+
+                <div class="w-full">
+                    <canvas id="hoursTaughtChart" class="max-h-96" ></canvas>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 {% endblock body %}
 
 {# Additional javascript #}
 {% block javascript %}
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const chartData = JSON.parse('{{ chart_data|escapejs }}');
+        const datasets = chartData.map(course => ({
+            label: course.course,
+            data: course.data.map(record => ({ x: record.day, y: record.hours })),
+            borderColor: getRandomColor(),
+            backgroundColor: getRandomColor(0.5),
+            fill: false
+        }));
+
+        const ctx = document.getElementById('hoursTaughtChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                datasets: datasets
+            },
+            options: {
+                scales: {
+                    x: {
+                        type: 'category',
+                        labels: chartData[0].data.map(record => record.day),
+                        title: {
+                            display: true,
+                            text: 'Days'
+                        }
+                    },
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Hours Taught'
+                        }
+                    }
+                }
+            }
+        });
+
+        function getRandomColor(alpha = 1) {
+            const r = Math.floor(Math.random() * 255);
+            const g = Math.floor(Math.random() * 255);
+            const b = Math.floor(Math.random() * 255);
+            return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+        }
+    });
+</script>
 {% endblock javascript %}
