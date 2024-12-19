@@ -1416,7 +1416,7 @@ class LecturerDetailView(LoginRequiredMixin, CommonContextMixin, DetailView):
             total_hours = TeachingRecord.objects.filter(attendance__course=course).aggregate(
                 total_hours=Sum('lecturer_duration')
             )['total_hours'] or timedelta(0)
-            total_hours_in_hours = total_hours.total_seconds() / 3600
+            total_hours_in_hours = round(total_hours.total_seconds() / 3600, 2)
             total_hours_all_courses += total_hours_in_hours
             courses_taught_with_hours.append({
                 'course': course,
@@ -1440,7 +1440,7 @@ class LecturerDetailView(LoginRequiredMixin, CommonContextMixin, DetailView):
 
         context['chart_data'] = json.dumps(chart_data)
         context['courses_taught'] = courses_taught_with_hours
-        context['total_hours_all_courses'] = total_hours_all_courses
+        context['total_hours_all_courses'] = round(total_hours_all_courses, 2)
         return context
 
     def post(self, request, *args, **kwargs):

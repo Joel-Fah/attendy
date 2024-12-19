@@ -113,42 +113,49 @@
                                 <small class="text-sm text-secondaryColor">Full name:</small>
                                 {{ lecturer.name }}
                             </div>
-
-                            <div class="col-span-4 flex flex-col text-center bg-whiteHover rounded-2xl p-4">
-                                <small class="text-sm text-secondaryColor">Department</small>
-                                {{ lecturer.department }}
-                            </div>
+                            
 
                             <div class="col-span-3 flex flex-col text-center bg-whiteHover rounded-2xl p-4">
-                                <small class="text-sm text-secondaryColor">Gender:</small>
-                                {{ lecturer.gender }}
-                            </div>
-
-                            <div class="col-span-4 flex flex-col text-center bg-whiteHover rounded-2xl p-4">
-                                <small class="text-sm text-secondaryColor">Email:</small>
-                                {{ lecturer.email }}
-                            </div>
-
-                            <div class="col-span-4 flex flex-col text-center bg-whiteHover rounded-2xl p-4">
-                                <small class="text-sm text-secondaryColor">Phone number:</small>
-                                {{ lecturer.phone }}
+                                <small class="text-sm text-secondaryColor">Department</small>
+                                {{ lecturer.department }}
                             </div>
 
                             <div class="col-span-4 flex flex-col text-center bg-whiteHover rounded-2xl p-4">
                                 <small class="text-sm text-secondaryColor">Total hours taught:</small>
                                 {{ total_hours_all_courses }} hrs
                             </div>
+
+                            <div class="col-span-3 flex flex-col text-center bg-whiteHover rounded-2xl p-4">
+                                <small class="text-sm text-secondaryColor">Phone number:</small>
+                                {{ lecturer.phone }}
+                            </div>
+
+                            <div class="col-span-6 flex flex-col text-center bg-whiteHover rounded-2xl p-4">
+                                <small class="text-sm text-secondaryColor">Email:</small>
+                                {{ lecturer.email }}
+                            </div>
+
+                            <div class="col-span-3 flex flex-col text-center bg-whiteHover rounded-2xl p-4">
+                                <small class="text-sm text-secondaryColor">Gender:</small>
+                                {{ lecturer.gender }}
+                            </div>
+                            
                         </div>
                     </div>
                     <div class="flex flex-col gap-2">
                         <div class="flex items-center gap-2">
                             <h3 class="flex items-center gap-1 text-2xl whitespace-nowrap">
+                                {% if courses_taught|length > 1 %}
                                 Taught courses
-                                {% if courses_taught.count > 0 %}
+                                {% else %}
+                                Taught course
+                                {% endif %}
+
+                                {% if courses_taught|length > 0 %}
                                     <span class="text-gray-400">(</span>
                                         <span
                                         class="w-auto px-2 py-1 text-sm font-bold text-secondaryColor bg-secondaryColor/10 rounded-lg">
-                                        {{ courses_taught.count }}
+                                        {{ courses_taught|length }}
                                         </span>
                                     <span class="text-gray-400">)</span>
                                 {% endif %}
@@ -281,7 +288,7 @@
                         labels: chartData[0].data.map(record => record.day),
                         title: {
                             display: true,
-                            text: 'Days'
+                            text: 'Days (Attendances)'
                         }
                     },
                     y: {
