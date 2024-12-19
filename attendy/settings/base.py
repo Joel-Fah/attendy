@@ -11,24 +11,12 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 import os
 from pathlib import Path
-from dotenv import load_dotenv
-
-# load env
-load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
-BASE_DIR = Path(__file__).resolve().parent.parent
+BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
-
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-8_+&c$&g(8+xz=3l5g030jn%rm-grf$(e-bhfko27bu!tgbd@f'
-
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-
-ALLOWED_HOSTS = ['*']
 
 # Application definition
 
@@ -81,24 +69,6 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'attendy.wsgi.application'
-
-# Database
-# https://docs.djangoproject.com/en/5.1/ref/settings/#databases
-
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    },
-    'production': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'postgres',
-        'USER': 'postgres',
-        'PASSWORD': os.environ.get('PASSWORD'),
-        'HOST': 'localhost',
-        'PORT': '5432'
-    }
-}
 
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
@@ -157,8 +127,6 @@ INTERNAL_IPS = [
     '127.0.0.1',
 ]
 
-NPM_BIN_PATH = "C:/Program Files/nodejs/npm.cmd"
-
 # Summernote
 MAX_IMAGE_PIXELS = int(5 * 1024 * 1024)
 
@@ -203,6 +171,3 @@ ACCOUNT_EMAIL_VERIFICATION = 'none'
 ACCOUNT_FORMS = {
     'login': 'core.forms.UserLoginForm',
 }
-
-# SITE_URL = 'http://192.168.233.46:8000/'
-SITE_URL = 'http://127.0.0.1:8000/'

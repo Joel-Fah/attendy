@@ -56,8 +56,13 @@ class LevelView(LoginRequiredMixin, ListView):
 
     def get_queryset(self):
         if self.request.user.is_superuser:
-            return ClassLevel.objects.all()
-        return ClassLevel.objects.filter(class_level_users__user=self.request.user)
+            return ClassLevel.objects.all().order_by('year', 'semester')
+        return ClassLevel.objects.filter(class_level_users__user=self.request.user).order_by('year', 'semester')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['current_year'] = datetime.now().year
+        return context
 
 
 # Dashboard views
@@ -530,7 +535,174 @@ class CourseView(LoginRequiredMixin, CommonContextMixin, ListView):
                 course.title
             )
             messages.success(request, message)
+        elif 'dropzone-file' in request.FILES:
+            csv_file = request.FILES['dropzone-file']
+            if not csv_file.name.endswith('.csv'):
+                messages.error(request, 'This is not a CSV file.')
+                return self.get(request, *args, **kwargs)
+
+            try:
+                class_level = ClassLevel.objects.get(pk=self.kwargs['level_pk'])
+                decoded_file = csv_file.read().decode('utf-8').splitlines()
+                reader = csv.DictReader(decoded_file)
+                print(f"CSV reader >>> {reader}")
+                courses_added = 0
+                for row in reader:
+                    course_code = row['Course Code']
+                    course_title = row['Course Title']
+                    lecturer_email = row['Lecturer Email']
+
+                    # Get lecturer or error
+                    lecturer = Lecturer.objects.get(email=lecturer_email)
+                    if not lecturer:
+                        messages.error(request,
+                                       f'Lecturer with email {lecturer_email} not found. Please create the lecturer first or check your file.')
+                        return self.get(request, *args, **kwargs)
+
+                    course, created = Course.objects.update_or_create(
+                        class_level=class_level,
+                        code=course_code,
+                        defaults={
+                            'class_level': class_level,
+                            'code': course_code,
+                            'title': course_title,
+                            'lecturer': lecturer
+                        }
+                    )
+
+                    if created:
+                        courses_added += 1
+
+                messages.success(request, f'{courses_added} courses added to {class_level}.')
+            except (csv.Error, ValidationError) as e:
+                messages.error(request, f'Error processing CSV file: {e}')
+
+            # redirect to same page
+            reverse_lazy('core:courses', kwargs={'level_pk': self.kwargs['level_pk']})
         return self.get(request, *args, **kwargs)
+
+
+class CourseListPDFView(LoginRequiredMixin, CommonContextMixin, ListView):
+    model = Course
+    template_name = 'core/courses/courses.html'
+    context_object_name = 'courses'
+
+    def get_queryset(self):
+        return Course.objects.filter(class_level=self.kwargs['level_pk']).order_by('title')
+
+    def get(self, request, *args, **kwargs):
+        courses = self.get_queryset()
+        class_level = ClassLevel.objects.get(pk=self.kwargs['level_pk'])
+
+        # Generate PDF file path
+        filename = f"{class_level}_courses.pdf"
+        pdf_folder_path = os.path.join(settings.MEDIA_ROOT, 'course_lists')
+        os.makedirs(pdf_folder_path, exist_ok=True)
+        pdf_file_path = os.path.join(pdf_folder_path, filename)
+
+        doc = SimpleDocTemplate(pdf_file_path, title=filename, pagesize=A4, rightMargin=24, leftMargin=24, topMargin=20,
+                                bottomMargin=18)
+        elements = []
+
+        # Add the image at the top
+        image_path = str(settings.BASE_DIR / 'static/core/images/ictu_logo.png')
+        logo = Image(image_path)
+        logo.drawHeight = 1.25 * inch
+        logo.drawWidth = 1.25 * inch
+        elements.append(logo)
+
+        styles = getSampleStyleSheet()
+        styles['Normal'].leading = 20
+        title = Paragraph("Information and Communication Technology University<br/>Institute (ICT-U) Cameroon".upper(),
+                          ParagraphStyle(
+                              name='Heading3',
+                              alignment=TA_CENTER,
+                              fontSize=12,
+                              spaceBefore=16,
+                              spaceAfter=16,
+                              textColor=colors.black,
+                              fontName='Times-Roman',
+                              leading=16
+                          ))
+        elements.append(title)
+        sub_title = Paragraph(f"List of courses for<br/>{class_level}", ParagraphStyle(
+            name='Heading2',
+            alignment=TA_CENTER,
+            fontSize=14,
+            spaceBefore=16,
+            spaceAfter=16,
+            textColor=colors.black,
+            fontName='Helvetica-Bold',
+            leading=16,
+        ))
+        elements.append(sub_title)
+
+        class_details = f"""
+                        <strong>CLASS LEVEL:</strong> {class_level.get_level_display()} &nbsp;
+                        <strong>CLASS GROUP:</strong> Group {class_level.group} &nbsp;
+                        <strong>DEPARTMENT:</strong> {class_level.department} &nbsp;
+                        <strong>SEMESTER:</strong> {class_level.semester} {class_level.year} &nbsp;
+                        <strong>MAIN HALL:</strong> {class_level.main_hall} &nbsp;
+                        {f'<strong>ALT. HALL:</strong> {class_level.secondary_hall} &nbsp;' if class_level.secondary_hall else ''}
+                        <strong>NO. COURSES:</strong> {courses.count()} &nbsp;
+                        """
+        elements.append(Paragraph(class_details, styles['Normal']))
+        elements.append(Spacer(width=20, height=10))
+
+        data = [['No.', 'Course Code', 'Course Title', 'Lecturer', 'Course Delegate']]
+        for i, course in enumerate(courses, start=1):
+            course_delegate = CourseDelegate.objects.filter(course=course, student__is_delegate=True, role='delegate')
+            data.append([i, course.code, course.title, course.lecturer.name,
+                         course_delegate.first().student.name if course_delegate.exists() else ''])
+
+        table = Table(data, colWidths=[None, None, None, None, None], hAlign='LEFT')
+        table.setStyle(TableStyle([
+            ('BACKGROUND', (0, 0), (-1, 0), colors.white),
+            ('TEXTCOLOR', (0, 0), (-1, 0), colors.black),
+            ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+            ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+            ('BOTTOMPADDING', (0, 0), (-1, 0), 8),
+            ('BACKGROUND', (0, 1), (-1, -1), colors.white),
+            ('GRID', (0, 0), (-1, -1), 1, colors.black),
+        ]))
+        elements.append(table)
+
+        # Add footer with placeholders for signatures
+        elements.append(Spacer(width=20, height=50))
+        footer = Table(
+            [[f'{"_" * 30}\nLecturer'.upper(), '', '', '', f'{"_" * 30}\nAdmin Assistant'.upper()]],
+            colWidths=[None, None, None, None, None],
+            hAlign='LEFT'
+        )
+        footer.setStyle(TableStyle([
+            ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+            ('FONTNAME', (0, 0), (-1, -1), 'Times-Roman'),
+            ('BOTTOMPADDING', (0, 0), (-1, -1), 12),
+        ]))
+        elements.append(footer)
+
+        done_on = Paragraph(
+            text=f"Generated on {date_formatter(datetime.now())} at {time_formatter(datetime.now())}",
+            style=ParagraphStyle(
+                name='Small',
+                parent=styles['Normal'],
+                fontSize=8,
+                textColor=colors.grey,
+                alignment=TA_LEFT,
+            )
+        )
+        elements.append(Spacer(width=1, height=4))
+        elements.append(done_on)
+
+        doc.build(elements)
+
+        # Serve the PDF file
+        response = FileResponse(open(pdf_file_path, 'rb'), content_type='application/pdf')
+        response['Content-Disposition'] = f'attachment; filename={filename}'
+
+        # Redirect to course list page
+        reverse_lazy('core:courses', kwargs={'level_pk': self.kwargs['level_pk'], })
+        return response
 
 
 class CourseDetailView(LoginRequiredMixin, CommonContextMixin, DetailView):
@@ -574,7 +746,7 @@ class CourseDetailView(LoginRequiredMixin, CommonContextMixin, DetailView):
         return self.get(request, *args, **kwargs)
 
 
-class CoursePDFView(LoginRequiredMixin, CommonContextMixin, DetailView):
+class CourseStudentsPDFView(LoginRequiredMixin, CommonContextMixin, DetailView):
     model = Course
     template_name = 'core/courses/course_details.html'
     context_object_name = 'course'
@@ -1285,8 +1457,8 @@ class LecturerPDFView(LoginRequiredMixin, CommonContextMixin, ListView):
         class_level = ClassLevel.objects.get(pk=self.kwargs['level_pk'])
 
         # Generate PDF file path
-        filename = f"{class_level}_class_lecturers.pdf"
-        pdf_folder_path = os.path.join(settings.MEDIA_ROOT, 'overall_class_lists')
+        filename = f"{class_level}_lecturers.pdf"
+        pdf_folder_path = os.path.join(settings.MEDIA_ROOT, 'class_lecturers')
         os.makedirs(pdf_folder_path, exist_ok=True)
         pdf_file_path = os.path.join(pdf_folder_path, filename)
 

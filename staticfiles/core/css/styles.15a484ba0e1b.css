@@ -1,0 +1,62 @@
+/* Import Patrick Font */
+@font-face {
+    font-family: "Patrick Hand";
+    src: url("../fonts/PatrickHand-Regular.0b94e62171b8.ttf") format('truetype');
+    font-weight: 400;
+    font-style: normal;
+}
+
+html, body {
+    font-family: "Patrick Hand", system-ui;
+}
+
+
+#typewriter {
+    display: inline-block;
+    overflow: hidden;
+    white-space: nowrap;
+    border-right: 0.08em solid #FFF5EA;
+    /* Cursor effect */
+    animation: blink-caret 0.75s step-end infinite;
+}
+
+@keyframes blink-caret {
+
+    from,
+    to {
+        border-color: transparent;
+    }
+
+    50% {
+        border-color: #FFF5EA;
+    }
+}
+#f13c03 {
+    color: rgb(241, 60, 3);
+}
+
+.accordion.active>.accordion-toggle.accordion-active\:text-secondaryColor {
+    --tw-text-opacity: 1;
+    color: rgb(241 60 3 / var(--tw-text-opacity));
+}
+
+.accordion.active>.accordion-toggle .accordion-active\:text-secondaryColor {
+    --tw-text-opacity: 1;
+    color: rgb(241 60 3 / var(--tw-text-opacity));
+}
+
+.accordion.active>.accordion-toggle .accordion-active\:rotate-180 {
+    --tw-rotate: 180deg;
+    transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
+}
+
+.accordion.active>.accordion-toggle .accordion-active\:rotate-90 {
+    --tw-rotate: 90deg;
+    transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
+}
+
+.accordion-content {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+}
