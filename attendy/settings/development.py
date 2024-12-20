@@ -1,5 +1,6 @@
 from .base import *
 from dotenv import load_dotenv
+import dj_database_url
 
 # Settings overrides for development environment
 
@@ -30,7 +31,8 @@ DATABASES = {
         'PASSWORD': os.environ.get('DB_PASSWORD'),
         'HOST': 'localhost',
         'PORT': '5432'
-    }
+    },
+    'prod': dj_database_url.parse(os.getenv('RENDER_POSTGRESQL_URL'))
 }
 
 # Add compression and caching support for whitenoise
