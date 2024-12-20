@@ -12,6 +12,7 @@ def create_or_save_user_profile(sender, instance, created, **kwargs):
         Profile.objects.get_or_create(user=instance)
     else:
         # Ensure the profile is saved when the User is updated
+        Profile.objects.get_or_create(user=instance)
         instance.profile.save()
 
 
