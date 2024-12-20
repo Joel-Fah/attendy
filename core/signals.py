@@ -4,15 +4,15 @@ from django.contrib.auth.models import User
 from .models import Profile, TeachingRecord, Attendance
 
 
-@receiver(post_save, sender=User)
-def create_user_profile(sender, instance, created, **kwargs):
+@receiver(post_save, sender=User, weak=False)
+def create_or_save_user_profile(sender, instance, created, **kwargs):
+    # Create a new Profile only if one doesn't already exist
     if created:
+        # Only create a new profile if one doesn't exist
         Profile.objects.get_or_create(user=instance)
-
-
-@receiver(post_save, sender=User)
-def save_user_profile(sender, instance, **kwargs):
-    instance.profile.save()
+    else:
+        # Ensure the profile is saved when the User is updated
+        instance.profile.save()
 
 
 @receiver(post_save, sender=Attendance)
