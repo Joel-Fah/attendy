@@ -1,3 +1,5 @@
+import os
+
 from .base import *
 import dj_database_url
 from dotenv import load_dotenv
@@ -28,3 +30,5 @@ STATIC_ROOT = BASE_DIR / "staticfiles"
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 SITE_URL = os.getenv('SITE_URL')
+
+CSRF_TRUSTED_ORIGINS = os.getenv('CSRF_TRUSTED_ORIGINS').split(" ")
