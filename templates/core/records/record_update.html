@@ -28,7 +28,7 @@
     <div class="relative p-4 md:ml-64">
         <div class="flex flex-col gap-4 items-start justify-center w-full mt-14">
             <div class="grid grid-cols-12 items-center justify-center gap-2 gap-y-4">
-                <div class="col-start-2 col-span-10 flex flex-col gap-4">
+                <div class="col-start-1 lg:col-start-2 col-span-full lg:col-span-10 flex flex-col gap-4">
                     <div class="flex flex-col gap-2">
                         <h2 class="text-2xl">
                             You're updating record for
@@ -57,9 +57,9 @@
                         {% endif %}
 
                         <div class="flex flex-col gap-2 w-full">
-                            <div class="flex gap-2">
+                            <div class="flex flex-wrap lg:gap-2">
                                 {# Lecturer Arrival Time field #}
-                                <div class="w-1/3">
+                                <div class="w-1/2 md:w-1/3">
                                     <label for="{{ form.lecturer_arrival_time.label }}"
                                         class="ps-4 text-xs text-gray-500"> {{ form.lecturer_arrival_time.label }} </label>
                                     <div class="relative">
@@ -83,7 +83,7 @@
                                 </div>
 
                                 {# Lecturer Departure Time field #}
-                                <div class="w-1/3">
+                                <div class="w-1/2 md:w-1/3">
                                     <label for="{{ form.lecturer_departure_time.label }}"
                                         class="ps-4 text-xs text-gray-500"> {{ form.lecturer_departure_time.label }} </label>
                                     <div class="relative">
@@ -107,7 +107,7 @@
                                 </div>
 
                                 {# Quality Assurance field #}
-                                <div class="w-1/3">
+                                <div class="w-full md:w-1/3">
                                     <label for="{{ form.quality_assurance.label }}"
                                            class="ps-4 text-xs text-gray-500"> {{ form.quality_assurance.label }} </label>
                                     <div class="relative">
@@ -162,7 +162,7 @@
                     </form>
                 </div>
 
-                <div id="lect_img" class="relative col-start-2 col-span-10 h-52">
+                <div id="lect_img" class="relative col-start-1 lg:col-start-2 col-span-full lg:col-span-10 h-52">
                     <blockquote
                             class="flex flex-col gap-2 text-[16px] leading-tight text-whiteColor p-4 text-left max-w-64">
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none"

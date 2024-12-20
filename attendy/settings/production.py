@@ -26,9 +26,6 @@ DATABASES = {
     'default': dj_database_url.parse(os.getenv('RENDER_POSTGRESQL_URL'))
 }
 
-STATIC_ROOT = BASE_DIR / "staticfiles"
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
-
 SITE_URL = os.getenv('SITE_URL')
 
 CSRF_TRUSTED_ORIGINS = os.getenv('CSRF_TRUSTED_ORIGINS').split(" ")

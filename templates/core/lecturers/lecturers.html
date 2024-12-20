@@ -30,8 +30,8 @@
                             stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" />
                     </svg>
                 </div>
-                <input type="search" name="search_lecturers" id="search_courses" placeholder="search for a lecturer..."
-                    class="w-full rounded-2xl block ps-10 p-2.5 bg-whiteColor border-darkColor placeholder-darkColor/50 focus:ring-primaryColor focus:border-primaryColor transition-all duration-300 ease-in-out">
+                <input disabled type="search" name="search_lecturers" id="search_courses" placeholder="search for a lecturer..."
+                    class="w-full rounded-2xl block ps-10 p-2.5 bg-whiteColor border-darkColor placeholder-darkColor/50 focus:ring-primaryColor focus:border-primaryColor disabled:outline-dashed disabled:border-0 disabled:outline-1 disabled:outline-gray-400 transition-all duration-300 ease-in-out">
             </div>
         </div>
 
@@ -44,19 +44,19 @@
                             <th scope="col" class="p-4">
                                 S/N
                             </th>
-                            <th scope="col" class="px-6 py-3">
+                            <th scope="col" class="px-6 py-3 whitespace-nowrap">
                                 Names
                             </th>
-                            <th scope="col" class="px-6 py-3">
+                            <th scope="col" class="px-6 py-3 whitespace-nowrap">
                                 Dep't
                             </th>
-                            <th scope="col" class="px-6 py-3">
+                            <th scope="col" class="px-6 py-3 whitespace-nowrap">
                                 Email
                             </th>
-                            <th scope="col" class="px-6 py-3">
+                            <th scope="col" class="px-6 py-3 whitespace-nowrap">
                                 Phone No.
                             </th>
-                            <th scope="col" class="px-6 py-3">
+                            <th scope="col" class="px-6 py-3 whitespace-nowrap">
                                 Gender
                             </th>
                             <th scope="col" class="px-6 py-3 bg-whiteHover">
@@ -83,7 +83,7 @@
                                 N/A
                                 {% endif %}
                             </td>
-                            <td class="px-6 py-4">
+                            <td class="px-6 py-4 whitespace-nowrap">
                                 {% if lecturer.phone %}
                                 {{ lecturer.phone }}
                                 {% else %}

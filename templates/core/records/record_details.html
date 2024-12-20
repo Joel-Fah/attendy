@@ -4,7 +4,7 @@
 {% load custom_date_formatter duration_formatter %}
 
 {# Title of the page #}
-{% block title %} {{ record.attendance.course.title }} {% endblock %}
+{% block title %} {{ record }} {% endblock %}
 
 {% block extra_styles %}
 <style>
@@ -73,7 +73,7 @@
     <div class="flex flex-col gap-4 items-start justify-center w-full mt-14">
         <div class="w-full flex items-center justify-between">
             <div class="space-y-2">
-                <h2 class="text-3xl text-primaryColor flex items-center gap-2">
+                <h2 class="text-2xl md:text-3xl text-primaryColor flex items-center gap-2">
                     {{ record.attendance.course }}
                         {% if record.quality_assurance == 'Approved' %}
                         <small class="text-success text-sm font-normal px-2 py-0.5 rounded-full bg-success/5">{{ record.quality_assurance }}</small>
@@ -98,7 +98,7 @@
         </div>
 
         <div class="grid grid-cols-12 grid-flow-row gap-2 w-full">
-            <div class="col-span-full lg:col-span-8 space-y-2">
+            <div class="col-span-full lg:col-span-8 space-y-2 mb-8 lg:mb-0">
                 <h3 class="block text-xl text-secondaryColor font-medium">Lessons and Brief Content/Assignments</h3>
                 <div class="record-content bg-white h-full p-4 shadow-md text-base">
                     {{ record.description|safe }}

@@ -23,7 +23,7 @@
 <div class="relative p-4 md:ml-64">
     <div class="flex flex-col gap-4 items-start justify-center w-full mt-14">
         <div class="w-full grid grid-cols-12 items-start justify-center gap-2">
-            <div class="col-span-8">
+            <div class="col-span-full lg:col-span-8">
                 <div class="flex items-center justify-between">
                     <div class="space-y-1">
                         <h2 class="flex gap-2 items-center text-3xl text-primaryColor font-bold capitalize">
@@ -109,28 +109,28 @@
                         </div>
 
                         <div class="grid grid-cols-12 gap-2 items-center w-full px-1">
-                            <div class="col-span-5 flex flex-col text-center bg-whiteHover rounded-2xl p-4">
+                            <div class="col-span-8 lg:col-span-5 flex flex-col text-center bg-whiteHover rounded-2xl p-4">
                                 <small class="text-sm text-secondaryColor">Full name:</small>
                                 {{ lecturer.name }}
                             </div>
                             
 
-                            <div class="col-span-3 flex flex-col text-center bg-whiteHover rounded-2xl p-4">
+                            <div class="col-span-4 lg:col-span-3 flex flex-col text-center bg-whiteHover rounded-2xl p-4">
                                 <small class="text-sm text-secondaryColor">Department</small>
                                 {{ lecturer.department }}
                             </div>
 
-                            <div class="col-span-4 flex flex-col text-center bg-whiteHover rounded-2xl p-4">
+                            <div class="col-span-6 lg:col-span-4 flex flex-col text-center bg-whiteHover rounded-2xl p-4">
                                 <small class="text-sm text-secondaryColor">Total hours taught:</small>
                                 {{ total_hours_all_courses }} hrs
                             </div>
 
-                            <div class="col-span-3 flex flex-col text-center bg-whiteHover rounded-2xl p-4">
+                            <div class="col-span-6 lg:col-span-3 flex flex-col text-center bg-whiteHover rounded-2xl p-4">
                                 <small class="text-sm text-secondaryColor">Phone number:</small>
                                 {{ lecturer.phone }}
                             </div>
 
-                            <div class="col-span-6 flex flex-col text-center bg-whiteHover rounded-2xl p-4">
+                            <div class="col-span-9 lg:col-span-6 flex flex-col text-center bg-whiteHover rounded-2xl p-4">
                                 <small class="text-sm text-secondaryColor">Email:</small>
                                 {{ lecturer.email }}
                             </div>
@@ -188,7 +188,7 @@
                 </div>
             </div>
 
-            <div class="col-span-4 px-1">
+            <div class="col-span-full lg:col-span-4 mt-4 lg:mt-0 px-1">
                 <h2 class="text-2xl">
                     Attendance access QR Code
                     <small class="text-sm font-normal text-secondaryColor bg-secondaryColor/10 rounded-xl px-2.5 py-0.5">
@@ -254,7 +254,7 @@
                 </p>
 
                 <div class="w-full">
-                    <canvas id="hoursTaughtChart" class="max-h-96" ></canvas>
+                    <canvas id="hoursTaughtChart" class="h-auto lg:max-h-96"></canvas>
                 </div>
             </div>
         </div>

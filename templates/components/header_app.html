@@ -25,7 +25,7 @@
                 </a>
             </div>
             <div class="flex items-center">
-                <div class="flex items-center ms-3">
+                <div class="hidden md:flex items-center ms-3">
                     <div>
                         <button type="button"
                             class="flex items-center gap-1 px-2.5 py-1 rounded-xl hover:bg-secondaryColor/10 hover:shadow focus:bg-secondaryColor/10 focus:ring-1 focus:ring-secondaryColor transition-all duration-300 ease-linear"
@@ -37,7 +37,7 @@
                             {{ level.get_level_display }} - Group {{ level.group }} - {{ level.semester }} {{ level.year }}
                         </button>
                     </div>
-                    <div class="z-50 hidden overflow-hidden my-4 text-base list-none bg-whiteColor divide-y divide-secondaryColor/10 rounded-xl shadow-lg"
+                    <div class="min-w-60 z-50 hidden overflow-hidden my-4 text-base list-none bg-whiteColor divide-y divide-secondaryColor/10 rounded-xl shadow-lg"
                         id="dropdown-class">
                         <div class="px-4 py-3" role="none">
                             <p class="text-sm" role="none">
@@ -143,10 +143,54 @@
         class="absolute bottom-0 lg:-bottom-10 w-full scale-150">
     <div class="h-full px-3 pb-4 overflow-y-auto bg-whiteColor">
         <ul class="space-y-4 font-medium">
+            <li class="md:hidden">
+                <div class="mt-2">
+                    <button type="button"
+                        class="flex items-center justify-between !w-full gap-1 p-2 rounded-xl hover:bg-secondaryColor/10 hover:shadow focus:bg-secondaryColor/10 focus:ring-1 focus:ring-secondaryColor transition-all duration-300 ease-linear"
+                        aria-expanded="false" data-dropdown-toggle="dropdown-class-mobile">
+                        <span class="sr-only">Open class menu</span>
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none">
+                                <path
+                                    d="M17.5798 9.71016C17.0765 9.57314 16.5468 9.5 16 9.5C13.4668 9.5 11.3002 11.0699 10.4202 13.2898M17.5798 9.71016C20.1271 10.4036 22 12.7331 22 15.5C22 18.8137 19.3137 21.5 16 21.5C14.4633 21.5 13.0615 20.9223 12 19.9722M17.5798 9.71016C17.851 9.02618 18 8.2805 18 7.5C18 4.18629 15.3137 1.5 12 1.5C8.68629 1.5 6 4.18629 6 7.5C6 8.2805 6.14903 9.02618 6.42018 9.71016M10.4202 13.2898C10.149 13.9738 10 14.7195 10 15.5C10 17.277 10.7725 18.8736 12 19.9722M10.4202 13.2898C8.59146 12.792 7.11029 11.451 6.42018 9.71016M6.42018 9.71016C3.87294 10.4036 2 12.7331 2 15.5C2 18.8137 4.68629 21.5 8 21.5C9.53671 21.5 10.9385 20.9223 12 19.9722"
+                                    stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+                            </svg>
+                            <span class="whitespace-nowrap w-full text-left ms-3">{{ level.get_level_display }} - Group {{ level.group }}</span>
+
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none" class="w-5">
+                            <path d="M18 9.00005C18 9.00005 13.5811 15 12 15C10.4188 15 6 9 6 9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                        </svg>
+                    </button>
+                </div>
+                <div class="z-50 min-w-60 hidden overflow-hidden my-4 text-base list-none bg-whiteColor divide-y divide-secondaryColor/10 rounded-xl shadow-lg"
+                    id="dropdown-class-mobile">
+                    <div class="px-4 py-3" role="none">
+                        <p class="text-sm" role="none">
+                            {{ level.main_hall }}
+                        </p>
+                        <p class="text-sm font-medium truncate text-gray-500" role="none">
+                            {{ level.semester }} {{ level.year }} | {{ level.department }}
+                        </p>
+                    </div>
+                    <ul class="py-1" role="none">
+                        <li>
+                            <a href="{% url 'core:dashboard_detail' level_pk=level.id level_slug=level.slug %}"
+                                class="block px-4 py-2 text-sm hover:bg-secondaryColor/10" role="menuitem">
+                                Class overview
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{% url 'core:levels' %}"
+                                class="block px-4 py-2 text-sm hover:bg-secondaryColor/10" role="menuitem">
+                                My classes
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </li>
             <li>
                 <a href="{% if url_name == 'dashboard' %} # {% else %} {% url 'core:dashboard' level_pk=level.id level_slug=level.slug %} {% endif %}"
                     class="flex items-center p-2 rounded-xl transition-all duration-300 ease-linear hover:bg-whiteHover group {% if url_name == 'dashboard' or url_name == 'attendance_detail' or url_name == 'attendance_update' or url_name == 'enroll_add' %} bg-secondaryColor/10 hover:bg-secondaryColor/20 shadow-sm border border-secondaryColor {% endif %}">
-                    <svg width="25" height="24" viewBox="0 0 25 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <svg width="24" height="24" viewBox="0 0 25 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <path
                             d="M7 22C9.20914 22 11 20.2091 11 18C11 15.7909 9.20914 14 7 14C4.79086 14 3 15.7909 3 18C3 20.2091 4.79086 22 7 22Z"
                             stroke="#0C0C0C" stroke-width="3" stroke-linejoin="round" />

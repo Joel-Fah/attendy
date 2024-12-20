@@ -38,13 +38,13 @@
                             stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" />
                     </svg>
                 </div>
-                <input type="search" name="search_records" id="search_courses" placeholder="search for a record..."
-                    class="w-full rounded-2xl block ps-10 p-2.5 bg-whiteColor border-darkColor placeholder-darkColor/50 focus:ring-primaryColor focus:border-primaryColor transition-all duration-300 ease-in-out">
+                <input disabled type="search" name="search_records" id="search_courses" placeholder="search for a record..."
+                    class="w-full rounded-2xl block ps-10 p-2.5 bg-whiteColor border-darkColor placeholder-darkColor/50 focus:ring-primaryColor focus:border-primaryColor disabled:outline-dashed disabled:border-0 disabled:outline-1 disabled:outline-gray-400 transition-all duration-300 ease-in-out">
             </div>
         </div>
 
         <div id="ad"
-            class="w-full relative flex flex-col items-start justify-center overflow-hidden px-8 py-4 bg-primaryColor shadow-lg">
+            class="w-full relative flex flex-col items-start justify-center overflow-hidden px-4 lg:px-8 py-4 bg-primaryColor shadow-lg">
             <div class="flex items-center gap-1">
                 <svg width="25" height="24" viewBox="0 0 25 24" fill="none" xmlns="http://www.w3.org/2000/svg"
                     class="w-4 h-5 text-gray-500">
@@ -64,11 +64,11 @@
                     Attendy, the game changer.
                 </small>
             </div>
-            <h2 class="text-3xl font-bold max-w-sm my-2 text-whiteColor">
+            <h2 class="text-xl md:text-3xl font-bold max-w-60 md:max-w-sm my-2 text-whiteColor">
                 Deciding what not to do is as important as deciding what to do
             </h2>
             <small class="text-secondaryColor font-bold text-sm">Jessica Jackley</small>
-            <img src="{% static 'core/images/attendy-white.svg' %}" alt="" class="absolute -bottom-1/3 right-0 w-1/4 -rotate-12 scale-110">
+            <img src="{% static 'core/images/attendy-white.svg' %}" alt="" class="absolute -bottom-0 lg:-bottom-1/3 right-0 w-1/4 -rotate-12 scale-150 lg:scale-110">
         </div>
 
         <div class="w-full flex flex-col gap-2.5">
@@ -79,7 +79,7 @@
                     {% for record in records %}
                     <li>
                         <div  
-                            class="flex items-center justify-between w-full px-4 py-2 hover:bg-secondaryColor/5 transition-all duration-300 ease-linear">
+                            class="flex flex-col md:flex-row items-start gap-2 justify-between w-full px-4 py-2 hover:bg-secondaryColor/5 transition-all duration-300 ease-linear">
                             <a href="{% url 'core:record_detail' level_pk=level.id pk=record.id slug=record.attendance.course.slug %}" class="flex items-center gap-4">
                                 <span> {{ forloop.counter }}. </span>
                                 <div class="">
@@ -111,9 +111,9 @@
                                     </small>
                                 </div>
                             </a>
-                            <div class="flex items-center gap-2">
+                            <div class="flex items-center gap-2 w-full md:w-auto">
                                 <a href="{% url 'core:attendance_detail' level_pk=level.id level_slug=level.slug pk=record.attendance.id %}"
-                                    class="text-nowrap px-4 py-2 rounded-xl outline outline-1 outline-secondaryColor text-secondaryColor text-sm hover:bg-secondaryColor/10 transition-colors duration-100 ease-linear">
+                                    class="w-full md:w-auto text-nowrap px-4 py-2 rounded-xl outline outline-1 outline-secondaryColor text-secondaryColor text-sm hover:bg-secondaryColor/10 transition-colors duration-100 ease-linear">
                                     View attendance
                                 </a>
                                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24"

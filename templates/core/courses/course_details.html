@@ -92,7 +92,7 @@
         </div>
 
         <div class="w-full grid grid-cols-12 gap-2 text-base">
-            <div class="col-span-9 flex flex-col gap-2">
+            <div class="col-span-full lg:col-span-9 flex flex-col gap-2">
                 <div class="relative right-0">
                     <ul class="relative flex flex-wrap p-1 list-none rounded-xl bg-blue-gray-50/60" data-tabs="tabs"
                         role="list">
@@ -158,7 +158,7 @@
                                     <h2 class="text-2xl text-primaryColor">Visual Data</h2>
                                 </div>
 
-                                <div class="col-span-4">
+                                <div class="col-span-full lg:col-span-4">
                                     <canvas id="genderChart"></canvas>
                                 </div>
                             </div>
@@ -172,22 +172,22 @@
                                             <th scope="col" class="p-4">
                                                 S/N
                                             </th>
-                                            <th scope="col" class="px-6 py-3">
+                                            <th scope="col" class="px-6 py-3 whitespace-nowrap">
                                                 Names
                                             </th>
-                                            <th scope="col" class="px-6 py-3">
+                                            <th scope="col" class="px-6 py-3 whitespace-nowrap">
                                                 Email
                                             </th>
-                                            <th scope="col" class="px-6 py-3">
+                                            <th scope="col" class="px-6 py-3 whitespace-nowrap">
                                                 Dep't
                                             </th>
-                                            <th scope="col" class="px-6 py-3">
+                                            <th scope="col" class="px-6 py-3 whitespace-nowrap">
                                                 Phone No
                                             </th>
-                                            <th scope="col" class="px-6 py-3">
+                                            <th scope="col" class="px-6 py-3 whitespace-nowrap">
                                                 Gender
                                             </th>
-                                            <th scope="col" class="px-6 py-3 bg-whiteHover">
+                                            <th scope="col" class="px-6 py-3 whitespace-nowrap bg-whiteHover">
                                                 Actions
                                             </th>
                                         </tr>
@@ -210,7 +210,7 @@
                                             <td class="px-6 py-4">
                                                 {{ student.class_level.department}}
                                             </td>
-                                            <td class="px-6 py-4">
+                                            <td class="px-6 py-4 whitespace-nowrap">
                                                 {{ student.phone }}
                                             </td>
                                             <td class="px-6 py-4">
@@ -233,8 +233,8 @@
                 </div>
             </div>
 
-            <div class=" flex flex-col gap-2 col-start-10 col-span-3">
-                <h3 class="text-xl text-primaryColor">Course delegates and assistants</h3>
+            <div class=" flex flex-col gap-2 col-start-1 lg:col-start-10 col-span-full lg:col-span-3">
+                <h3 class="text-2xl lg:text-xl text-primaryColor">Course delegates and assistants</h3>
                 
                 <div class="flex flex-col gap-4">
                     <div class="flex flex-col items-start bg-whiteHover rounded-xl px-4 py-1.5 space-y-2">

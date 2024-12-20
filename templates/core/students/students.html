@@ -33,8 +33,8 @@
                                 stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" />
                         </svg>
                     </div>
-                    <input type="search" name="search_students" id="search_courses" placeholder="search for a student..."
-                        class="w-full rounded-2xl block ps-10 p-2.5 bg-whiteColor border-darkColor placeholder-darkColor/50 focus:ring-primaryColor focus:border-primaryColor transition-all duration-300 ease-in-out">
+                    <input disabled type="search" name="search_students" id="search_courses" placeholder="search for a student..."
+                        class="w-full rounded-2xl block ps-10 p-2.5 bg-whiteColor border-darkColor placeholder-darkColor/50 focus:ring-primaryColor focus:border-primaryColor disabled:outline-dashed disabled:border-0 disabled:outline-1 disabled:outline-gray-400 transition-all duration-300 ease-in-out">
                 </div>
             </div>
 
@@ -193,7 +193,7 @@
                                         <span class="font-semibold text-primaryColor">{{ page_obj.paginator.count }}</span>
                                     </span>
                                         
-                                        {% if is_paginated %}
+                                    {% if is_paginated %}
                                         <ul class="inline-flex -space-x-px text-sm h-8">
                                             {% if page_obj.has_previous %}
                                                 <li>
@@ -229,20 +229,22 @@
                                         </ul>
                                     {% endif %}
                                 </nav>
+                            </div>
 
-                                <div class="grid grid-cols-12 items-center gap-2 mt-4">
-                                    <div class="col-span-full">
-                                        <h2 class="text-2xl text-primaryColor">Visual Data</h2>
-                                    </div>
-    
-                                    <div class="col-span-12 w-1/3 m-auto">
-                                        <canvas id="genderChart"></canvas>
-                                    </div>
-
-                                    <div class="col-span-12"></div>
-                                        <canvas id="attendanceChart"></canvas>
-                                    </div>
+                            <div class="grid grid-cols-12 items-center gap-2 mt-4">
+                                <div class="col-span-full">
+                                    <h2 class="text-2xl text-primaryColor">Visual Data</h2>
                                 </div>
+
+                                <div class="col-span-12 w-full lg:w-1/3 m-auto">
+                                    <canvas id="genderChart"></canvas>
+                                </div>
+
+                                <div class="col-span-12 w-full">
+                                    <canvas id="attendanceChart" class="h-auto"></canvas>
+                                </div>
+                            </div>
+                            
                         </div>
 
                         <div class="hidden opacity-0" id="message" role="tabpanel">
