@@ -57,7 +57,7 @@
                         data-dialog-mount="opacity-100 translate-y-0 scale-100"
                         data-dialog-unmount="opacity-0 -translate-y-28 scale-90 pointer-events-none"
                         data-dialog-transition="transition-all duration-300"
-                        class="relative m-4 w-2/5 min-w-[40%] max-w-[40%] rounded-2xl bg-whiteColor antialiased shadow-2xl">
+                        class="relative m-4 w-11/12 lg:w-3/5 min-w-[40%] max-w-screen-sm lg:max-w-[50%] rounded-2xl bg-whiteColor antialiased shadow-2xl">
                         <div class="flex flex-col items-center p-5 text-2xl antialiased shrink-0">
                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none">
                                 <path d="M13 22H6.59087C5.04549 22 3.81631 21.248 2.71266 20.1966C0.453365 18.0441 4.1628 16.324 5.57757 15.4816C7.97679 14.053 10.8425 13.6575 13.5 14.2952" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
@@ -65,7 +65,7 @@
                                 <path d="M16 22L19 19M19 19L22 16M19 19L16 16M19 19L22 22" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
                             </svg>
                             <span class="text-xl">You're about to delete</span>
-                            <span class="text-danger">{{ course.title }}</span>
+                            <span class="text-danger text-center">{{ course.title }}</span>
                         </div>
                         <div class="relative py-2 px-5 text-base antialiased leading-relaxed">
                             By deleting this course, you will lose all the data associated with it.

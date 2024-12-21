@@ -44,7 +44,7 @@ module.exports = {
     theme: {
         extend: {
             fontFamily: {
-                sans: ['"Patrick Hand"', 'cursive'],
+                sans: ['"Patrick Hand"', 'sans-serif'],
                 body: ['Urbanist', 'sans-serif'],
             },
             colors: {

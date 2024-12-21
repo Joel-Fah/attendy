@@ -46,7 +46,7 @@ html,
   -o-tab-size: 4;
      tab-size: 4;
   /* 3 */
-  font-family: "Patrick Hand", cursive;
+  font-family: "Patrick Hand", sans-serif;
   /* 4 */
   font-feature-settings: normal;
   /* 5 */
@@ -966,6 +966,14 @@ select {
   top: 0.75rem;
 }
 
+.-bottom-2 {
+  bottom: -0.5rem;
+}
+
+.-bottom-8 {
+  bottom: -2rem;
+}
+
 .z-0 {
   z-index: 0;
 }
@@ -1426,6 +1434,18 @@ select {
   width: 100vw;
 }
 
+.w-4\/5 {
+  width: 80%;
+}
+
+.w-5\/6 {
+  width: 83.333333%;
+}
+
+.w-11\/12 {
+  width: 91.666667%;
+}
+
 .min-w-10 {
   min-width: 2.5rem;
 }
@@ -1492,6 +1512,10 @@ select {
 
 .max-w-xs {
   max-width: 20rem;
+}
+
+.max-w-screen-sm {
+  max-width: 640px;
 }
 
 .flex-1 {
@@ -1599,6 +1623,10 @@ select {
 
 .cursor-pointer {
   cursor: pointer;
+}
+
+.cursor-default {
+  cursor: default;
 }
 
 .touch-none {
@@ -1730,25 +1758,12 @@ select {
        column-gap: 3rem;
 }
 
-.gap-y-4 {
-  row-gap: 1rem;
-}
-
-.gap-y-6 {
-  row-gap: 1.5rem;
-}
-
-.gap-y-3 {
-  row-gap: 0.75rem;
-}
-
-.gap-x-3 {
-  -moz-column-gap: 0.75rem;
-       column-gap: 0.75rem;
-}
-
 .gap-y-2 {
   row-gap: 0.5rem;
+}
+
+.gap-y-4 {
+  row-gap: 1rem;
 }
 
 .-space-x-3 > :not([hidden]) ~ :not([hidden]) {
@@ -2132,6 +2147,11 @@ select {
   background-color: rgb(255 236 213 / var(--tw-bg-opacity));
 }
 
+.bg-red-200 {
+  --tw-bg-opacity: 1;
+  background-color: rgb(254 202 202 / var(--tw-bg-opacity));
+}
+
 .bg-opacity-10 {
   --tw-bg-opacity: 0.1;
 }
@@ -2340,6 +2360,21 @@ select {
   padding-bottom: 1.5rem;
 }
 
+.px-10 {
+  padding-left: 2.5rem;
+  padding-right: 2.5rem;
+}
+
+.px-16 {
+  padding-left: 4rem;
+  padding-right: 4rem;
+}
+
+.px-14 {
+  padding-left: 3.5rem;
+  padding-right: 3.5rem;
+}
+
 .pb-4 {
   padding-bottom: 1rem;
 }
@@ -2413,7 +2448,7 @@ select {
 }
 
 .font-sans {
-  font-family: "Patrick Hand", cursive;
+  font-family: "Patrick Hand", sans-serif;
 }
 
 .font-serif {
@@ -3330,6 +3365,10 @@ select {
     top: -8rem;
   }
 
+  .lg\:bottom-0 {
+    bottom: 0px;
+  }
+
   .lg\:order-1 {
     order: 1;
   }
@@ -3442,8 +3481,16 @@ select {
     width: auto;
   }
 
+  .lg\:w-3\/5 {
+    width: 60%;
+  }
+
   .lg\:max-w-64 {
     max-width: 16rem;
+  }
+
+  .lg\:max-w-\[50\%\] {
+    max-width: 50%;
   }
 
   .lg\:scale-110 {
@@ -3468,11 +3515,6 @@ select {
 
   .lg\:gap-2 {
     gap: 0.5rem;
-  }
-
-  .lg\:gap-x-12 {
-    -moz-column-gap: 3rem;
-         column-gap: 3rem;
   }
 
   .lg\:p-0 {

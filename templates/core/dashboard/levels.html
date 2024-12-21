@@ -162,6 +162,54 @@
                 </a>
                 {% endif %}                
             {% endfor %}
+
+            <!-- Paginations -->
+            <div class="absolute -bottom-8 lg:bottom-0 left-0 right-0 max-w-screen-xl px-4 lg:px-14 m-auto">
+                <nav class="flex items-center flex-column flex-wrap md:flex-row justify-between pt-4" aria-label="Table navigation">
+                    <span class="text-sm font-normal text-gray-500 mb-4 md:mb-0 block w-full md:inline md:w-auto">
+                        Showing 
+                        <span class="font-semibold text-primaryColor">{{ page_obj.start_index }}-{{ page_obj.end_index }}</span> 
+                        of 
+                        <span class="font-semibold text-primaryColor">{{ page_obj.paginator.count }}</span>
+                    </span>
+                        
+                    {% if is_paginated %}
+                        <ul class="inline-flex -space-x-px text-sm h-8">
+                            {% if page_obj.has_previous %}
+                                <li>
+                                    <a href="?page={{ page_obj.previous_page_number }}" class="flex items-center justify-center px-3 h-8 ms-0 leading-tight text-gray-500 bg-whiteColor border border-gray-300 rounded-s-lg hover:bg-primaryColor/5 hover:text-gray-700">Previous</a>
+                                </li>
+                            {% else %}
+                                <li>
+                                    <span class="flex items-center justify-center px-3 h-8 ms-0 leading-tight text-gray-500 bg-whiteColor border border-gray-300 rounded-s-lg cursor-not-allowed">Previous</span>
+                                </li>
+                            {% endif %}
+                    
+                            {% for num in page_obj.paginator.page_range %}
+                                {% if page_obj.number == num %}
+                                    <li>
+                                        <a href="?page={{ num }}" aria-current="page" class="flex items-center justify-center px-3 h-8 text-secondaryColor border border-gray-300 bg-secondaryColor/5 hover:bg-secondaryColor/10 hover:text-orange-600">{{ num }}</a>
+                                    </li>
+                                {% else %}
+                                    <li>
+                                        <a href="?page={{ num }}" class="flex items-center justify-center px-3 h-8 leading-tight text-gray-500 bg-whiteColor border border-gray-300 hover:bg-primaryColor/5 hover:text-gray-700">{{ num }}</a>
+                                    </li>
+                                {% endif %}
+                            {% endfor %}
+                    
+                            {% if page_obj.has_next %}
+                                <li>
+                                    <a href="?page={{ page_obj.next_page_number }}" class="flex items-center justify-center px-3 h-8 leading-tight text-gray-500 bg-whiteColor border border-gray-300 rounded-e-lg hover:bg-primaryColor/5 hover:text-gray-700">Next</a>
+                                </li>
+                            {% else %}
+                                <li>
+                                    <span class="flex items-center justify-center px-3 h-8 leading-tight text-gray-500 bg-whiteColor border border-gray-300 rounded-e-lg cursor-not-allowed">Next</span>
+                                </li>
+                            {% endif %}
+                        </ul>
+                    {% endif %}
+                </nav>
+            </div>
         </section>
         {% include "components/footer.html" with max_screen='xl' %}
     </div>
