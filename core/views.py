@@ -24,7 +24,7 @@ from reportlab.lib.units import inch
 from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer, Image
 
 from .forms import CourseForm, LecturerForm, StudentForm, TeachingRecordForm, AttendanceForm, CourseAttendanceForm, \
-    FeedbackForm
+    FeedbackForm, ClassLevelForm
 from .mixins import CommonContextMixin, ClassLevelAccessMixin
 from .models import Course, Student, Lecturer, TeachingRecord, CourseDelegate, CourseAttendance, \
     ClassLevel, Attendance, ClassLevelUser, Feedback, CourseRegistration
@@ -127,6 +127,32 @@ class DashboardDetailView(LoginRequiredMixin, CommonContextMixin, DetailView):
         context['users'] = ClassLevelUser.objects.filter(class_level=self.kwargs['level_pk'])
         return context
 
+
+class DashboardUpdateView(LoginRequiredMixin, CommonContextMixin, UpdateView):
+    model = ClassLevel
+    template_name = 'core/dashboard/dashboard_update.html'
+    context_object_name = 'form'
+    form_class = ClassLevelForm
+
+    def get_object(self, queryset=None):
+        return get_object_or_404(self.model, id=self.kwargs['level_pk'], slug=self.kwargs['level_slug'])
+
+    def get_success_url(self):
+        return reverse_lazy('core:dashboard_detail', kwargs={'level_pk': self.kwargs['level_pk'], 'level_slug': self.kwargs['level_slug']})
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['class_level'] = self.get_object()
+        return context
+
+    def form_valid(self, form):
+        form.save()
+        messages.success(self.request, 'Class info updated successfully.')
+        return super().form_valid(form)
+
+    def form_invalid(self, form):
+        messages.error(self.request, 'An error occurred while updating class info. Please try again.')
+        return super().form_invalid(form)
 
 class AttendanceDetailView(LoginRequiredMixin, CommonContextMixin, DetailView):
     model = Attendance
@@ -345,8 +371,12 @@ class AttendanceUpdateView(LoginRequiredMixin, CommonContextMixin, UpdateView):
     form_class = AttendanceForm
 
     def get_object(self, queryset=None):
-        queryset = self.get_queryset()
-        return queryset.get(id=self.kwargs['pk'], class_level=self.kwargs['level_pk'])
+        return get_object_or_404(
+            self.model,
+            class_level=self.kwargs['level_pk'],
+            class_level__slug=self.kwargs['level_slug'],
+            id=self.kwargs['pk']
+        )
 
     def get_success_url(self):
         return reverse_lazy('core:attendance_detail',
@@ -920,8 +950,7 @@ class CourseUpdateView(LoginRequiredMixin, CommonContextMixin, UpdateView):
     form_class = CourseForm
 
     def get_object(self, queryset=None):
-        queryset = self.get_queryset()
-        return queryset.get(id=self.kwargs['pk'], slug=self.kwargs['slug'])
+        return get_object_or_404(self.model, id=self.kwargs['pk'], slug=self.kwargs['slug'])
 
     def get_success_url(self):
         return reverse_lazy('core:course_detail',
@@ -1285,8 +1314,7 @@ class StudentUpdateView(LoginRequiredMixin, CommonContextMixin, UpdateView):
     form_class = StudentForm
 
     def get_object(self, queryset=None):
-        queryset = self.get_queryset()
-        return queryset.get(id=self.kwargs['pk'], slug=self.kwargs['slug'])
+        return get_object_or_404(self.model, id=self.kwargs['pk'], slug=self.kwargs['slug'])
 
     def get_success_url(self):
         return reverse_lazy('core:student_detail',
@@ -1668,8 +1696,7 @@ class LecturerUpdateView(LoginRequiredMixin, CommonContextMixin, UpdateView):
     form_class = LecturerForm
 
     def get_object(self, queryset=None):
-        queryset = self.get_queryset()
-        return queryset.get(id=self.kwargs['pk'], slug=self.kwargs['slug'])
+        return get_object_or_404(self.model, id=self.kwargs['pk'], slug=self.kwargs['slug'])
 
     def get_success_url(self):
         return reverse_lazy('core:lecturers', kwargs={'level_pk': self.kwargs['level_pk']})
@@ -1912,8 +1939,12 @@ class TeachingRecordUpdateView(LoginRequiredMixin, CommonContextMixin, UpdateVie
     form_class = TeachingRecordForm
 
     def get_object(self, queryset=None):
-        queryset = self.get_queryset()
-        return queryset.get(id=self.kwargs['pk'], attendance__course__slug=self.kwargs['slug'])
+        return get_object_or_404(
+            self.model,
+            attendance__course__class_level_id=self.kwargs['level_pk'],
+            id=self.kwargs['pk'],
+            attendance__course__slug=self.kwargs['slug']
+        )
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

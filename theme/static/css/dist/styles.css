@@ -862,6 +862,10 @@ select {
   bottom: -1.25rem;
 }
 
+.-bottom-8 {
+  bottom: -2rem;
+}
+
 .-left-2 {
   left: -0.5rem;
 }
@@ -964,14 +968,6 @@ select {
 
 .top-3 {
   top: 0.75rem;
-}
-
-.-bottom-2 {
-  bottom: -0.5rem;
-}
-
-.-bottom-8 {
-  bottom: -2rem;
 }
 
 .z-0 {
@@ -1365,6 +1361,10 @@ select {
   width: 2.5rem;
 }
 
+.w-11\/12 {
+  width: 91.666667%;
+}
+
 .w-2\/3 {
   width: 66.666667%;
 }
@@ -1387,10 +1387,6 @@ select {
 
 .w-3\/4 {
   width: 75%;
-}
-
-.w-3\/5 {
-  width: 60%;
 }
 
 .w-4 {
@@ -1434,18 +1430,6 @@ select {
   width: 100vw;
 }
 
-.w-4\/5 {
-  width: 80%;
-}
-
-.w-5\/6 {
-  width: 83.333333%;
-}
-
-.w-11\/12 {
-  width: 91.666667%;
-}
-
 .min-w-10 {
   min-width: 2.5rem;
 }
@@ -1486,10 +1470,6 @@ select {
   max-width: 40px;
 }
 
-.max-w-\[50\%\] {
-  max-width: 50%;
-}
-
 .max-w-full {
   max-width: 100%;
 }
@@ -1502,6 +1482,10 @@ select {
   max-width: 1024px;
 }
 
+.max-w-screen-sm {
+  max-width: 640px;
+}
+
 .max-w-screen-xl {
   max-width: 1280px;
 }
@@ -1512,10 +1496,6 @@ select {
 
 .max-w-xs {
   max-width: 20rem;
-}
-
-.max-w-screen-sm {
-  max-width: 640px;
 }
 
 .flex-1 {
@@ -1617,16 +1597,16 @@ select {
   transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
 }
 
+.cursor-default {
+  cursor: default;
+}
+
 .cursor-not-allowed {
   cursor: not-allowed;
 }
 
 .cursor-pointer {
   cursor: pointer;
-}
-
-.cursor-default {
-  cursor: default;
 }
 
 .touch-none {
@@ -2147,11 +2127,6 @@ select {
   background-color: rgb(255 236 213 / var(--tw-bg-opacity));
 }
 
-.bg-red-200 {
-  --tw-bg-opacity: 1;
-  background-color: rgb(254 202 202 / var(--tw-bg-opacity));
-}
-
 .bg-opacity-10 {
   --tw-bg-opacity: 0.1;
 }
@@ -2358,21 +2333,6 @@ select {
 .py-6 {
   padding-top: 1.5rem;
   padding-bottom: 1.5rem;
-}
-
-.px-10 {
-  padding-left: 2.5rem;
-  padding-right: 2.5rem;
-}
-
-.px-16 {
-  padding-left: 4rem;
-  padding-right: 4rem;
-}
-
-.px-14 {
-  padding-left: 3.5rem;
-  padding-right: 3.5rem;
 }
 
 .pb-4 {
@@ -3477,12 +3437,12 @@ select {
     width: 40%;
   }
 
-  .lg\:w-auto {
-    width: auto;
-  }
-
   .lg\:w-3\/5 {
     width: 60%;
+  }
+
+  .lg\:w-auto {
+    width: auto;
   }
 
   .lg\:max-w-64 {

@@ -1,0 +1,178 @@
+{% extends 'core/base_app.html' %}
+{% load static %}
+{% load tailwind_tags %}
+{% load custom_date_formatter duration_formatter %}
+
+{# Title of the page #}
+{% block title %} Update for {{ class_level }} {% endblock %}
+
+{% block extra_styles %}
+    <style>
+        #lect_img {
+            background: linear-gradient(170deg, rgba(0, 0, 0, 0.9) 25%, rgba(0, 0, 0, 0.1) 75%), url("{% static 'core/images/class_level.jpg' %}");
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+    </style>
+{% endblock extra_styles %}
+
+{# Header of the page #}
+{% block header %}
+    {% include "components/header_app.html" %}
+{% endblock header %}
+
+{# Body of the page #}
+{% block body %}
+    <div class="relative p-4 md:ml-64">
+        <div class="flex flex-col gap-4 items-start justify-center w-full mt-14">
+            <div class="grid grid-cols-12 items-center justify-center gap-2">
+                <div class="col-start-1 lg:col-start-2 col-span-full lg:col-span-5 flex flex-col gap-4">
+                    <div class="flex flex-col gap-2">
+                        <h2 class="text-2xl">
+                            You're updating info about
+                            <span class="block text-primaryColor">{{ class_level }}</span>
+                        </h2>
+                        <small class="w-max px-2.5 rounded-xl bg-darkColor/5">
+                            <span class="text-gray-500">Last update:</span>
+                            {{ class_level.updated_at|format_date }}
+                        </small>
+                        <p class="text-sm">
+                            Keep track of your course activity by adding them to the platform on a weekly basis as they
+                            are being taught in class.
+                        </p>
+                    </div>
+
+                    <form action="" method="post" class="max-w-lg w-full">
+                        {% csrf_token %}
+
+                        <!-- Display non fields errors -->
+                        {% if form.non_field_errors %}
+                            <small class="text-sm text-danger bg-danger/10 rounded-xl px-2 py-1">
+                                {% for error in form.non_field_errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </small>
+                        {% endif %}
+
+                        <div class="flex flex-col gap-2">
+                            {# About field #}
+                            <div class="">
+                                <label for="{{ form.about.label }}"
+                                       class="ps-4 text-xs text-gray-500"> {{ form.about.label }} </label>
+                                <div class="relative">
+                                    <div class="absolute top-3 start-0 flex items-center ps-2.5 pointer-events-none">
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none">
+                                            <path d="M3 3H21" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                                            <path d="M3 15H9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                                            <path d="M3 21H9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                                            <path d="M3 9H16.5C18.9853 9 21 11.0147 21 13.5C21 15.9853 18.9853 18 16.5 18H12M12 18C12 17.1597 14.3932 15.5898 15 15M12 18C12 18.8403 14.3932 20.4102 15 21" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                                        </svg>
+                                    </div>
+                                    {{ form.about }}
+                                </div>
+
+                                {% if form.about.errors %}
+                                    <small class="text-sm text-danger">
+                                        {% for error in form.about.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </small>
+                                {% endif %}
+                            </div>
+
+                            {# Main hall field #}
+                            <div class="">
+                                <label for="{{ form.main_hall.label }}"
+                                       class="ps-4 text-xs text-gray-500"> {{ form.main_hall.label }} </label>
+                                <div class="relative">
+                                    <div class="absolute inset-y-0 start-0 flex items-center ps-2.5 pointer-events-none">
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none">
+                                            <path d="M16 10L18.1494 10.6448C19.5226 11.0568 20.2092 11.2628 20.6046 11.7942C21 12.3256 21 13.0425 21 14.4761V22" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" />
+                                            <path d="M8 9L11 9M8 13L11 13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                                            <path d="M12 22V19C12 18.0572 12 17.5858 11.7071 17.2929C11.4142 17 10.9428 17 10 17H9C8.05719 17 7.58579 17 7.29289 17.2929C7 17.5858 7 18.0572 7 19V22" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" />
+                                            <path d="M2 22L22 22" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+                                            <path d="M3 22V6.71724C3 4.20649 3 2.95111 3.79118 2.32824C4.58237 1.70537 5.74742 2.04355 8.07752 2.7199L13.0775 4.17122C14.4836 4.57937 15.1867 4.78344 15.5933 5.33965C16 5.89587 16 6.65344 16 8.16857V22" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                                        </svg>
+                                    </div>
+                                    {{ form.main_hall }}
+                                </div>
+                                <small class="ps-4 text-gray-400 text-xs">
+                                    {{ form.main_hall.help_text }}
+                                </small>
+
+                                {% if form.main_hall.errors %}
+                                    <small class="text-sm text-danger">
+                                        {% for error in form.main_hall.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </small>
+                                {% endif %}
+                            </div>
+
+                            {# Secondary hall field #}
+                            <div class="">
+                                <label for="{{ form.secondary_hall.label }}"
+                                       class="ps-4 text-xs text-gray-500"> {{ form.secondary_hall.label }} </label>
+                                <div class="relative">
+                                    <div class="absolute inset-y-0 start-0 flex items-center ps-2.5 pointer-events-none">
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none">
+                                            <path d="M15 2H9C5.69067 2 5 2.69067 5 6V22H19V6C19 2.69067 18.3093 2 15 2Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" />
+                                            <path d="M3 22H21" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                                            <path d="M15 22V19C15 17.3453 14.6547 17 13 17H11C9.34533 17 9 17.3453 9 19V22" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" />
+                                            <path d="M13.5 6H10.5M13.5 9.5H10.5M13.5 13H10.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+                                        </svg>
+                                    </div>
+                                    {{ form.secondary_hall }}
+                                </div>
+
+                                {% if form.secondary_hall.errors %}
+                                    <small class="text-sm text-danger">
+                                        {% for error in form.secondary_hall.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </small>
+                                {% endif %}
+                            </div>
+
+                            {# Submit button #}
+                            <div class="text-whiteColor">
+                                <button type="submit"
+                                        class="block mb-2 focus:outline-none rounded-2xl w-full px-5 py-2 text-center bg-primaryColor hover:bg-blue-950 focus:ring-2 focus:ring-secondaryColor focus:ring-offset-1 transition-all duration-300 ease-in-out">
+                                    Update class info
+                                </button>
+                                <small class="text-gray-500 text-xs">
+                                    This class accounts for {{ class_level.semester }} {{ class_level.year }}
+                                </small>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+
+                <div id="lect_img" class="relative lg:col-start-8 col-span-full lg:col-span-4 h-80 lg:h-screen">
+                    <blockquote
+                            class="flex flex-col gap-2 text-[16px] leading-tight text-whiteColor p-4 text-left max-w-64">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none"
+                             class="text-secondaryColor">
+                            <path d="M5.07579 17C4.08939 4.54502 12.9123 1.0121 19.9734 2.22417C20.2585 6.35185 18.2389 7.89748 14.3926 8.61125C15.1353 9.38731 16.4477 10.3639 16.3061 11.5847C16.2054 12.4534 15.6154 12.8797 14.4355 13.7322C11.8497 15.6004 8.85421 16.7785 5.07579 17Z"
+                                  stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
+                                  stroke-linejoin="round"/>
+                            <path d="M4 22C4 15.5 7.84848 12.1818 10.5 10" stroke="currentColor" stroke-width="1.5"
+                                  stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        University: where you spend four years pretending you're not just waiting for the diploma so you can finally start Googling 'how to adult.'
+                        <cite class="block font-semibold mt-2 text-secondaryColor">ChatGPT</cite>
+                    </blockquote>
+                    <img src="{% static 'core/images/logo-shapes.svg' %}" alt="Attendy shapes"
+                         class="w-20 absolute bottom-3 right-3">
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+{% endblock body %}
+
+{# Additional javascript #}
+{% block javascript %}
+{% endblock javascript %}

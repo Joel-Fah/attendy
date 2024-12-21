@@ -43,6 +43,62 @@ class UserLoginForm(LoginForm):
         self.fields['password'].required = True
 
 
+class ClassLevelForm(forms.ModelForm):
+    class Meta:
+        model = ClassLevel
+        fields = [
+            'about',
+            'main_hall',
+            'secondary_hall'
+        ]
+
+    about = forms.CharField(
+        widget=forms.Textarea(
+            attrs={
+                'id': 'about',
+                'name': 'about',
+                'placeholder': 'A brief description about your class/level.',
+                'class': 'rounded-2xl block w-full ps-10 p-2.5 bg-whiteColor border-darkColor placeholder-darkColor/50 '
+                         'focus:ring-primaryColor focus:border-primaryColor transition-all duration-300 ease-in-out',
+            }
+        ),
+        label='About',
+        help_text='Enter a brief description about your class/level.',
+        required=False,
+    )
+
+    main_hall = forms.CharField(
+        widget=forms.TextInput(
+            attrs={
+                'id': 'main_hall',
+                'name': 'main_hall',
+                'placeholder': 'Main hall',
+                'class': 'rounded-2xl block w-full ps-10 p-2.5 bg-whiteColor border-darkColor placeholder-darkColor/50 '
+                         'focus:ring-primaryColor focus:border-primaryColor transition-all duration-300 ease-in-out',
+            }
+        ),
+        label='Main hall',
+        help_text='Enter the main hall for the class level. Enter "Online" if you hold your class instead online',
+        error_messages={'required': 'Please enter the main hall for the class level'},
+        required=True,
+    )
+
+    secondary_hall = forms.CharField(
+        widget=forms.TextInput(
+            attrs={
+                'id': 'secondary_hall',
+                'name': 'secondary_hall',
+                'placeholder': 'Secondary hall',
+                'class': 'rounded-2xl block w-full ps-10 p-2.5 bg-whiteColor border-darkColor placeholder-darkColor/50 '
+                         'focus:ring-primaryColor focus:border-primaryColor transition-all duration-300 ease-in-out',
+            }
+        ),
+        label='Secondary hall',
+        help_text='Enter the secondary hall for the class level.',
+        required=False,
+    )
+
+
 class CourseForm(forms.ModelForm):
     class Meta:
         model = Course
